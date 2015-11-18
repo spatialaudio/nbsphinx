@@ -3,9 +3,10 @@ Main Page
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
    helloworld
-   subdir/another
+   subdir/*
    rst
    matplotlib
    sympy
