@@ -1,0 +1,10 @@
+Jinja2
+Pygments
+Sphinx
+
+docutils
+nbconvert
+nbformat
+
+NumPy
+matplotlib
