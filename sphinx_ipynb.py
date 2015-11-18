@@ -11,7 +11,13 @@ class NotebookParser(docutils.parsers.rst.Parser):
     def parse(self, inputstring, document):
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
 
-        # TODO: check if outputs are available and execute notebook if not
+        resources = {}
+
+        # Execute notebook only if there are no outputs:
+        if not any(c.outputs for c in nb.cells if 'outputs' in c):
+            pp = nbconvert.preprocessors.ExecutePreprocessor()
+            nb, resources = pp.preprocess(nb, resources)
+
         # TODO: save a copy of the notebook with and without outputs
         #       (see "source" of document)
 
