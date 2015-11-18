@@ -8,3 +8,4 @@ nbformat
 
 NumPy
 matplotlib
+SymPy
