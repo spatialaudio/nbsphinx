@@ -19,7 +19,7 @@ class NotebookParser(docutils.parsers.rst.Parser):
             nb, resources = pp.preprocess(nb, resources)
 
         # TODO: save a copy of the notebook with and without outputs
-        #       (see "source" of document)
+        #       (see document.get('source'))
 
         exporter = nbconvert.RSTExporter()
         rststring, resources = exporter.from_notebook_node(nb)
