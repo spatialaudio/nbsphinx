@@ -26,3 +26,5 @@ https://github.com/ipython/nbconvert/pull/35
 https://github.com/matthew-brett/brole
 
 https://github.com/perrette/dimarray/blob/master/docs/scripts/nbconvert_to_rst.py
+
+https://github.com/matthew-brett/nb2plots
