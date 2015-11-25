@@ -22,6 +22,6 @@ class NotebookParser(docutils.parsers.rst.Parser):
         #       (see document.get('source'))
 
         exporter = nbconvert.RSTExporter()
-        rststring, resources = exporter.from_notebook_node(nb)
+        rststring, resources = exporter.from_notebook_node(nb, resources)
 
         docutils.parsers.rst.Parser.parse(self, rststring, document)

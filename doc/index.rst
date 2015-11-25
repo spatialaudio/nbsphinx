@@ -5,7 +5,7 @@ Main Page
    :maxdepth: 2
    :glob:
 
-   helloworld
+   example
    subdir/*
    rst
    matplotlib
