@@ -6,6 +6,7 @@ Main Page
    :glob:
 
    example
+   pre-executed
    subdir/*
    rst
    matplotlib
