@@ -25,6 +25,7 @@ import docutils
 import nbconvert
 import nbformat
 import os
+import sphinx
 
 _ipynbversion = 4
 
@@ -33,22 +34,32 @@ class NotebookParser(docutils.parsers.rst.Parser):
 
     def parse(self, inputstring, document):
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
-
-        env = document.settings.env
-
         resources = {}
+        env = document.settings.env
+        srcdir = os.path.dirname(env.doc2path(env.docname))
+        auxdir = os.path.join(env.doctreedir, 'nbsphinx')
+        sphinx.util.ensuredir(auxdir)
 
         # Execute notebook only if there are no outputs:
         if not any(c.outputs for c in nb.cells if 'outputs' in c):
-            dirname = os.path.dirname(env.doc2path(env.docname))
-            resources.setdefault('metadata', {})['path'] = dirname
+            resources.setdefault('metadata', {})['path'] = srcdir
             pp = nbconvert.preprocessors.ExecutePreprocessor()
             nb, resources = pp.preprocess(nb, resources)
 
         # TODO: save a copy of the notebook with and without outputs
-        #       (see document.get('source'))
+
+        # Sphinx doesn't accept absolute paths in images etc.
+        resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
+        resources['unique_key'] = env.docname.replace(os.sep, '_')
 
         exporter = nbconvert.RSTExporter()
         rststring, resources = exporter.from_notebook_node(nb, resources)
+
+        # Create additional output files (figures etc.),
+        # see nbconvert.writers.FilesWriter.write()
+        for filename, data in resources.get('outputs', {}).items():
+            dest = os.path.normpath(os.path.join(srcdir, filename))
+            with open(dest, 'wb') as f:
+                f.write(data)
 
         docutils.parsers.rst.Parser.parse(self, rststring, document)

@@ -14,6 +14,7 @@ setup(
         'docutils',
         'nbconvert',
         'nbformat',
+        'sphinx',
     ],
     author='Matthias Geier',
     author_email='Matthias.Geier@gmail.com',
