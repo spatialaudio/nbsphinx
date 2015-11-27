@@ -28,3 +28,11 @@ https://github.com/matthew-brett/brole
 https://github.com/perrette/dimarray/blob/master/docs/scripts/nbconvert_to_rst.py
 
 https://github.com/matthew-brett/nb2plots
+
+https://github.com/getpelican/pelican-plugins/blob/master/liquid_tags/notebook.py
+
+https://github.com/jupyter/nbconvert/issues/47
+
+http://hplgit.github.io/doconce/doc/web/index.html
+
+http://sphinx-doc.org/extdev/
