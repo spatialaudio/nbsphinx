@@ -24,6 +24,7 @@ __version__ = '0.0.0'
 import docutils
 import nbconvert
 import nbformat
+import os
 
 _ipynbversion = 4
 
@@ -33,10 +34,14 @@ class NotebookParser(docutils.parsers.rst.Parser):
     def parse(self, inputstring, document):
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
 
+        env = document.settings.env
+
         resources = {}
 
         # Execute notebook only if there are no outputs:
         if not any(c.outputs for c in nb.cells if 'outputs' in c):
+            dirname = os.path.dirname(env.doc2path(env.docname))
+            resources.setdefault('metadata', {})['path'] = dirname
             pp = nbconvert.preprocessors.ExecutePreprocessor()
             nb, resources = pp.preprocess(nb, resources)
 
