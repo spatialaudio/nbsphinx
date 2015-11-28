@@ -2,12 +2,10 @@ Main Page
 =========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :glob:
 
    example
    pre-executed
    subdir/*
    rst
-   matplotlib
-   sympy

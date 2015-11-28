@@ -1,11 +1,4 @@
-Jinja2
-Pygments
-Sphinx
-
+sphinx
 docutils
 nbconvert
 nbformat
-
-NumPy
-matplotlib
-SymPy
