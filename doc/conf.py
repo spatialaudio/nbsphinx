@@ -11,9 +11,6 @@ from subprocess import check_output
 # Add path to nbsphinx.py (if you didn't install it with pip):
 sys.path.insert(0, os.path.abspath('..'))
 
-# If you copied the file to the current directory, use this instead:
-#sys.path.insert(0, os.path.abspath('.'))
-
 # Select nbsphinx and, if needed, add a math extension (mathjax or pngmath):
 extensions = [
     'nbsphinx',
@@ -26,6 +23,7 @@ project = 'Jupyter Notebook Tools for Sphinx'
 author = 'Matthias Geier'
 copyright = '2015, ' + author
 
+# Get version information from Git:
 try:
     release = check_output(['git', 'describe', '--tags', '--always'])
     release = release.decode().strip()
@@ -42,9 +40,9 @@ html_title = project + ' version ' + release
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-'papersize': 'a4paper',
+    'papersize': 'a4paper',
 }
 
 latex_documents = [
-  (master_doc, 'nbsphinx.tex', project, author, 'howto'),
+    (master_doc, 'nbsphinx.tex', project, author, 'howto'),
 ]
