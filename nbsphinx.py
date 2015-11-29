@@ -55,6 +55,9 @@ class NotebookParser(docutils.parsers.rst.Parser):
         exporter = nbconvert.RSTExporter()
         rststring, resources = exporter.from_notebook_node(nb, resources)
 
+        if nb.metadata.get('nbsphinx', {}).get('orphan', False):
+            rststring = ':orphan:\n' + rststring
+
         # Create additional output files (figures etc.),
         # see nbconvert.writers.FilesWriter.write()
         for filename, data in resources.get('outputs', {}).items():

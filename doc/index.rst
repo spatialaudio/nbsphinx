@@ -11,3 +11,5 @@ Example Pages
    pre-executed
    subdir/*
    rst
+
+There is also :doc:`orphan`, just for the sake of it.
