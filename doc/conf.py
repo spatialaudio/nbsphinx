@@ -6,6 +6,7 @@
 
 import sys
 import os
+from subprocess import check_output
 
 # Add path to nbsphinx.py (if you didn't install it with pip):
 sys.path.insert(0, os.path.abspath('..'))
@@ -30,8 +31,11 @@ project = 'Jupyter Notebook Tools for Sphinx'
 author = 'Matthias Geier'
 copyright = '2015, ' + author
 
-version = '0.0'
-release = '0.0'
+try:
+    release = check_output(['git', 'describe', '--tags', '--always'])
+    release = release.decode().strip()
+except Exception:
+    release = '<unknown>'
 
 # Exclude Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
