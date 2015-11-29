@@ -2,3 +2,4 @@ sphinx
 docutils
 nbconvert
 nbformat
+ipykernel
