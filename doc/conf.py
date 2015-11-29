@@ -14,16 +14,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # If you copied the file to the current directory, use this instead:
 #sys.path.insert(0, os.path.abspath('.'))
 
-from nbsphinx import NotebookParser
-
-# If needed, select a math extensions (mathjax or pngmath):
+# Select nbsphinx and, if needed, add a math extension (mathjax or pngmath):
 extensions = [
+    'nbsphinx',
     'sphinx.ext.mathjax',
 ]
-
-# This allows Jupyter notebooks as sources (besides reStructuredText):
-source_suffix = ['.rst', '.ipynb']
-source_parsers = {'ipynb': NotebookParser}
 
 master_doc = 'index'
 

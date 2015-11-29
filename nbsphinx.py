@@ -70,3 +70,11 @@ class NotebookParser(docutils.parsers.rst.Parser):
                 f.write(data)
 
         docutils.parsers.rst.Parser.parse(self, rststring, document)
+
+
+def setup(app):
+    """Initialize Sphinx extension."""
+    app.config.source_suffix.append('.ipynb')
+    if 'ipynb' not in app.config.source_parsers:
+        app.config.source_parsers['ipynb'] = NotebookParser
+    return {'version': __version__}
