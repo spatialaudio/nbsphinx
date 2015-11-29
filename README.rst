@@ -36,3 +36,5 @@ https://github.com/jupyter/nbconvert/issues/47
 http://hplgit.github.io/doconce/doc/web/index.html
 
 http://sphinx-doc.org/extdev/
+
+https://github.com/sphinx-doc/sphinx/issues/1907
