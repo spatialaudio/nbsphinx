@@ -1,5 +1,7 @@
-Main Page
-=========
+.. include:: ../README.rst
+
+Example Pages
+-------------
 
 .. toctree::
    :maxdepth: 3
