@@ -4,6 +4,12 @@ Jupyter Notebook Tools for Sphinx
 For now, this is just a test to see if ``*.ipynb`` files can be used as Sphinx
 sources using ``source_parsers``.
 
+Documentation:
+   http://nbsphinx.rtfd.org/
+
+Code:
+   http://github.com/mgeier/nbsphinx/
+
 Links
 -----
 

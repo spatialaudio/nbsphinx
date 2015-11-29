@@ -22,7 +22,7 @@ setup(
     long_description=open('README.rst').read(),
     license='MIT',
     keywords='Sphinx Jupyter notebook'.split(),
-    url='n/a',
+    url='http://nbsphinx.rtfd.org/',
     platforms='any',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

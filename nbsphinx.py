@@ -18,7 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-"""Sphinx source parser for ipynb files."""
+"""Sphinx source parser for ipynb files.
+
+http://nbsphinx.rtfd.org/
+
+"""
 __version__ = '0.0.0'
 
 import docutils
