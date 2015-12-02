@@ -12,4 +12,6 @@ Example Pages
    subdir/*
    rst
 
-There is also :doc:`orphan`, just for the sake of it.
+.. only:: html
+
+   There is also :doc:`orphan`, just for the sake of it.
