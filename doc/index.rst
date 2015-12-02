@@ -4,14 +4,14 @@ Example Pages
 -------------
 
 .. toctree::
-   :maxdepth: 3
-   :glob:
+    :maxdepth: 3
+    :glob:
 
-   example
-   pre-executed
-   subdir/*
-   rst
+    example
+    pre-executed
+    subdir/*
+    rst
 
 .. only:: html
 
-   There is also :doc:`orphan`, just for the sake of it.
+    There is also :doc:`orphan`, just for the sake of it.
