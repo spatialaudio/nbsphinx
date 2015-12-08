@@ -26,13 +26,34 @@ http://nbsphinx.rtfd.org/
 __version__ = '0.1.0'
 
 import docutils
-from docutils.parsers.rst.directives import positive_int
+from docutils.parsers.rst.directives import positive_int, nonnegative_int
+import jinja2
 import nbconvert
 import nbformat
 import os
 import sphinx
 
 _ipynbversion = 4
+
+RST_TEMPLATE = """
+{%- extends 'rst.tpl' -%}
+
+{% block input -%}
+.. nbinput:: {% if nb.metadata.language_info.pygments_lexer -%}
+{{ nb.metadata.language_info.pygments_lexer }}
+{%- endif %}
+{%- set before, after = resources.get_empty_lines(cell.source) %}
+    :empty-lines-before: {{ before }}
+    :empty-lines-after: {{ after }}
+{%- if cell.execution_count %}
+    :execution-count: {{ cell.execution_count }}
+{%- endif %}
+{%- if cell.source.strip() %}
+
+{{ cell.source.strip('\n') | indent }}
+{%- endif %}
+{% endblock input %}
+"""
 
 
 class NotebookParser(docutils.parsers.rst.Parser):
@@ -59,7 +80,25 @@ class NotebookParser(docutils.parsers.rst.Parser):
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace(os.sep, '_')
 
-        exporter = nbconvert.RSTExporter()
+        def get_empty_lines(s):
+            before = 0
+            lines = s.split('\n')
+            for line in lines:
+                if line.strip():
+                    break
+                before += 1
+            after = 0
+            for line in reversed(lines[before:]):
+                if line.strip():
+                    break
+                after += 1
+            return before, after
+
+        resources['get_empty_lines'] = get_empty_lines
+
+        loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
+        exporter = nbconvert.RSTExporter(template_file='nbsphinx-rst',
+                                         extra_loaders=[loader])
         rststring, resources = exporter.from_notebook_node(nb, resources)
 
         if nb.metadata.get('nbsphinx', {}).get('orphan', False):
@@ -123,8 +162,8 @@ class NbInput(docutils.parsers.rst.Directive):
     final_argument_whitespace = False
     option_spec = {
         'execution-count': positive_int,
-        'empty-lines-before': positive_int,
-        'empty-lines-after': positive_int,
+        'empty-lines-before': nonnegative_int,
+        'empty-lines-after': nonnegative_int,
     }
     has_content = True
 
@@ -146,7 +185,7 @@ class NbInput(docutils.parsers.rst.Directive):
         node = CodeNode.create(
             text, language=self.arguments[0] if self.arguments else 'none')
         for attr in 'empty-lines-before', 'empty-lines-after':
-            value = self.options.get(attr)
+            value = self.options.get(attr, 0)
             if value:
                 node.attributes[attr] = value
         container += node
