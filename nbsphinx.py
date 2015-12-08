@@ -153,10 +153,6 @@ class NbInput(docutils.parsers.rst.Directive):
 
         container += LATEX_AFTER
 
-        if execution_count:
-            # Every input cell becomes a link target, just because we can.
-            container['names'].append('cell-{}'.format(execution_count))
-            self.state.document.note_explicit_target(container, container)
         return [container]
 
 
