@@ -26,7 +26,7 @@ http://nbsphinx.rtfd.org/
 __version__ = '0.1.0'
 
 import docutils
-from docutils.parsers.rst.directives import positive_int, nonnegative_int
+from docutils.parsers import rst
 import jinja2
 import nbconvert
 import nbformat
@@ -36,27 +36,102 @@ import sphinx
 _ipynbversion = 4
 
 RST_TEMPLATE = """
-{%- extends 'rst.tpl' -%}
+{% extends 'rst.tpl' %}
+
+
+{% macro insert_empty_lines(text) %}
+{%- set before, after = resources.get_empty_lines(text) %}
+{%- if before %}
+    :empty-lines-before: {{ before }}
+{%- endif %}
+{%- if after %}
+    :empty-lines-after: {{ after }}
+{%- endif %}
+{%- endmacro %}
+
 
 {% block input -%}
 .. nbinput:: {% if nb.metadata.language_info.pygments_lexer -%}
 {{ nb.metadata.language_info.pygments_lexer }}
-{%- endif %}
-{%- set before, after = resources.get_empty_lines(cell.source) %}
-    :empty-lines-before: {{ before }}
-    :empty-lines-after: {{ after }}
+{%- endif -%}
+{{ insert_empty_lines(cell.source) }}
 {%- if cell.execution_count %}
     :execution-count: {{ cell.execution_count }}
+{%- endif %}
+{%- if not cell.outputs %}
+    :no-output:
 {%- endif %}
 {%- if cell.source.strip() %}
 
 {{ cell.source.strip('\n') | indent }}
 {%- endif %}
 {% endblock input %}
+
+
+{% block execute_result -%}
+{%- if output.output_type == 'stream' %}
+    {%- set datatype = 'text/plain' %}
+    {%- set outputdata = output.text[:-1] %}{# trailing \n is stripped #}
+{%- elif output.output_type == 'error' %}
+    {%- set datatype = 'ansi' %}
+    {%- set outputdata = '\n'.join(output.traceback) %}
+{%- else %}
+    {%- set datatype = (output.data | filter_data_type)[0] %}
+    {%- set outputdata = output.data[datatype] %}
+{%- endif %}
+.. nboutput::
+{%- if datatype == 'text/plain' %}{# nothing #}
+{%- elif datatype == 'ansi' %} ansi
+{%- else %} rst
+{%- endif %}
+{%- if output.output_type == 'execute_result' and cell.execution_count %}
+    :execution-count: {{ cell.execution_count }}
+{%- endif %}
+{%- if output != cell.outputs[-1] %}
+    :more-to-come:
+{%- endif %}
+{%- if output.name == 'stderr' %}
+    :class: output_stderr
+{%- endif %}
+{%- if datatype == 'text/plain' -%}
+{{ insert_empty_lines(outputdata) }}
+
+{{ outputdata.strip(\n) | indent }}
+{%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg'] %}
+
+    .. image:: {{ output.metadata.filenames[datatype] | urlencode }}
+{%- elif datatype in ['text/markdown'] %}
+
+{{ output.data['text/markdown'] | markdown2rst | indent }}
+{%- elif datatype in ['text/latex'] %}
+
+    .. math::
+
+{{ output.data['text/latex'] | strip_dollars | indent | indent }}
+{%- elif datatype == 'text/html' %}
+
+    .. raw:: html
+
+{{ output.data['text/html'] | indent | indent }}
+{%- elif datatype == 'ansi' -%}
+{{ insert_empty_lines(outputdata) }}
+
+{{ outputdata.strip(\n) | indent }}
+{%- else %}
+
+    WARNING! Data type not implemented: {{ datatype }}
+{%- endif %}
+{% endblock execute_result %}
+
+
+{% block display_data %}{{ self.execute_result() }}{% endblock display_data %}
+{% block stream %}{{ self.execute_result() }}{% endblock stream %}
+{% block error %}{{ self.execute_result() }}{% endblock error %}
+
 """
 
 
-class NotebookParser(docutils.parsers.rst.Parser):
+class NotebookParser(rst.Parser):
 
     def parse(self, inputstring, document):
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
@@ -111,7 +186,7 @@ class NotebookParser(docutils.parsers.rst.Parser):
             with open(dest, 'wb') as f:
                 f.write(data)
 
-        docutils.parsers.rst.Parser.parse(self, rststring, document)
+        rst.Parser.parse(self, rststring, document)
 
 
 def raw_latex(lines):
@@ -121,13 +196,12 @@ def raw_latex(lines):
 LATEX_BEFORE = raw_latex([
     r'',
     r'\noindent',
-    r'\begin{minipage}[t]{13ex}',
+    r'\begin{minipage}[t]{12ex}',
 ])
 
 LATEX_BETWEEN = raw_latex([
     r'\end{minipage}',
-    r'\hspace{.5ex}',
-    r'\begin{minipage}[t]{\linewidth}  % too wide, but who cares?',
+    r'\begin{minipage}[t]{\linewidth}',  # too wide, but who cares?
 ])
 
 LATEX_AFTER = raw_latex([
@@ -139,8 +213,9 @@ LATEX_AFTER = raw_latex([
 class CodeNode(docutils.nodes.Element):
 
     @classmethod
-    def create(cls, text, language='none'):
-        node = docutils.nodes.literal_block(text, text, language=language)
+    def create(cls, text, language='none', classes=[]):
+        node = docutils.nodes.literal_block(text, text, language=language,
+                                            classes=classes)
         return cls(text, node)
 
 
@@ -154,23 +229,27 @@ class PromptNode(docutils.nodes.Element):
 
 # See http://docutils.sourceforge.net/docs/howto/rst-directives.html
 
-class NbInput(docutils.parsers.rst.Directive):
+class NbInput(rst.Directive):
     """A notebook input cell with prompt and code area."""
 
     required_arguments = 0
     optional_arguments = 1  # lexer name
     final_argument_whitespace = False
     option_spec = {
-        'execution-count': positive_int,
-        'empty-lines-before': nonnegative_int,
-        'empty-lines-after': nonnegative_int,
+        'execution-count': rst.directives.positive_int,
+        'empty-lines-before': rst.directives.nonnegative_int,
+        'empty-lines-after': rst.directives.nonnegative_int,
+        'no-output': rst.directives.flag,
     }
     has_content = True
 
     def run(self):
         """This is called by the reST parser."""
         execution_count = self.options.get('execution-count')
-        container = docutils.nodes.container(classes=['nbinput'])
+        classes = ['nbinput']
+        if 'no-output' in self.options:
+            classes.append('nblast')
+        container = docutils.nodes.container(classes=classes)
 
         container += LATEX_BEFORE
 
@@ -184,15 +263,73 @@ class NbInput(docutils.parsers.rst.Directive):
         text = '\n'.join(self.content.data)
         node = CodeNode.create(
             text, language=self.arguments[0] if self.arguments else 'none')
-        for attr in 'empty-lines-before', 'empty-lines-after':
-            value = self.options.get(attr, 0)
-            if value:
-                node.attributes[attr] = value
+        _set_emtpy_lines(node, self.options)
         container += node
 
         container += LATEX_AFTER
 
         return [container]
+
+
+class NbOutput(rst.Directive):
+    """A notebook output cell with optional prompt."""
+
+    required_arguments = 0
+    optional_arguments = 1
+    final_argument_whitespace = False
+    option_spec = {
+        'execution-count': rst.directives.positive_int,
+        'more-to-come': rst.directives.flag,
+        'empty-lines-before': rst.directives.nonnegative_int,
+        'empty-lines-after': rst.directives.nonnegative_int,
+        'class': rst.directives.unchanged,
+    }
+    has_content = True
+
+    def run(self):
+        """This is called by the reST parser."""
+        outputtype = self.arguments[0] if self.arguments else ''
+        execution_count = self.options.get('execution-count')
+        classes = ['nboutput']
+        if 'more-to-come' not in self.options:
+            classes.append('nblast')
+        container = docutils.nodes.container(classes=classes)
+
+        # Optional output prompt
+        if execution_count:
+            container += LATEX_BEFORE
+            text = 'Out[{}]:'.format(execution_count)
+            container += PromptNode.create(text)
+            container += LATEX_BETWEEN
+        else:
+            container += rst.nodes.container()  # empty container for HTML
+
+        if outputtype == 'rst':
+            self.state.nested_parse(self.content, self.content_offset,
+                                    container)
+        elif outputtype == 'ansi':
+            # TODO: ansi2html (inside <pre> without escaping!), ansi2latex
+            container += CodeNode.create('TODO!')
+        else:
+            text = '\n'.join(self.content.data)
+            classes = []
+            if 'class' in self.options:
+                classes.append(self.options['class'])
+            node = CodeNode.create(text, classes=classes)
+            _set_emtpy_lines(node, self.options)
+            container += node
+
+        if execution_count:
+            container += LATEX_AFTER
+
+        return [container]
+
+
+def _set_emtpy_lines(node, options):
+    for attr in 'empty-lines-before', 'empty-lines-after':
+        value = options.get(attr, 0)
+        if value:
+            node.attributes[attr] = value
 
 
 def builder_inited(app):
@@ -210,20 +347,32 @@ CSS_STRING = """
 
 /* remove conflicting styling from Sphinx themes */
 .nbinput div,
-.nbinput div pre {
+.nbinput div pre,
+.nboutput div,
+.nboutput div pre {
     background: none;
     border: none;
     padding: 0 0;
     margin: 0;
 }
 
-/* main input container */
-.nbinput {
+/* input/output containers */
+.nbinput,
+.nboutput {
     display: -webkit-flex;
     display: flex;
     align-items: baseline;
-    padding: 5px 0;
     margin: 0;
+}
+
+/* input container */
+.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+.nblast {
+    padding-bottom: 5px;
 }
 
 /* input prompt */
@@ -245,14 +394,24 @@ CSS_STRING = """
     text-align: right;
 }
 
+/* input/output area */
+.nbinput > :nth-child(2),
+.nboutput > :nth-child(2) {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
 /* input area */
 .nbinput > :nth-child(2) {
     border: 1px solid #cfcfcf;
     border-radius: 2px;
-    padding: 0.4em;
     background: #f7f7f7;
-    -webkit-flex: 1;
-    flex: 1;
+}
+
+/* standard error */
+.nboutput  > :nth-child(2).output_stderr {
+    background: #fdd;
 }
 """
 
@@ -296,8 +455,8 @@ def depart_code_latex(self, node):
 def depart_prompt_latex(self, node):
     """Right-align prompt and choose the proper color."""
     text = self.body[-1]
-    text = text.replace('\nIn [', '\n\\color{nbsphinxin}\\hfill{}In [')
-    text = text.replace('\nOut[', '\n\\color{nbsphinxout}\\hfill{}Out[')
+    text = text.replace('\nIn [', '\n\\color{nbsphinxin}In [')
+    text = text.replace('\nOut[', '\n\\color{nbsphinxout}Out[')
     self.body[-1] = text
 
 
@@ -312,6 +471,7 @@ def setup(app):
         app.config.source_parsers['ipynb'] = NotebookParser
 
     app.add_directive('nbinput', NbInput)
+    app.add_directive('nboutput', NbOutput)
     app.add_node(CodeNode,
                  html=(do_nothing, depart_code_html),
                  latex=(do_nothing, depart_code_latex))

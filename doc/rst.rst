@@ -24,6 +24,11 @@ The ``nbsphinx`` extension provides custom directives to show notebook cells:
 
     6 * 7
 
+.. nboutput::
+    :execution-count: 42
+
+    42
+
 This was created with
 
 .. code-block:: rst
@@ -32,3 +37,8 @@ This was created with
         :execution-count: 42
     
         6 * 7
+
+    .. nboutput::
+        :execution-count: 42
+    
+        42
