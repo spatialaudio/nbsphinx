@@ -17,6 +17,13 @@ extensions = [
     'sphinx.ext.mathjax',
 ]
 
+# *** the following lines are (hopefully) temporary,
+# see https://github.com/sphinx-doc/sphinx/issues/2162
+import nbsphinx
+source_suffix = ['.rst', '.ipynb']
+source_parsers = {'ipynb': nbsphinx.NotebookParser}
+# *** end of temporary lines
+
 master_doc = 'index'
 
 project = 'Jupyter Notebook Tools for Sphinx'
