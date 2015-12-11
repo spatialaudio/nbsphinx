@@ -189,41 +189,12 @@ class NotebookParser(rst.Parser):
         rst.Parser.parse(self, rststring, document)
 
 
-def raw_latex(lines):
-    return docutils.nodes.raw('', '\n'.join(lines), format='latex')
-
-
-LATEX_BEFORE = raw_latex([
-    r'',
-    r'\noindent',
-    r'\begin{minipage}[t]{12ex}',
-])
-
-LATEX_BETWEEN = raw_latex([
-    r'\end{minipage}',
-    r'\begin{minipage}[t]{\linewidth}',  # too wide, but who cares?
-])
-
-LATEX_AFTER = raw_latex([
-    r'\end{minipage}',
-    r'',
-])
-
-
 class CodeNode(docutils.nodes.Element):
 
     @classmethod
     def create(cls, text, language='none', classes=[]):
         node = docutils.nodes.literal_block(text, text, language=language,
                                             classes=classes)
-        return cls(text, node)
-
-
-class PromptNode(docutils.nodes.Element):
-
-    @classmethod
-    def create(cls, text):
-        node = CodeNode.create(text)
         return cls(text, node)
 
 
@@ -251,23 +222,18 @@ class NbInput(rst.Directive):
             classes.append('nblast')
         container = docutils.nodes.container(classes=classes)
 
-        container += LATEX_BEFORE
-
         # Input prompt
         text = 'In [{}]:'.format(execution_count if execution_count else ' ')
-        container += PromptNode.create(text)
-
-        container += LATEX_BETWEEN
+        container += CodeNode.create(text)
+        latex_prompt = text + ' '
 
         # Input code area
         text = '\n'.join(self.content.data)
         node = CodeNode.create(
             text, language=self.arguments[0] if self.arguments else 'none')
         _set_emtpy_lines(node, self.options)
+        node.attributes['latex_prompt'] = latex_prompt
         container += node
-
-        container += LATEX_AFTER
-
         return [container]
 
 
@@ -297,12 +263,12 @@ class NbOutput(rst.Directive):
 
         # Optional output prompt
         if execution_count:
-            container += LATEX_BEFORE
             text = 'Out[{}]:'.format(execution_count)
-            container += PromptNode.create(text)
-            container += LATEX_BETWEEN
+            container += CodeNode.create(text)
+            latex_prompt = text + ' '
         else:
             container += rst.nodes.container()  # empty container for HTML
+            latex_prompt = ''
 
         if outputtype == 'rst':
             self.state.nested_parse(self.content, self.content_offset,
@@ -317,11 +283,8 @@ class NbOutput(rst.Directive):
                 classes.append(self.options['class'])
             node = CodeNode.create(text, classes=classes)
             _set_emtpy_lines(node, self.options)
+            node.attributes['latex_prompt'] = latex_prompt
             container += node
-
-        if execution_count:
-            container += LATEX_AFTER
-
         return [container]
 
 
@@ -436,28 +399,48 @@ def depart_code_html(self, node):
     self.body[-1] = text
 
 
+def visit_code_latex(self, node):
+    """Avoid creating a separate prompt node.
+
+    The prompt will be pre-pended in the main code node.
+
+    """
+    if 'latex_prompt' not in node.attributes:
+        raise docutils.nodes.SkipNode()
+
+
 def depart_code_latex(self, node):
-    """Remove frame and add empty lines before and after the code."""
+    """Some changes to code blocks.
+
+    * Remove the frame (by changing Verbatim -> OriginalVerbatim
+    * Add empty lines before and after the code
+    * Add prompt to the first line, emtpy space to the following lines
+
+    """
     lines = self.body[-1].split('\n')
     out = []
-    for line in lines:
-        if line.startswith(r'\begin{Verbatim}'):
-            out.append(line.replace('Verbatim', 'OriginalVerbatim'))
-            out.extend([''] * node.get('empty-lines-before', 0))
-        elif line.startswith(r'\end{Verbatim}'):
-            out.extend([''] * node.get('empty-lines-after', 0))
-            out.append(line.replace('Verbatim', 'OriginalVerbatim'))
-        else:
-            out.append(line)
+    assert lines[0] == ''
+    out.append(lines[0])
+    assert lines[1].startswith(r'\begin{Verbatim}')
+    out.append(lines[1].replace('Verbatim', 'OriginalVerbatim'))
+    code_lines = (
+        [''] * node.get('empty-lines-before', 0) +
+        lines[2:-2] +
+        [''] * node.get('empty-lines-after', 0)
+    )
+    prompt = node.get('latex_prompt')
+    color = 'nbsphinxin' if prompt.startswith('In') else 'nbsphinxout'
+    prefix = r'\textcolor{' + color + '}{' + prompt + '}' if prompt else ''
+    for line in code_lines[:1]:
+        out.append(prefix + line)
+    prefix = ' ' * len(prompt)
+    for line in code_lines[1:]:
+        out.append(prefix + line)
+    assert lines[-2].startswith(r'\end{Verbatim}')
+    out.append(lines[-2].replace('Verbatim', 'OriginalVerbatim'))
+    assert lines[-1] == ''
+    out.append(lines[-1])
     self.body[-1] = '\n'.join(out)
-
-
-def depart_prompt_latex(self, node):
-    """Right-align prompt and choose the proper color."""
-    text = self.body[-1]
-    text = text.replace('\nIn [', '\n\\color{nbsphinxin}In [')
-    text = text.replace('\nOut[', '\n\\color{nbsphinxout}Out[')
-    self.body[-1] = text
 
 
 def do_nothing(self, node):
@@ -474,10 +457,7 @@ def setup(app):
     app.add_directive('nboutput', NbOutput)
     app.add_node(CodeNode,
                  html=(do_nothing, depart_code_html),
-                 latex=(do_nothing, depart_code_latex))
-    app.add_node(PromptNode,
-                 html=(do_nothing, do_nothing),
-                 latex=(do_nothing, depart_prompt_latex))
+                 latex=(visit_code_latex, depart_code_latex))
     app.connect('builder-inited', builder_inited)
     app.connect('html-page-context', html_page_context)
 
