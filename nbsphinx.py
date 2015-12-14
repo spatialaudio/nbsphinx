@@ -248,6 +248,9 @@ CSS_STRING = """
 
 class NotebookParser(rst.Parser):
 
+    def get_transforms(self):
+        return rst.Parser.get_transforms(self) + [RewriteNotebookLinks]
+
     def parse(self, inputstring, document):
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
         resources = {}
@@ -407,6 +410,29 @@ def _set_emtpy_lines(node, options):
         value = options.get(attr, 0)
         if value:
             node.attributes[attr] = value
+
+
+class RewriteNotebookLinks(docutils.transforms.Transform):
+    """Turn links to local notebooks into ``:doc:`` links."""
+
+    default_priority = 400  # Should probably be adjusted?
+
+    def apply(self):
+        env = self.document.settings.env
+        for node in self.document.traverse(docutils.nodes.reference):
+            uri = node.get('refuri', '')
+            if '://' not in uri and uri.lower().endswith('.ipynb'):
+                target = uri[:-len('.ipynb')]
+                target_doc = os.path.normpath(
+                    os.path.join(os.path.dirname(env.docname), target))
+                if target_doc in env.found_docs:
+                    linktext = node.astext()
+                    xref = sphinx.addnodes.pending_xref(
+                        linktext, reftype='doc', reftarget=target,
+                        refwarn=True, refexplicit=True, refdoc=env.docname)
+                    xref.update_all_atts(node)
+                    xref += docutils.nodes.Text(linktext)
+                    node.replace_self(xref)
 
 
 def builder_inited(app):
