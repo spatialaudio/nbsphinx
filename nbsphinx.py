@@ -68,7 +68,7 @@ RST_TEMPLATE = """
 {% endblock input %}
 
 
-{% block execute_result -%}
+{% block nboutput -%}
 {%- if output.output_type == 'stream' %}
     {%- set datatype = 'text/plain' %}
     {%- set outputdata = output.text[:-1] %}{# trailing \n is stripped #}
@@ -81,7 +81,6 @@ RST_TEMPLATE = """
 {%- endif %}
 .. nboutput::
 {%- if datatype == 'text/plain' %}{# nothing #}
-{%- elif datatype == 'ansi' %} ansi
 {%- else %} rst
 {%- endif %}
 {%- if output.output_type == 'execute_result' and cell.execution_count %}
@@ -113,21 +112,51 @@ RST_TEMPLATE = """
     .. raw:: html
 
 {{ output.data['text/html'] | indent | indent }}
-{%- elif datatype == 'ansi' -%}
-{{ insert_empty_lines(outputdata) }}
+{%- elif datatype == 'ansi' %}
 
-{{ outputdata.strip(\n) | indent }}
+    .. raw:: html
+
+        <pre>
+{{ outputdata | ansi2html | indent | indent}}
+        </pre>
+
+    .. raw:: latex
+
+        \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
+{{ outputdata | ansi2latex | indent | indent}}
+        \\end{OriginalVerbatim}
 {%- else %}
 
     WARNING! Data type not implemented: {{ datatype }}
 {%- endif %}
-{% endblock execute_result %}
+{% endblock nboutput %}
 
 
-{% block display_data %}{{ self.execute_result() }}{% endblock display_data %}
-{% block stream %}{{ self.execute_result() }}{% endblock stream %}
-{% block error %}{{ self.execute_result() }}{% endblock error %}
+{% block execute_result %}{{ self.nboutput() }}{% endblock execute_result %}
+{% block display_data %}{{ self.nboutput() }}{% endblock display_data %}
+{% block stream %}{{ self.nboutput() }}{% endblock stream %}
+{% block error %}{{ self.nboutput() }}{% endblock error %}
+"""
 
+
+LATEX_PREAMBLE = r"""
+% Notebook prompt colors
+\definecolor{nbsphinxin}{rgb}{0.0, 0.0, 0.5}
+\definecolor{nbsphinxout}{rgb}{0.545, 0.0, 0.0}
+% ANSI colors for traceback highlighting
+\definecolor{red}{rgb}{.6,0,0}
+\definecolor{green}{rgb}{0,.65,0}
+\definecolor{brown}{rgb}{0.6,0.6,0}
+\definecolor{blue}{rgb}{0,.145,.698}
+\definecolor{purple}{rgb}{.698,.145,.698}
+\definecolor{cyan}{rgb}{0,.698,.698}
+\definecolor{lightgray}{gray}{0.5}
+\definecolor{darkgray}{gray}{0.25}
+\definecolor{lightred}{rgb}{1.0,0.39,0.28}
+\definecolor{lightgreen}{rgb}{0.48,0.99,0.0}
+\definecolor{lightblue}{rgb}{0.53,0.81,0.92}
+\definecolor{lightpurple}{rgb}{0.87,0.63,0.87}
+\definecolor{lightcyan}{rgb}{0.5,1.0,0.83}
 """
 
 
@@ -271,11 +300,10 @@ class NbOutput(rst.Directive):
             latex_prompt = ''
 
         if outputtype == 'rst':
+            output_area = docutils.nodes.container()
             self.state.nested_parse(self.content, self.content_offset,
-                                    container)
-        elif outputtype == 'ansi':
-            # TODO: ansi2html (inside <pre> without escaping!), ansi2latex
-            container += CodeNode.create('TODO!')
+                                    output_area)
+            container += output_area
         else:
             text = '\n'.join(self.content.data)
             classes = []
@@ -299,8 +327,7 @@ def builder_inited(app):
     """Add color definitions to LaTeX preamble."""
     latex_elements = app.builder.config.latex_elements
     latex_elements['preamble'] = '\n'.join([
-        r'\definecolor{nbsphinxin}{rgb}{0.0, 0.0, 0.5}',
-        r'\definecolor{nbsphinxout}{rgb}{0.545, 0.0, 0.0}',
+        LATEX_PREAMBLE,
         latex_elements.get('preamble', ''),
     ])
 
@@ -376,6 +403,18 @@ CSS_STRING = """
 .nboutput  > :nth-child(2).output_stderr {
     background: #fdd;
 }
+
+/* ANSI colors */
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansicyan { color: steelblue; }
+.ansiblue { color: darkblue; }
+.ansiyellow { color: #c4a000; }
+.ansiblack { color: black; }
+.ansipurple { color: darkviolet; }
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+.ansibold { font-weight: bold; }
 """
 
 
