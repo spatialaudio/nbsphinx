@@ -5,6 +5,22 @@ This is a normal RST file.
 
 .. note:: Those still work!
 
+Links to Notebooks
+------------------
+
+Links to notebooks can be easily created: :doc:`subdir/another` (the notebook
+title is used as link text).
+You can also use :doc:`an alternative text <subdir/another>`.
+Relative links to notebooks in subdirectories are possible.
+
+The above links were created with (note that the ``.ipynb`` file extension has
+to be stripped):
+
+.. code-block:: rst
+
+    :doc:`subdir/another`
+    :doc:`an alternative text <subdir/another>`
+
 Sphinx Directives for Jupyter Notebook Cells
 --------------------------------------------
 
