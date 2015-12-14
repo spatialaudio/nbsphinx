@@ -160,6 +160,92 @@ LATEX_PREAMBLE = r"""
 """
 
 
+CSS_STRING = """
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+.nbinput div,
+.nbinput div pre,
+.nboutput div,
+.nboutput div pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+}
+
+/* input/output containers */
+.nbinput,
+.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: baseline;
+    margin: 0;
+}
+
+/* input container */
+.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+.nbinput > :first-child {
+    color: navy;
+}
+
+/* output prompt */
+.nboutput > :first-child {
+    color: darkred;
+}
+
+/* all prompts */
+.nbinput > :first-child,
+.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+}
+
+/* input/output area */
+.nbinput > :nth-child(2),
+.nboutput > :nth-child(2) {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+.nbinput > :nth-child(2) {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* standard error */
+.nboutput  > :nth-child(2).output_stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansicyan { color: steelblue; }
+.ansiblue { color: darkblue; }
+.ansiyellow { color: #c4a000; }
+.ansiblack { color: black; }
+.ansipurple { color: darkviolet; }
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+.ansibold { font-weight: bold; }
+"""
+
+
 class NotebookParser(rst.Parser):
 
     def parse(self, inputstring, document):
@@ -330,92 +416,6 @@ def builder_inited(app):
         LATEX_PREAMBLE,
         latex_elements.get('preamble', ''),
     ])
-
-
-CSS_STRING = """
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-.nbinput div,
-.nbinput div pre,
-.nboutput div,
-.nboutput div pre {
-    background: none;
-    border: none;
-    padding: 0 0;
-    margin: 0;
-}
-
-/* input/output containers */
-.nbinput,
-.nboutput {
-    display: -webkit-flex;
-    display: flex;
-    align-items: baseline;
-    margin: 0;
-}
-
-/* input container */
-.nbinput {
-    padding-top: 5px;
-}
-
-/* last container */
-.nblast {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-.nbinput > :first-child {
-    color: navy;
-}
-
-/* output prompt */
-.nboutput > :first-child {
-    color: darkred;
-}
-
-/* all prompts */
-.nbinput > :first-child,
-.nboutput > :first-child {
-    min-width: 11ex;
-    padding-top: 0.4em;
-    padding-right: 0.4em;
-    text-align: right;
-}
-
-/* input/output area */
-.nbinput > :nth-child(2),
-.nboutput > :nth-child(2) {
-    padding: 0.4em;
-    -webkit-flex: 1;
-    flex: 1;
-}
-
-/* input area */
-.nbinput > :nth-child(2) {
-    border: 1px solid #cfcfcf;
-    border-radius: 2px;
-    background: #f7f7f7;
-}
-
-/* standard error */
-.nboutput  > :nth-child(2).output_stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansired { color: darkred; }
-.ansigreen { color: darkgreen; }
-.ansicyan { color: steelblue; }
-.ansiblue { color: darkblue; }
-.ansiyellow { color: #c4a000; }
-.ansiblack { color: black; }
-.ansipurple { color: darkviolet; }
-.ansigray { color: gray; }  /* nbconvert CSS */
-.ansigrey { color: gray; }  /* nbconvert HTML output */
-.ansibold { font-weight: bold; }
-"""
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
