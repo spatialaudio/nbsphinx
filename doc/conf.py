@@ -37,8 +37,8 @@ try:
 except Exception:
     release = '<unknown>'
 
-# Exclude Jupyter backup files:
-exclude_patterns = ['**.ipynb_checkpoints']
+# Exclude build directory and Jupyter backup files:
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 # -- Options for HTML output ----------------------------------------------
 
