@@ -172,6 +172,7 @@ CSS_STRING = """
     border: none;
     padding: 0 0;
     margin: 0;
+    box-shadow: none;
 }
 
 /* input/output containers */
@@ -179,7 +180,7 @@ CSS_STRING = """
 .nboutput {
     display: -webkit-flex;
     display: flex;
-    align-items: baseline;
+    align-items: top;
     margin: 0;
 }
 
@@ -194,12 +195,12 @@ CSS_STRING = """
 }
 
 /* input prompt */
-.nbinput > :first-child {
+.nbinput > :first-child pre {
     color: navy;
 }
 
 /* output prompt */
-.nboutput > :first-child {
+.nboutput > :first-child pre {
     color: darkred;
 }
 
@@ -210,6 +211,7 @@ CSS_STRING = """
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
+    flex: 0;
 }
 
 /* input/output area */
@@ -225,6 +227,11 @@ CSS_STRING = """
     border: 1px solid #cfcfcf;
     border-radius: 2px;
     background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+.nboutput div[class*=MathJax] {
+    text-align: left !important;
 }
 
 /* standard error */
