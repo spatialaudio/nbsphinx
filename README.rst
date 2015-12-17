@@ -10,6 +10,9 @@ Documentation:
 Code:
     http://github.com/spatialaudio/nbsphinx/
 
+License:
+   MIT -- see the file ``LICENSE`` for details.
+
 Links
 -----
 
