@@ -265,10 +265,6 @@ class NotebookParser(rst.Parser):
             pp = nbconvert.preprocessors.ExecutePreprocessor()
             nb, resources = pp.preprocess(nb, resources)
 
-        # TODO: save a copy of the notebook with and without outputs
-        # TODO: add links with ".. only:: html"
-        # TODO: ... or with custom html template?
-
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace(os.sep, '_')
