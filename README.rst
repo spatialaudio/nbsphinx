@@ -8,7 +8,7 @@ Documentation:
     http://nbsphinx.rtfd.org/
 
 Code:
-    http://github.com/mgeier/nbsphinx/
+    http://github.com/spatialaudio/nbsphinx/
 
 Links
 -----
