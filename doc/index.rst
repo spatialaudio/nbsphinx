@@ -7,6 +7,7 @@ Example Pages
     :maxdepth: 3
     :glob:
 
+    usage
     example
     pre-executed
     subdir/*
