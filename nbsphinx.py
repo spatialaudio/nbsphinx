@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-"""Sphinx source parser for ipynb files.
+"""Jupyter Notebook Tools for Sphinx.
 
 http://nbsphinx.rtfd.org/
 

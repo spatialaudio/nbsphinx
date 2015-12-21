@@ -26,7 +26,7 @@ source_parsers = {'ipynb': nbsphinx.NotebookParser}
 
 master_doc = 'index'
 
-project = 'Jupyter Notebook Tools for Sphinx'
+project = 'nbsphinx'
 author = 'Matthias Geier'
 copyright = '2015, ' + author
 
