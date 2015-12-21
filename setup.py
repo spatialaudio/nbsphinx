@@ -12,6 +12,7 @@ setup(
     py_modules=['nbsphinx'],
     install_requires=[
         'docutils',
+        'jinja2',
         'nbconvert',
         'nbformat',
         'sphinx',
