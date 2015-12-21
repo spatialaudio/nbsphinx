@@ -1,10 +1,13 @@
 .. include:: ../README.rst
 
-Example Pages
--------------
+Table Of Contents
+-----------------
+
+All content mentioned below -- except for the section :doc:`rst` -- was
+generated from Jupyter notebooks.
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
     :glob:
 
     usage
@@ -12,6 +15,7 @@ Example Pages
     pre-executed
     subdir/*
     rst
+    links
 
 .. only:: html
 
