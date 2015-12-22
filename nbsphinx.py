@@ -117,13 +117,13 @@ RST_TEMPLATE = """
     .. raw:: html
 
         <pre>
-{{ outputdata | ansi2html | indent | indent}}
+{{ outputdata | ansi2html | indent | indent }}
         </pre>
 
     .. raw:: latex
 
         \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
-{{ outputdata | ansi2latex | indent | indent}}
+{{ outputdata | ansi2latex | indent | indent }}
         \\end{OriginalVerbatim}
 {%- else %}
 
@@ -136,6 +136,32 @@ RST_TEMPLATE = """
 {% block display_data %}{{ self.nboutput() }}{% endblock display_data %}
 {% block stream %}{{ self.nboutput() }}{% endblock stream %}
 {% block error %}{{ self.nboutput() }}{% endblock error %}
+
+
+{% block rawcell %}
+{%- set raw_mimetype = cell.metadata.get('raw_mimetype', '').lower() %}
+{%- if raw_mimetype == '' %}
+.. raw:: html
+
+{{ cell.source | indent }}
+
+.. raw:: latex
+
+{{ cell.source | indent }}
+{%- elif raw_mimetype == 'text/html' %}
+.. raw:: html
+
+{{ cell.source | indent }}
+{%- elif raw_mimetype == 'text/latex' %}
+.. raw:: latex
+
+{{ cell.source | indent }}
+{%- elif raw_mimetype == 'text/markdown' %}
+{{ cell.source | markdown2rst }}
+{%- elif raw_mimetype == 'text/restructuredtext' %}
+{{ cell.source }}
+{% endif %}
+{% endblock rawcell %}
 """
 
 
