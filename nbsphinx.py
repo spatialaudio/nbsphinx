@@ -190,10 +190,10 @@ CSS_STRING = """
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-.nbinput div,
-.nbinput div pre,
-.nboutput div,
-.nboutput div pre {
+div.nbinput div,
+div.nbinput div pre,
+div.nboutput div,
+div.nboutput div pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -202,8 +202,8 @@ CSS_STRING = """
 }
 
 /* input/output containers */
-.nbinput,
-.nboutput {
+div.nbinput,
+div.nboutput {
     display: -webkit-flex;
     display: flex;
     align-items: top;
@@ -211,28 +211,28 @@ CSS_STRING = """
 }
 
 /* input container */
-.nbinput {
+div.nbinput {
     padding-top: 5px;
 }
 
 /* last container */
-.nblast {
+div.nblast {
     padding-bottom: 5px;
 }
 
 /* input prompt */
-.nbinput > :first-child pre {
+div.nbinput > :first-child pre {
     color: navy;
 }
 
 /* output prompt */
-.nboutput > :first-child pre {
+div.nboutput > :first-child pre {
     color: darkred;
 }
 
 /* all prompts */
-.nbinput > :first-child,
-.nboutput > :first-child {
+div.nbinput > :first-child,
+div.nboutput > :first-child {
     min-width: 11ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
@@ -241,22 +241,22 @@ CSS_STRING = """
 }
 
 /* input/output area */
-.nbinput > :nth-child(2),
-.nboutput > :nth-child(2) {
+div.nbinput > :nth-child(2),
+div.nboutput > :nth-child(2) {
     padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
 }
 
 /* input area */
-.nbinput > :nth-child(2) {
+div.nbinput > :nth-child(2) {
     border: 1px solid #cfcfcf;
     border-radius: 2px;
     background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
-.nboutput div[class*=MathJax] {
+div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
@@ -266,7 +266,7 @@ div.nboutput div.math p {
 }
 
 /* standard error */
-.nboutput  > :nth-child(2).output_stderr {
+div.nboutput  > :nth-child(2).output_stderr {
     background: #fdd;
 }
 
