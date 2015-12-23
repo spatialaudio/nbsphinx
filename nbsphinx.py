@@ -485,7 +485,6 @@ class RewriteNotebookLinks(docutils.transforms.Transform):
                     xref = sphinx.addnodes.pending_xref(
                         linktext, reftype='doc', reftarget=target,
                         refwarn=True, refexplicit=True, refdoc=env.docname)
-                    xref.update_all_atts(node)
                     xref += docutils.nodes.Text(linktext)
                     node.replace_self(xref)
 
