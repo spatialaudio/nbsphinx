@@ -260,6 +260,11 @@ CSS_STRING = """
     text-align: left !important;
 }
 
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
 /* standard error */
 .nboutput  > :nth-child(2).output_stderr {
     background: #fdd;
