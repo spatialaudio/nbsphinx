@@ -555,4 +555,4 @@ def setup(app):
     app.connect('builder-inited', builder_inited)
     app.connect('html-page-context', html_page_context)
 
-    return {'version': __version__}
+    return {'version': __version__, 'parallel_read_safe': True}
