@@ -280,11 +280,22 @@ CSS_STRING = """
 
 
 class NotebookParser(rst.Parser):
+    """Sphinx source parser for Jupyter notebooks.
+
+    Uses nbconvert to convert the notebook content to reStructuredText,
+    which is then parsed by Sphinx's built-in reST parser.  An extended
+    Jinja2 template is provided that uses custom reST directives for
+    input and output cells.  Notebooks without output cells are
+    automatically executed before conversion.
+
+    """
 
     def get_transforms(self):
+        """List of transforms for documents parsed by this parser."""
         return rst.Parser.get_transforms(self) + [RewriteNotebookLinks]
 
     def parse(self, inputstring, document):
+        """Parse `inputstring`, write results to `document`."""
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
         resources = {}
         env = document.settings.env
@@ -303,6 +314,7 @@ class NotebookParser(rst.Parser):
         resources['unique_key'] = env.docname.replace(os.sep, '_')
 
         def get_empty_lines(s):
+            """Get number of empty lines before and after code."""
             before = 0
             lines = s.split('\n')
             for line in lines:
@@ -337,9 +349,16 @@ class NotebookParser(rst.Parser):
 
 
 class CodeNode(docutils.nodes.Element):
+    """A custom node that contains a literal_block node."""
 
     @classmethod
     def create(cls, text, language='none', classes=[]):
+        """Create a new CodeNode containing a literal_block node.
+
+        Apparently, this cannot be done in CodeNode.__init__(), see:
+        https://groups.google.com/forum/#!topic/sphinx-dev/0chv7BsYuW0
+
+        """
         node = docutils.nodes.literal_block(text, text, language=language,
                                             classes=classes)
         return cls(text, node)
@@ -388,7 +407,7 @@ class NbOutput(rst.Directive):
     """A notebook output cell with optional prompt."""
 
     required_arguments = 0
-    optional_arguments = 1
+    optional_arguments = 1  # 'rst' or nothing (which means literal text)
     final_argument_whitespace = False
     option_spec = {
         'execution-count': rst.directives.positive_int,
@@ -417,6 +436,7 @@ class NbOutput(rst.Directive):
             container += rst.nodes.container()  # empty container for HTML
             latex_prompt = ''
 
+        # Output area
         if outputtype == 'rst':
             output_area = docutils.nodes.container()
             self.state.nested_parse(self.content, self.content_offset,
@@ -435,6 +455,11 @@ class NbOutput(rst.Directive):
 
 
 def _set_emtpy_lines(node, options):
+    """Set "empty lines" attributes on a CodeNode.
+
+    See http://stackoverflow.com/q/34050044/500098.
+
+    """
     for attr in 'empty-lines-before', 'empty-lines-after':
         value = options.get(attr, 0)
         if value:
@@ -447,6 +472,7 @@ class RewriteNotebookLinks(docutils.transforms.Transform):
     default_priority = 400  # Should probably be adjusted?
 
     def apply(self):
+        """Main transform function."""
         env = self.document.settings.env
         for node in self.document.traverse(docutils.nodes.reference):
             uri = node.get('refuri', '')
@@ -474,8 +500,7 @@ def builder_inited(app):
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
-    # TODO: add <style> only on pages that actually need it
-    # TODO: add <style> to head instead of body?
+    """Add CSS string to HTML page."""
     body = context.get('body', '')
     if body:
         style = '\n<style>' + CSS_STRING + '</style>\n'
@@ -506,7 +531,7 @@ def visit_code_latex(self, node):
 def depart_code_latex(self, node):
     """Some changes to code blocks.
 
-    * Remove the frame (by changing Verbatim -> OriginalVerbatim
+    * Remove the frame (by changing Verbatim -> OriginalVerbatim)
     * Add empty lines before and after the code
     * Add prompt to the first line, emtpy space to the following lines
 
