@@ -302,6 +302,7 @@ class NotebookParser(rst.Parser):
     def parse(self, inputstring, document):
         """Parse `inputstring`, write results to `document`."""
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
+        nbsphinx_metadata = nb.metadata.get('nbsphinx', {})
         resources = {}
         env = document.settings.env
         srcdir = os.path.dirname(env.doc2path(env.docname))
@@ -311,7 +312,9 @@ class NotebookParser(rst.Parser):
         # Execute notebook only if there are no outputs:
         if not any(c.outputs for c in nb.cells if 'outputs' in c):
             resources.setdefault('metadata', {})['path'] = srcdir
-            pp = nbconvert.preprocessors.ExecutePreprocessor()
+            allow_errors = nbsphinx_metadata.get('allow_errors', False)
+            pp = nbconvert.preprocessors.ExecutePreprocessor(
+                allow_errors=allow_errors)
             nb, resources = pp.preprocess(nb, resources)
 
         # Sphinx doesn't accept absolute paths in images etc.
@@ -340,7 +343,7 @@ class NotebookParser(rst.Parser):
                                          extra_loaders=[loader])
         rststring, resources = exporter.from_notebook_node(nb, resources)
 
-        if nb.metadata.get('nbsphinx', {}).get('orphan', False):
+        if nbsphinx_metadata.get('orphan', False):
             rststring = ':orphan:\n' + rststring
 
         # Create additional output files (figures etc.),

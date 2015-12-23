@@ -13,6 +13,7 @@ generated from Jupyter notebooks.
     usage
     example
     pre-executed
+    allow-errors
     subdir/*
     rst
     links
