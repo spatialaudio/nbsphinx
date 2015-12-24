@@ -201,6 +201,12 @@ div.nboutput div pre {
     box-shadow: none;
 }
 
+/* remove negative margin from cloud theme */
+div.nbinput div[class|="highlight"],
+div.nboutput div[class|="highlight"] {
+    margin: 0;
+}
+
 /* input/output containers */
 div.nbinput,
 div.nboutput {
