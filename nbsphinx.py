@@ -206,7 +206,7 @@ div.nbinput,
 div.nboutput {
     display: -webkit-flex;
     display: flex;
-    align-items: top;
+    align-items: flex-start;
     margin: 0;
 }
 
