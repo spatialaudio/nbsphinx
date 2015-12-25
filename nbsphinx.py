@@ -190,8 +190,10 @@ CSS_STRING = """
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
+div.nbinput,
 div.nbinput div,
 div.nbinput div pre,
+div.nboutput,
 div.nboutput div,
 div.nboutput div pre {
     background: none;
