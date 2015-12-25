@@ -51,7 +51,7 @@ RST_TEMPLATE = """
 
 
 {% block input -%}
-.. nbinput:: {% if nb.metadata.language_info.pygments_lexer -%}
+.. nbinput:: {% if nb.metadata.language_info -%}
 {{ nb.metadata.language_info.pygments_lexer }}
 {%- endif -%}
 {{ insert_empty_lines(cell.source) }}
