@@ -14,6 +14,7 @@ generated from Jupyter notebooks.
     example
     pre-executed
     allow-errors
+    hidden-cells
     subdir/*
     rst
     links

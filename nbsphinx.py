@@ -325,6 +325,10 @@ class NotebookParser(rst.Parser):
                 allow_errors=allow_errors)
             nb, resources = pp.preprocess(nb, resources)
 
+        # Remove hidden cells
+        nb.cells[:] = (cell for cell in nb.cells
+                       if cell.metadata.get('nbsphinx') != 'hidden')
+
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace(os.sep, '_')
