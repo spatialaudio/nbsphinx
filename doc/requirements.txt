@@ -1,5 +1,2 @@
-sphinx
-docutils
-nbconvert
-nbformat
+nbsphinx
 ipykernel

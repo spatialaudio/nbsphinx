@@ -8,7 +8,7 @@ import os
 import sys
 
 # Add relative path to nbsphinx.py (if you didn't install it with pip):
-sys.path.insert(0, os.path.abspath('..'))
+#sys.path.insert(0, os.path.abspath('.'))
 
 # Select nbsphinx and, if needed, add a math extension (mathjax or pngmath):
 extensions = [
