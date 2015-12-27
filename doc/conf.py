@@ -50,6 +50,7 @@ html_title = project + ' version ' + release
 
 latex_elements = {
     'papersize': 'a4paper',
+    'preamble': '\setcounter{tocdepth}{2}',
 }
 
 latex_documents = [

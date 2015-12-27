@@ -1,9 +1,6 @@
 .. include:: ../README.rst
 
-Table Of Contents
------------------
-
-All content mentioned below -- except for the section :doc:`rst` -- was
+All content shown below -- except for the section :doc:`rst` -- was
 generated from Jupyter notebooks.
 
 .. toctree::

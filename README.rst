@@ -21,4 +21,21 @@ Python Package Index:
     https://pypi.python.org/pypi/nbsphinx/
 
 License:
-   MIT -- see the file ``LICENSE`` for details.
+    MIT -- see the file ``LICENSE`` for details.
+
+Quick Start:
+    #. Install ``nbsphinx`` with pip_::
+
+           pip install nbsphinx --user
+
+       ... or, if you prefer, just copy the file ``nbsphinx.py`` your Sphinx
+       directory.
+
+    #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
+
+    #. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
+       (without the ``.ipynb`` extension) to the ``toctree`` directive.
+
+    #. Run Sphinx!
+
+.. _pip: https://pip.pypa.io/en/latest/installing/
