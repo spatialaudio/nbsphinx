@@ -1,0 +1,8 @@
+include LICENSE
+include *.rst
+include doc/requirements.txt
+include doc/conf.py
+include doc/*.rst
+include doc/*.ipynb
+include doc/subdir/*.ipynb
+include doc/images/*
