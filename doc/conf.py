@@ -19,12 +19,6 @@ extensions = [
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
-# *** the following lines are (hopefully) temporary,
-# see https://github.com/sphinx-doc/sphinx/issues/2162
-source_suffix = ['.rst', '.ipynb']
-source_parsers = {'ipynb': 'nbsphinx.NotebookParser'}
-# *** end of temporary lines
-
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'

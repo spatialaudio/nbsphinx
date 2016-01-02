@@ -585,11 +585,32 @@ def do_nothing(self, node):
     pass
 
 
+def _add_notebook_parser(app):
+    """Ugly hack to modify source_suffix and source_parsers.
+
+    Once https://github.com/sphinx-doc/sphinx/pull/2209 is merged (and
+    some additional time has passed), this should be replaced by ::
+
+        app.add_source_parser('.ipynb', NotebookParser)
+
+    See also https://github.com/sphinx-doc/sphinx/issues/2162.
+
+    """
+    source_suffix = app.config._raw_config.get('source_suffix', ['.rst'])
+    if isinstance(source_suffix, sphinx.config.string_types):
+        source_suffix = [source_suffix]
+    if '.ipynb' not in source_suffix:
+        source_suffix.append('.ipynb')
+        app.config._raw_config['source_suffix'] = source_suffix
+    source_parsers = app.config._raw_config.get('source_parsers', {})
+    if '.ipynb' not in source_parsers and 'ipynb' not in source_parsers:
+        source_parsers['.ipynb'] = NotebookParser
+        app.config._raw_config['source_parsers'] = source_parsers
+
+
 def setup(app):
     """Initialize Sphinx extension."""
-    app.config.source_suffix.append('.ipynb')
-    if 'ipynb' not in app.config.source_parsers:
-        app.config.source_parsers['ipynb'] = NotebookParser
+    _add_notebook_parser(app)
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
