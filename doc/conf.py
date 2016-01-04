@@ -4,12 +4,6 @@
 # Use sphinx-quickstart to create your own conf.py file!
 # After that, you have to edit a few things.  See below.
 
-import os
-import sys
-
-# Add relative path to nbsphinx.py (if you didn't install it with pip):
-#sys.path.insert(0, os.path.abspath('.'))
-
 # Select nbsphinx and, if needed, add a math extension (mathjax or pngmath):
 extensions = [
     'nbsphinx',

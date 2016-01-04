@@ -28,9 +28,6 @@ Quick Start:
 
            pip install nbsphinx --user
 
-       ... or, if you prefer, just copy the file ``nbsphinx.py`` your Sphinx
-       directory.
-
     #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
 
     #. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
