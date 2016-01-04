@@ -8,18 +8,33 @@ This is a normal RST file.
 Links to Notebooks
 ------------------
 
-Links to notebooks can be easily created: :doc:`subdir/another` (the notebook
-title is used as link text).
-You can also use :doc:`an alternative text <subdir/another>`.
-Relative links to notebooks in subdirectories are possible.
+Links to notebooks can be easily created: :ref:`subdir/another.ipynb` (the
+notebook title is used as link text).
+You can also use :ref:`an alternative text <subdir/another.ipynb>`.
 
-The above links were created with (note that the ``.ipynb`` file extension has
-to be stripped):
+The above links were created with:
 
 .. code-block:: rst
 
-    :doc:`subdir/another`
-    :doc:`an alternative text <subdir/another>`
+    :ref:`subdir/another.ipynb`
+    :ref:`an alternative text <subdir/another.ipynb>`
+
+Links to subsections are also possible,
+e.g.  :ref:`subdir/another.ipynb#A-Sub-Section` (the subsection title is used
+as link text) and :ref:`alternative text <subdir/another.ipynb#A-Sub-Section>`.
+
+These links were created with:
+
+.. code-block:: rst
+
+    :ref:`subdir/another.ipynb#A-Sub-Section`
+    :ref:`alternative text <subdir/another.ipynb#A-Sub-Section>`
+
+.. note::
+
+    * Spaces in the section title have to be replaced by hyphens!
+    * "``../``" is not allowed, you have to specify the full path even if the
+      current source file is in a subdirectory!
 
 Sphinx Directives for Jupyter Notebook Cells
 --------------------------------------------
@@ -51,10 +66,10 @@ This was created with
 
     .. nbinput:: ipython3
         :execution-count: 42
-    
+
         6 * 7
 
     .. nboutput::
         :execution-count: 42
-    
+
         42
