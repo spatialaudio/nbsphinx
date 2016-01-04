@@ -1,3 +1,6 @@
+Version 0.2.1 (2016-01-04):
+ * No need to mention ``source_suffix`` and ``source_parsers`` in ``conf.py``
+
 Version 0.2.0 (2015-12-27):
  * Add support for ``allow_errors`` and ``hidden`` metadata
  * Add custom reST template
