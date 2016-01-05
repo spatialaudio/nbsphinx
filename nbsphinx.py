@@ -356,7 +356,7 @@ class NotebookParser(rst.Parser):
         rststring, resources = exporter.from_notebook_node(nb, resources)
 
         if nbsphinx_metadata.get('orphan', False):
-            rststring = ':orphan:\n' + rststring
+            rststring = ':orphan:\n\n' + rststring
 
         # Create additional output files (figures etc.),
         # see nbconvert.writers.FilesWriter.write()
