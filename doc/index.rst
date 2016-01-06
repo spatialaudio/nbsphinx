@@ -4,7 +4,7 @@ All content shown below -- except for the section :doc:`rst` -- was
 generated from Jupyter notebooks.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :glob:
 
     usage
