@@ -1,3 +1,6 @@
+Version 0.2.2 (2016-01-06):
+ * Support for links to sub-sections in other notebooks
+
 Version 0.2.1 (2016-01-04):
  * No need to mention ``source_suffix`` and ``source_parsers`` in ``conf.py``
 
