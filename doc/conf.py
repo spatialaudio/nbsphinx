@@ -44,3 +44,5 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'nbsphinx.tex', project, author, 'howto'),
 ]
+
+latex_show_urls = 'footnote'
