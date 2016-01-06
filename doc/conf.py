@@ -19,7 +19,7 @@ master_doc = 'index'
 
 project = 'nbsphinx'
 author = 'Matthias Geier'
-copyright = '2015, ' + author
+copyright = '2016, ' + author
 
 # -- Get version information from Git -------------------------------------
 
