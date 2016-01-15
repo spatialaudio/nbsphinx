@@ -332,7 +332,7 @@ class NotebookParser(rst.Parser):
 
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
-        resources['unique_key'] = env.docname.replace(os.sep, '_')
+        resources['unique_key'] = env.docname.replace('/', '_')
 
         def get_empty_lines(s):
             """Get number of empty lines before and after code."""
