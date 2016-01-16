@@ -98,7 +98,7 @@ RST_TEMPLATE = """
 {{ outputdata.strip(\n) | indent }}
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg'] %}
 
-    .. image:: {{ output.metadata.filenames[datatype] | urlencode }}
+    .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
 {%- elif datatype in ['text/markdown'] %}
 
 {{ output.data['text/markdown'] | markdown2rst | indent }}
