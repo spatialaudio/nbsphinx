@@ -303,7 +303,7 @@ class NotebookParser(rst.Parser):
 
     def get_transforms(self):
         """List of transforms for documents parsed by this parser."""
-        return rst.Parser.get_transforms(self) + [RewriteNotebookLinks,
+        return rst.Parser.get_transforms(self) + [ProcessLocalLinks,
                                                   CreateSectionLabels]
 
     def parse(self, inputstring, document):
@@ -485,8 +485,11 @@ def _set_emtpy_lines(node, options):
             node.attributes[attr] = value
 
 
-class RewriteNotebookLinks(docutils.transforms.Transform):
-    """Turn links to local notebooks into ``:doc:``/``:ref:`` links.
+class ProcessLocalLinks(docutils.transforms.Transform):
+    """Process links to local files.
+
+    Marks local files to be copied to the HTML output directory and
+    turns links to local notebooks into ``:doc:``/``:ref:`` links.
 
     Links to subsections are possible with ``...#Subsection-Title``.
     These links use the labels created by CreateSectionLabels.
@@ -510,38 +513,58 @@ class RewriteNotebookLinks(docutils.transforms.Transform):
         env = self.document.settings.env
         for node in self.document.traverse(docutils.nodes.reference):
             uri = node.get('refuri', '')
-            if '://' not in uri:
-                if uri.lower().endswith('.ipynb'):
-                    target = uri[:-len('.ipynb')]
-                    target_ext = ''
-                    reftype = 'doc'
-                    refdomain = None
-                elif '.ipynb#' in uri.lower():
-                    idx = uri.lower().find('.ipynb#')
-                    target = uri[:idx]
-                    target_ext = uri[idx:]
-                    reftype = 'ref'
-                    refdomain = 'std'
-                else:
-                    continue  # Not a local notebook
-                target_docname = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), target))
-                if target_docname in env.found_docs:
-                    if target_ext:
-                        target = target_docname + target_ext
-                        target = target.lower()
-                    linktext = node.astext()
-                    xref = sphinx.addnodes.pending_xref(
-                        reftype=reftype, reftarget=target, refdomain=refdomain,
-                        refwarn=True, refexplicit=True, refdoc=env.docname)
-                    xref += docutils.nodes.Text(linktext, linktext)
-                    node.replace_self(xref)
+            if not uri:
+                continue  # No URI (e.g. named reference)
+            elif '://' in uri:
+                continue  # Not a local link
+            elif uri.startswith('#'):
+                continue  # Nothing to be done
+            elif uri.lower().endswith('.ipynb'):
+                target = uri[:-len('.ipynb')]
+                target_ext = ''
+                reftype = 'doc'
+                refdomain = None
+            elif '.ipynb#' in uri.lower():
+                idx = uri.lower().find('.ipynb#')
+                target = uri[:idx]
+                target_ext = uri[idx:]
+                reftype = 'ref'
+                refdomain = 'std'
+            else:
+                file = os.path.normpath(
+                    os.path.join(os.path.dirname(env.docname), uri))
+                if not os.path.isfile(os.path.join(env.srcdir, file)):
+                    env.app.warn('file not found: {!r}'.format(file),
+                                 env.doc2path(env.docname))
+                    continue  # Link is ignored
+                elif file.startswith('..'):
+                    env.app.warn(
+                        'link outside of source directory: {!r}'.format(file),
+                        env.doc2path(env.docname))
+                    continue  # Link is ignored
+                if not hasattr(env, 'nbsphinx_files'):
+                    env.nbsphinx_files = {}
+                env.nbsphinx_files.setdefault(env.docname, []).append(file)
+                continue  # We're done here
+
+            target_docname = os.path.normpath(
+                os.path.join(os.path.dirname(env.docname), target))
+            if target_docname in env.found_docs:
+                if target_ext:
+                    target = target_docname + target_ext
+                    target = target.lower()
+                linktext = node.astext()
+                xref = sphinx.addnodes.pending_xref(
+                    reftype=reftype, reftarget=target, refdomain=refdomain,
+                    refwarn=True, refexplicit=True, refdoc=env.docname)
+                xref += docutils.nodes.Text(linktext, linktext)
+                node.replace_self(xref)
 
 
 class CreateSectionLabels(docutils.transforms.Transform):
     """Make labels for each notebook and each section thereof.
 
-    These labels are referenced in RewriteNotebookLinks.
+    These labels are referenced in ProcessLocalLinks.
     Note: Sphinx lower-cases the HTML section IDs, Jupyter doesn't.
 
     """
@@ -589,6 +612,30 @@ def html_page_context(app, pagename, templatename, context, doctree):
     if body:
         style = '\n<style>' + CSS_STRING + '</style>\n'
         context['body'] = style + body
+
+
+def html_collect_pages(app):
+    """This event handler is abused to copy local files around."""
+    files = set()
+    for file_list in getattr(app.env, 'nbsphinx_files', {}).values():
+        files.update(file_list)
+    for file in app.status_iterator(files, 'copying linked files... ',
+                                    sphinx.util.console.brown, len(files)):
+        target = os.path.join(app.builder.outdir, file)
+        sphinx.util.ensuredir(os.path.dirname(target))
+        try:
+            sphinx.util.copyfile(os.path.join(app.env.srcdir, file), target)
+        except OSError as err:
+            app.warn('cannot copy local file {!r}: {}'.format(file, err))
+    return []  # No new HTML pages are created
+
+
+def env_purge_doc(app, env, docname):
+    """Remove list of local files for a given document."""
+    try:
+        del env.nbsphinx_files[docname]
+    except (AttributeError, KeyError):
+        pass
 
 
 def depart_code_html(self, node):
@@ -684,5 +731,7 @@ def setup(app):
                  latex=(visit_code_latex, depart_code_latex))
     app.connect('builder-inited', builder_inited)
     app.connect('html-page-context', html_page_context)
+    app.connect('html-collect-pages', html_collect_pages)
+    app.connect('env-purge-doc', env_purge_doc)
 
     return {'version': __version__, 'parallel_read_safe': True}
