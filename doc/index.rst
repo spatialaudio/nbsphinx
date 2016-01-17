@@ -8,7 +8,9 @@ generated from Jupyter notebooks.
     :glob:
 
     usage
-    example
+    markdown-cells
+    code-cells
+    raw-cells
     pre-executed
     allow-errors
     hidden-cells
