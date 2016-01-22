@@ -26,7 +26,7 @@ setup(
     url='http://nbsphinx.rtfd.org/',
     platforms='any',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Framework :: Sphinx',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
