@@ -23,7 +23,7 @@
 http://nbsphinx.rtfd.org/
 
 """
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 import docutils
 from docutils.parsers import rst

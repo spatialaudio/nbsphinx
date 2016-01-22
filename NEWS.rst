@@ -1,3 +1,6 @@
+Version 0.2.3 (2016-01-22):
+ * Links from notebooks to local files can now be used
+
 Version 0.2.2 (2016-01-06):
  * Support for links to sub-sections in other notebooks
 
