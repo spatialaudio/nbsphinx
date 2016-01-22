@@ -114,6 +114,8 @@ RST_TEMPLATE = """
 {{ output.data['text/html'] | indent | indent }}
 {%- elif datatype == 'ansi' %}
 
+    .. rst-class:: highlight
+
     .. raw:: html
 
         <pre>
