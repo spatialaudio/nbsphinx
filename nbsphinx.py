@@ -68,9 +68,9 @@ RST_TEMPLATE = """
 {% endblock input %}
 
 
-{% block nboutput -%}
+{% block nboutput %}
 {%- if output.output_type == 'stream' %}
-    {%- set datatype = 'text/plain' %}
+    {%- set datatype = 'ansi' %}
     {%- set outputdata = output.text[:-1] %}{# trailing \n is stripped #}
 {%- elif output.output_type == 'error' %}
     {%- set datatype = 'ansi' %}
@@ -78,7 +78,7 @@ RST_TEMPLATE = """
 {%- else %}
     {%- set datatype = (output.data | filter_data_type)[0] %}
     {%- set outputdata = output.data[datatype] %}
-{%- endif %}
+{%- endif -%}
 .. nboutput::
 {%- if datatype == 'text/plain' %}{# nothing #}
 {%- else %} rst
@@ -90,7 +90,7 @@ RST_TEMPLATE = """
     :more-to-come:
 {%- endif %}
 {%- if output.name == 'stderr' %}
-    :class: output_stderr
+    :class: stderr
 {%- endif %}
 {%- if datatype == 'text/plain' -%}
 {{ insert_empty_lines(outputdata) }}
@@ -124,10 +124,11 @@ RST_TEMPLATE = """
 
     .. raw:: latex
 
+        % This comment is needed to force a line break for adjacent ANSI cells
         \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
 {{ outputdata | ansi2latex | indent | indent }}
         \\end{OriginalVerbatim}
-{%- else %}
+{% else %}
 
     WARNING! Data type not implemented: {{ datatype }}
 {%- endif %}
@@ -274,7 +275,7 @@ div.nboutput div.math p {
 }
 
 /* standard error */
-div.nboutput  > :nth-child(2).output_stderr {
+div.nboutput  > :nth-child(2).stderr {
     background: #fdd;
 }
 
@@ -373,15 +374,14 @@ class CodeNode(docutils.nodes.Element):
     """A custom node that contains a literal_block node."""
 
     @classmethod
-    def create(cls, text, language='none', classes=[]):
+    def create(cls, text, language='none'):
         """Create a new CodeNode containing a literal_block node.
 
         Apparently, this cannot be done in CodeNode.__init__(), see:
         https://groups.google.com/forum/#!topic/sphinx-dev/0chv7BsYuW0
 
         """
-        node = docutils.nodes.literal_block(text, text, language=language,
-                                            classes=classes)
+        node = docutils.nodes.literal_block(text, text, language=language)
         return cls(text, node)
 
 
@@ -459,16 +459,14 @@ class NbOutput(rst.Directive):
 
         # Output area
         if outputtype == 'rst':
-            output_area = docutils.nodes.container()
+            classes = [self.options.get('class', '')]
+            output_area = docutils.nodes.container(classes=classes)
             self.state.nested_parse(self.content, self.content_offset,
                                     output_area)
             container += output_area
         else:
             text = '\n'.join(self.content.data)
-            classes = []
-            if 'class' in self.options:
-                classes.append(self.options['class'])
-            node = CodeNode.create(text, classes=classes)
+            node = CodeNode.create(text)
             _set_emtpy_lines(node, self.options)
             node.attributes['latex_prompt'] = latex_prompt
             container += node
