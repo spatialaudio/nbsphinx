@@ -194,12 +194,12 @@ CSS_STRING = """
 /* remove conflicting styling from Sphinx themes */
 div.nbinput,
 div.nbinput > div,
-div.nbinput div[class|=highlight],
-div.nbinput div[class|=highlight] pre,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
 div.nboutput,
 div.nboutput > div,
-div.nboutput div[class|=highlight],
-div.nboutput div[class|=highlight] pre {
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -237,8 +237,8 @@ div.nboutput > :first-child pre {
 }
 
 /* all prompts */
-div.nbinput > :first-child[class|=highlight],
-div.nboutput > :first-child[class|=highlight],
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
     min-width: 11ex;
     padding-top: 0.4em;
@@ -248,16 +248,16 @@ div.nboutput > :first-child {
 }
 
 /* input/output area */
-div.nbinput > :nth-child(2)[class|=highlight],
+div.nbinput > :nth-child(2)[class^=highlight],
 div.nboutput > :nth-child(2),
-div.nboutput > :nth-child(2)[class|=highlight] {
+div.nboutput > :nth-child(2)[class^=highlight] {
     padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
 }
 
 /* input area */
-div.nbinput > :nth-child(2)[class|=highlight] {
+div.nbinput > :nth-child(2)[class^=highlight] {
     border: 1px solid #cfcfcf;
     border-radius: 2px;
     background: #f7f7f7;
