@@ -280,15 +280,26 @@ div.nboutput  > :nth-child(2).stderr {
 }
 
 /* ANSI colors */
+.ansiblack { color: black; }
 .ansired { color: darkred; }
 .ansigreen { color: darkgreen; }
-.ansicyan { color: steelblue; }
-.ansiblue { color: darkblue; }
 .ansiyellow { color: #c4a000; }
-.ansiblack { color: black; }
+.ansiblue { color: darkblue; }
 .ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
 .ansigray { color: gray; }  /* nbconvert CSS */
 .ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
 .ansibold { font-weight: bold; }
 """
 
