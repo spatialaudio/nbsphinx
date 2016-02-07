@@ -141,6 +141,15 @@ RST_TEMPLATE = """
 {% block error %}{{ self.nboutput() }}{% endblock error %}
 
 
+{% block markdowncell %}
+{%- if 'nbsphinx-toctree' in cell.metadata %}
+{{ resources.extract_toctree(cell) }}
+{%- else %}
+{{ super() }}
+{% endif %}
+{% endblock markdowncell %}
+
+
 {% block rawcell %}
 {%- set raw_mimetype = cell.metadata.get('raw_mimetype', '').lower() %}
 {%- if raw_mimetype == '' %}
@@ -362,6 +371,64 @@ class NotebookParser(rst.Parser):
             return before, after
 
         resources['get_empty_lines'] = get_empty_lines
+
+        def extract_toctree(cell):
+            """Extract document names from Markdown cell."""
+            lines = ['.. toctree::']
+            options = cell.metadata['nbsphinx-toctree']
+            try:
+                for option, value in options.items():
+                    if value is True:
+                        lines.append(':{}:'.format(option))
+                    elif value is False:
+                        pass
+                    else:
+                        lines.append(':{}: {}'.format(option, value))
+            except AttributeError:
+                env.app.warn('invalid toctree options: {!r}'.format(options),
+                             env.doc2path(env.docname))
+                return ''
+
+            text = nbconvert.filters.markdown2rst(cell.source)
+            settings = docutils.frontend.OptionParser(
+                components=(rst.Parser,)).get_default_values()
+            toctree_node = docutils.utils.new_document('extract_toctree',
+                                                       settings)
+            parser = rst.Parser()
+            parser.parse(text, toctree_node)
+
+            if 'caption' not in options:
+                for sec in toctree_node.traverse(docutils.nodes.section):
+                    assert sec.children
+                    assert isinstance(sec.children[0], docutils.nodes.title)
+                    title = sec.children[0].astext()
+                    lines.append(':caption: ' + title)
+                    break
+            lines.append('')  # empty line
+            for ref in toctree_node.traverse(docutils.nodes.reference):
+                uri = ref.get('refuri', '')
+                if '://' in uri:
+                    lines.append(ref.astext().replace('\n', '') +
+                                 ' <' + uri + '>')
+                    continue
+                target = uri
+                for suffix in env.config.source_suffix:
+                    if target.lower().endswith(suffix.lower()):
+                        target = target[:-len(suffix)]
+                        break
+                target_docname = os.path.normpath(
+                    os.path.join(os.path.dirname(env.docname), target))
+                if target_docname in env.found_docs:
+                    # Absolute names are relative to the source directory:
+                    lines.append(ref.astext().replace('\n', '') +
+                                 ' </' + target_docname + '>')
+                else:
+                    env.app.warn(
+                        'toctree reference not found: {!r}'.format(uri),
+                        env.doc2path(env.docname))
+            return '\n    '.join(lines)
+
+        resources['extract_toctree'] = extract_toctree
 
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         exporter = nbconvert.RSTExporter(template_file='nbsphinx-rst',
