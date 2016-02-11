@@ -597,8 +597,15 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 continue  # Not a local link
             elif uri.startswith('#'):
                 continue  # Nothing to be done
-            elif uri.lower().endswith('.ipynb'):
-                target = uri[:-len('.ipynb')]
+
+            for suffix in env.config.source_suffix:
+                if uri.lower().endswith(suffix.lower()):
+                    target = uri[:-len(suffix)]
+                    break
+            else:
+                target = ''
+
+            if target:
                 target_ext = ''
                 reftype = 'doc'
                 refdomain = None
