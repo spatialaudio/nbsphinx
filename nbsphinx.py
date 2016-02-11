@@ -595,7 +595,7 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 continue  # No URI (e.g. named reference)
             elif '://' in uri:
                 continue  # Not a local link
-            elif uri.startswith('#'):
+            elif uri.startswith('#') or uri.startswith('mailto:'):
                 continue  # Nothing to be done
 
             for suffix in env.config.source_suffix:
