@@ -1,3 +1,6 @@
+Version 0.2.4 (2016-02-12):
+ * Support for "nbsphinx-toctree" cell metadata
+
 Version 0.2.3 (2016-01-22):
  * Links from notebooks to local files can now be used
 
