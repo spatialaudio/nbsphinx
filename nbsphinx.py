@@ -25,6 +25,7 @@ http://nbsphinx.rtfd.org/
 """
 __version__ = '0.2.4'
 
+import copy
 import docutils
 from docutils.parsers import rst
 import jinja2
@@ -40,7 +41,7 @@ RST_TEMPLATE = """
 
 
 {% macro insert_empty_lines(text) %}
-{%- set before, after = resources.get_empty_lines(text) %}
+{%- set before, after = text | get_empty_lines %}
 {%- if before %}
     :empty-lines-before: {{ before }}
 {%- endif %}
@@ -143,7 +144,7 @@ RST_TEMPLATE = """
 
 {% block markdowncell %}
 {%- if 'nbsphinx-toctree' in cell.metadata %}
-{{ resources.extract_toctree(cell) }}
+{{ cell | extract_toctree }}
 {%- else %}
 {{ super() }}
 {% endif %}
@@ -313,14 +314,61 @@ div.nboutput  > :nth-child(2).stderr {
 """
 
 
+class Exporter(nbconvert.RSTExporter):
+    """Convert Jupyter notebooks to reStructuredText.
+
+    Uses nbconvert to convert Jupyter notebooks to a reStructuredText
+    string with custom reST directives for input and output cells.
+
+    Notebooks without output cells are automatically executed before
+    conversion.
+
+    """
+
+    def __init__(self):
+        loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
+        super(Exporter, self).__init__(
+            template_file='nbsphinx-rst', extra_loaders=[loader],
+            filters={
+                'get_empty_lines': _get_empty_lines,
+                'extract_toctree': _extract_toctree,
+            })
+
+    def from_notebook_node(self, nb, resources=None, **kw):
+        nb = copy.deepcopy(nb)
+        if resources is None:
+            resources = {}
+        else:
+            resources = copy.deepcopy(resources)
+        nbsphinx_metadata = nb.metadata.get('nbsphinx', {})
+
+        # Execute notebook only if there are no outputs:
+        if not any(c.outputs for c in nb.cells if 'outputs' in c):
+            allow_errors = nbsphinx_metadata.get('allow_errors', False)
+            pp = nbconvert.preprocessors.ExecutePreprocessor(
+                allow_errors=allow_errors)
+            nb, resources = pp.preprocess(nb, resources)
+
+        # Remove hidden cells
+        nb.cells[:] = (cell for cell in nb.cells
+                       if cell.metadata.get('nbsphinx') != 'hidden')
+
+        # Call into RSTExporter
+        rststr, resources = super(Exporter, self).from_notebook_node(
+            nb, resources, **kw)
+
+        if nbsphinx_metadata.get('orphan', False):
+            rststr = ':orphan:\n\n' + rststr
+
+        return rststr, resources
+
+
 class NotebookParser(rst.Parser):
     """Sphinx source parser for Jupyter notebooks.
 
-    Uses nbconvert to convert the notebook content to reStructuredText,
-    which is then parsed by Sphinx's built-in reST parser.  An extended
-    Jinja2 template is provided that uses custom reST directives for
-    input and output cells.  Notebooks without output cells are
-    automatically executed before conversion.
+    Uses nbsphinx.Exporter to convert notebook content to a
+    reStructuredText string, which is then parsed by Sphinx's built-in
+    reST parser.
 
     """
 
@@ -332,111 +380,23 @@ class NotebookParser(rst.Parser):
     def parse(self, inputstring, document):
         """Parse `inputstring`, write results to `document`."""
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
-        nbsphinx_metadata = nb.metadata.get('nbsphinx', {})
-        resources = {}
         env = document.settings.env
         srcdir = os.path.dirname(env.doc2path(env.docname))
         auxdir = os.path.join(env.doctreedir, 'nbsphinx')
         sphinx.util.ensuredir(auxdir)
 
-        # Execute notebook only if there are no outputs:
-        if not any(c.outputs for c in nb.cells if 'outputs' in c):
-            resources.setdefault('metadata', {})['path'] = srcdir
-            allow_errors = nbsphinx_metadata.get('allow_errors', False)
-            pp = nbconvert.preprocessors.ExecutePreprocessor(
-                allow_errors=allow_errors)
-            nb, resources = pp.preprocess(nb, resources)
-
-        # Remove hidden cells
-        nb.cells[:] = (cell for cell in nb.cells
-                       if cell.metadata.get('nbsphinx') != 'hidden')
-
+        resources = {}
+        # Working directory for ExecutePreprocessor
+        resources['metadata'] = {'path': srcdir}
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace('/', '_')
 
-        def get_empty_lines(s):
-            """Get number of empty lines before and after code."""
-            before = 0
-            lines = s.split('\n')
-            for line in lines:
-                if line.strip():
-                    break
-                before += 1
-            after = 0
-            for line in reversed(lines[before:]):
-                if line.strip():
-                    break
-                after += 1
-            return before, after
-
-        resources['get_empty_lines'] = get_empty_lines
-
-        def extract_toctree(cell):
-            """Extract document names from Markdown cell."""
-            lines = ['.. toctree::']
-            options = cell.metadata['nbsphinx-toctree']
-            try:
-                for option, value in options.items():
-                    if value is True:
-                        lines.append(':{}:'.format(option))
-                    elif value is False:
-                        pass
-                    else:
-                        lines.append(':{}: {}'.format(option, value))
-            except AttributeError:
-                env.app.warn('invalid toctree options: {!r}'.format(options),
-                             env.doc2path(env.docname))
-                return ''
-
-            text = nbconvert.filters.markdown2rst(cell.source)
-            settings = docutils.frontend.OptionParser(
-                components=(rst.Parser,)).get_default_values()
-            toctree_node = docutils.utils.new_document('extract_toctree',
-                                                       settings)
-            parser = rst.Parser()
-            parser.parse(text, toctree_node)
-
-            if 'caption' not in options:
-                for sec in toctree_node.traverse(docutils.nodes.section):
-                    assert sec.children
-                    assert isinstance(sec.children[0], docutils.nodes.title)
-                    title = sec.children[0].astext()
-                    lines.append(':caption: ' + title)
-                    break
-            lines.append('')  # empty line
-            for ref in toctree_node.traverse(docutils.nodes.reference):
-                uri = ref.get('refuri', '')
-                if '://' in uri:
-                    lines.append(ref.astext().replace('\n', '') +
-                                 ' <' + uri + '>')
-                    continue
-                target = uri
-                for suffix in env.config.source_suffix:
-                    if target.lower().endswith(suffix.lower()):
-                        target = target[:-len(suffix)]
-                        break
-                target_docname = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), target))
-                if target_docname in env.found_docs:
-                    # Absolute names are relative to the source directory:
-                    lines.append(ref.astext().replace('\n', '') +
-                                 ' </' + target_docname + '>')
-                else:
-                    env.app.warn(
-                        'toctree reference not found: {!r}'.format(uri),
-                        env.doc2path(env.docname))
-            return '\n    '.join(lines)
-
-        resources['extract_toctree'] = extract_toctree
-
-        loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
-        exporter = nbconvert.RSTExporter(template_file='nbsphinx-rst',
-                                         extra_loaders=[loader])
-        rststring, resources = exporter.from_notebook_node(nb, resources)
-
-        if nbsphinx_metadata.get('orphan', False):
-            rststring = ':orphan:\n\n' + rststring
+        try:
+            rststring, resources = Exporter().from_notebook_node(nb, resources)
+        except NotebookError as e:
+            env.warn(env.docname, str(e))
+            return  # document is unchanged (i.e. empty)
 
         # Create additional output files (figures etc.),
         # see nbconvert.writers.FilesWriter.write()
@@ -446,6 +406,10 @@ class NotebookParser(rst.Parser):
                 f.write(data)
 
         rst.Parser.parse(self, rststring, document)
+
+
+class NotebookError(Exception):
+    """Error during notebook parsing."""
 
 
 class CodeNode(docutils.nodes.Element):
@@ -549,6 +513,58 @@ class NbOutput(rst.Directive):
             node.attributes['latex_prompt'] = latex_prompt
             container += node
         return [container]
+
+
+def _extract_toctree(cell):
+    """Extract links from Markdown cell and create toctree."""
+    lines = ['.. toctree::']
+    options = cell.metadata['nbsphinx-toctree']
+    try:
+        for option, value in options.items():
+            if value is True:
+                lines.append(':{}:'.format(option))
+            elif value is False:
+                pass
+            else:
+                lines.append(':{}: {}'.format(option, value))
+    except AttributeError:
+        raise NotebookError(
+            'invalid nbsphinx-toctree option: {!r}'.format(options))
+
+    text = nbconvert.filters.markdown2rst(cell.source)
+    settings = docutils.frontend.OptionParser(
+        components=(rst.Parser,)).get_default_values()
+    toctree_node = docutils.utils.new_document('extract_toctree', settings)
+    parser = rst.Parser()
+    parser.parse(text, toctree_node)
+
+    if 'caption' not in options:
+        for sec in toctree_node.traverse(docutils.nodes.section):
+            assert sec.children
+            assert isinstance(sec.children[0], docutils.nodes.title)
+            title = sec.children[0].astext()
+            lines.append(':caption: ' + title)
+            break
+    lines.append('')  # empty line
+    for ref in toctree_node.traverse(docutils.nodes.reference):
+        lines.append(ref.astext().replace('\n', '') +
+                     ' <' + ref.get('refuri', '') + '>')
+    return '\n    '.join(lines)
+
+
+def _get_empty_lines(text):
+    """Get number of empty lines before and after code."""
+    lines = text.split('\n')
+    before = after = 0
+    for line in lines:
+        if line.strip():
+            break
+        before += 1
+    for line in reversed(lines[before:]):
+        if line.strip():
+            break
+        after += 1
+    return before, after
 
 
 def _set_emtpy_lines(node, options):
