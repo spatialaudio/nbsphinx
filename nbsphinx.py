@@ -192,9 +192,9 @@ RST_TEMPLATE = """
 
 
 LATEX_PREAMBLE = r"""
-% Notebook prompt colors
-\definecolor{nbsphinxin}{rgb}{0.0, 0.0, 0.5}
-\definecolor{nbsphinxout}{rgb}{0.545, 0.0, 0.0}
+% Jupyter Notebook prompt colors
+\definecolor{nbsphinxin}{HTML}{303F9F}
+\definecolor{nbsphinxout}{HTML}{D84315}
 % ANSI colors for traceback highlighting
 \definecolor{red}{rgb}{.6,0,0}
 \definecolor{green}{rgb}{0,.65,0}
@@ -252,12 +252,12 @@ div.nblast {
 
 /* input prompt */
 div.nbinput > :first-child pre {
-    color: navy;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput > :first-child pre {
-    color: darkred;
+    color: #D84315;
 }
 
 /* all prompts */
