@@ -7,16 +7,16 @@ generated from Jupyter notebooks.
     :maxdepth: 3
     :glob:
 
-    usage
-    markdown-cells
-    code-cells
-    raw-cells
-    pre-executed
-    allow-errors
-    hidden-cells
+    usage.ipynb
+    markdown-cells.ipynb
+    code-cells.ipynb
+    raw-cells.ipynb
+    pre-executed.ipynb
+    allow-errors.ipynb
+    hidden-cells.ipynb
     subdir/*
-    rst
-    links
+    rst.rst
+    links.ipynb
 
 .. only:: html
 

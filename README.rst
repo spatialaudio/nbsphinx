@@ -24,15 +24,13 @@ License:
     MIT -- see the file ``LICENSE`` for details.
 
 Quick Start:
-    #. Install ``nbsphinx`` with pip_::
+    #. Install ``nbsphinx``::
 
            pip install nbsphinx --user
 
     #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
 
     #. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
-       (without the ``.ipynb`` extension) to the ``toctree`` directive.
+       to the ``toctree``.
 
     #. Run Sphinx!
-
-.. _pip: https://pip.pypa.io/en/latest/installing/
