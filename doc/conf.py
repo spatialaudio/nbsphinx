@@ -13,6 +13,9 @@ extensions = [
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
+# Default language for syntax highlighting (e.g. in Markdown cells)
+highlight_language = 'none'
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'
