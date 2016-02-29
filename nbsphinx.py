@@ -326,6 +326,7 @@ class Exporter(nbconvert.RSTExporter):
     """
 
     def __init__(self):
+        """Initialize the Exporter."""
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
