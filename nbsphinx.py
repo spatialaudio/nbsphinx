@@ -361,8 +361,11 @@ class Exporter(nbconvert.RSTExporter):
         rststr, resources = super(Exporter, self).from_notebook_node(
             nb, resources, **kw)
 
-        if nbsphinx_metadata.get('orphan', False):
+        orphan = nbsphinx_metadata.get('orphan', False)
+        if orphan is True:
             rststr = ':orphan:\n\n' + rststr
+        elif orphan is not False:
+            raise NotebookError('invalid orphan option: {!r}'.format(orphan))
 
         return rststr, resources
 
