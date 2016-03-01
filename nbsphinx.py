@@ -51,6 +51,13 @@ RST_TEMPLATE = """
 {%- endmacro %}
 
 
+{% block any_cell %}
+{%- if cell.metadata.nbsphinx != 'hidden' %}
+{{ super() }}
+{% endif %}
+{%- endblock any_cell %}
+
+
 {% block input -%}
 .. nbinput:: {% if nb.metadata.language_info -%}
 {{ nb.metadata.language_info.pygments_lexer }}
@@ -349,10 +356,6 @@ class Exporter(nbconvert.RSTExporter):
             pp = nbconvert.preprocessors.ExecutePreprocessor(
                 allow_errors=allow_errors)
             nb, resources = pp.preprocess(nb, resources)
-
-        # Remove hidden cells
-        nb.cells[:] = (cell for cell in nb.cells
-                       if cell.metadata.get('nbsphinx') != 'hidden')
 
         # Call into RSTExporter
         rststr, resources = super(Exporter, self).from_notebook_node(
