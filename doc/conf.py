@@ -13,6 +13,9 @@ extensions = [
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
+# If True, the build process is continued even if an exception occurs:
+#nbsphinx_allow_errors = True
+
 # Default language for syntax highlighting (e.g. in Markdown cells)
 highlight_language = 'none'
 

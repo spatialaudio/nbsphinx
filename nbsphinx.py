@@ -332,8 +332,9 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self):
+    def __init__(self, allow_errors=False):
         """Initialize the Exporter."""
+        self._allow_errors = allow_errors
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
@@ -352,7 +353,8 @@ class Exporter(nbconvert.RSTExporter):
 
         # Execute notebook only if there are no outputs:
         if not any(c.outputs for c in nb.cells if 'outputs' in c):
-            allow_errors = nbsphinx_metadata.get('allow_errors', False)
+            allow_errors = (self._allow_errors or
+                            nbsphinx_metadata.get('allow_errors', False))
             pp = nbconvert.preprocessors.ExecutePreprocessor(
                 allow_errors=allow_errors)
             nb, resources = pp.preprocess(nb, resources)
@@ -399,8 +401,9 @@ class NotebookParser(rst.Parser):
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace('/', '_')
 
+        exporter = Exporter(allow_errors=env.config.nbsphinx_allow_errors)
         try:
-            rststring, resources = Exporter().from_notebook_node(nb, resources)
+            rststring, resources = exporter.from_notebook_node(nb, resources)
         except NotebookError as e:
             env.warn(env.docname, str(e))
             return  # document is unchanged (i.e. empty)
@@ -831,6 +834,8 @@ def _add_notebook_parser(app):
 def setup(app):
     """Initialize Sphinx extension."""
     _add_notebook_parser(app)
+
+    app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
