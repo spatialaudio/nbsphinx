@@ -1,3 +1,7 @@
+Version 0.2.5 (2016-03-15):
+ * Add option ``nbsphinx_allow_errors`` to globally ignore exceptions
+ * Separate class `nbsphinx.Exporter`
+
 Version 0.2.4 (2016-02-12):
  * Support for "nbsphinx-toctree" cell metadata
 
