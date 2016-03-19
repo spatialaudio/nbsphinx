@@ -27,6 +27,8 @@ project = 'nbsphinx'
 author = 'Matthias Geier'
 copyright = '2016, ' + author
 
+linkcheck_ignore = [r'http://localhost:\d+/']
+
 # -- Get version information from Git -------------------------------------
 
 try:

@@ -15,7 +15,7 @@ Documentation (and example of use):
     http://nbsphinx.rtfd.org/
 
 Code:
-    http://github.com/spatialaudio/nbsphinx/
+    https://github.com/spatialaudio/nbsphinx/
 
 Python Package Index:
     https://pypi.python.org/pypi/nbsphinx/
