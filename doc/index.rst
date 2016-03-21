@@ -15,6 +15,7 @@ generated from Jupyter notebooks.
     allow-errors.ipynb
     hidden-cells.ipynb
     subdir/*
+    sidebar.ipynb
     rst.rst
     links.ipynb
 

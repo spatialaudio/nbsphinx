@@ -152,6 +152,8 @@ RST_TEMPLATE = """
 {% block markdowncell %}
 {%- if 'nbsphinx-toctree' in cell.metadata %}
 {{ cell | extract_toctree }}
+{%- elif 'nbsphinx-sidebar' in cell.metadata %}
+{{ cell | extract_sidebar }}
 {%- else %}
 {{ super() }}
 {% endif %}
@@ -341,6 +343,7 @@ class Exporter(nbconvert.RSTExporter):
             filters={
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
+                'extract_sidebar': _extract_sidebar,
             })
 
     def from_notebook_node(self, nb, resources=None, **kw):
@@ -559,6 +562,45 @@ def _extract_toctree(cell):
     for ref in toctree_node.traverse(docutils.nodes.reference):
         lines.append(ref.astext().replace('\n', '') +
                      ' <' + ref.get('refuri', '') + '>')
+    return '\n    '.join(lines)
+
+
+def _extract_sidebar(cell):
+    """Create sidebar from Markdown cell."""
+    lines = ['.. sidebar::']
+    options = cell.metadata['nbsphinx-sidebar']
+    # TODO: re-use code!
+    try:
+        for option, value in options.items():
+            if value is True:
+                lines.append(':{}:'.format(option))
+            elif value is False:
+                pass
+            else:
+                lines.append(':{}: {}'.format(option, value))
+    except AttributeError:
+        raise NotebookError(
+            'invalid nbsphinx-sidebar option: {!r}'.format(options))
+
+    # TODO: re-use code!
+    text = nbconvert.filters.markdown2rst(cell.source)
+    settings = docutils.frontend.OptionParser(
+        components=(rst.Parser,)).get_default_values()
+    toctree_node = docutils.utils.new_document('extract_toctree', settings)
+    parser = rst.Parser()
+    parser.parse(text, toctree_node)
+
+    #if 'caption' not in options:
+    #    for sec in toctree_node.traverse(docutils.nodes.section):
+    #        assert sec.children
+    #        assert isinstance(sec.children[0], docutils.nodes.title)
+    #        title = sec.children[0].astext()
+    #        lines.append(':caption: ' + title)
+    #        break
+    lines.append('')  # empty line
+
+    # TODO: add the rest of the content as reST code
+
     return '\n    '.join(lines)
 
 
