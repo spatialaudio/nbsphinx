@@ -33,6 +33,10 @@ import nbconvert
 import nbformat
 import os
 import sphinx
+try:
+    from urllib.parse import unquote  # Python 3.x
+except ImportError:
+    from urllib2 import unquote  # Python 2.x
 
 _ipynbversion = 4
 
@@ -558,7 +562,7 @@ def _extract_toctree(cell):
     lines.append('')  # empty line
     for ref in toctree_node.traverse(docutils.nodes.reference):
         lines.append(ref.astext().replace('\n', '') +
-                     ' <' + ref.get('refuri', '') + '>')
+                     ' <' + unquote(ref.get('refuri')) + '>')
     return '\n    '.join(lines)
 
 
