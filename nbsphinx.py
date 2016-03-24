@@ -568,16 +568,8 @@ def _extract_toctree(cell):
 
 def _get_empty_lines(text):
     """Get number of empty lines before and after code."""
-    lines = text.split('\n')
-    before = after = 0
-    for line in lines:
-        if line.strip():
-            break
-        before += 1
-    for line in reversed(lines[before:]):
-        if line.strip():
-            break
-        after += 1
+    before = len(text) - len(text.lstrip('\n'))
+    after = len(text) - len(text.strip('\n')) - before
     return before, after
 
 
@@ -756,7 +748,6 @@ def env_purge_doc(app, env, docname):
 def depart_code_html(self, node):
     """Add empty lines before and after the code."""
     text = self.body[-1]
-    text = text.replace('<pre>\n</pre>', '<pre></pre>')
     text = text.replace('<pre>',
                         '<pre>\n' + '\n' * node.get('empty-lines-before', 0))
     text = text.replace('</pre>',
