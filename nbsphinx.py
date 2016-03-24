@@ -355,8 +355,9 @@ class Exporter(nbconvert.RSTExporter):
             resources = copy.deepcopy(resources)
         nbsphinx_metadata = nb.metadata.get('nbsphinx', {})
 
-        # Execute notebook only if there are no outputs:
-        if not any(c.outputs for c in nb.cells if 'outputs' in c):
+        # Execute notebook only if there are code cells and no outputs:
+        if (any(c.source for c in nb.cells if c.cell_type == 'code') and
+                not any(c.outputs for c in nb.cells if 'outputs' in c)):
             allow_errors = (self._allow_errors or
                             nbsphinx_metadata.get('allow_errors', False))
             pp = nbconvert.preprocessors.ExecutePreprocessor(
