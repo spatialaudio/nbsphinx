@@ -46,7 +46,10 @@ html_title = project + ' version ' + release
 
 latex_elements = {
     'papersize': 'a4paper',
-    'preamble': r'\setcounter{tocdepth}{3}',
+    'preamble': r"""
+\setcounter{tocdepth}{3}
+\usepackage{lmodern}  % heavier typewriter font
+""",
 }
 
 latex_documents = [
