@@ -19,10 +19,13 @@ highlight_language = 'none'
 # -- These set defaults that can be overridden through notebook metadata --
 
 # See http://nbsphinx.readthedocs.org/en/latest/allow-errors.html
-# for more details.
+# and http://nbsphinx.readthedocs.org/en/latest/timeout.html for more details.
 
 # If True, the build process is continued even if an exception occurs:
 #nbsphinx_allow_errors = True
+
+# Controls when a cell will time out (defaults to 30; use -1 for no timeout):
+#nbsphinx_timeout = 60
 
 # -- The settings below this line are not specific to nbsphinx ------------
 

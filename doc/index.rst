@@ -13,6 +13,7 @@ generated from Jupyter notebooks.
     raw-cells.ipynb
     pre-executed.ipynb
     allow-errors.ipynb
+    timeout.ipynb
     hidden-cells.ipynb
     subdir/*
     rst.rst

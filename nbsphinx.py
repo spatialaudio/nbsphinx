@@ -336,9 +336,10 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self, allow_errors=False):
+    def __init__(self, allow_errors=False, timeout=30):
         """Initialize the Exporter."""
         self._allow_errors = allow_errors
+        self._timeout = timeout
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
@@ -360,8 +361,9 @@ class Exporter(nbconvert.RSTExporter):
                 not any(c.outputs for c in nb.cells if 'outputs' in c)):
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
+            timeout = nbsphinx_metadata.get('timeout', self._timeout)
             pp = nbconvert.preprocessors.ExecutePreprocessor(
-                allow_errors=allow_errors)
+                allow_errors=allow_errors, timeout=timeout)
             nb, resources = pp.preprocess(nb, resources)
 
         # Call into RSTExporter
@@ -406,7 +408,9 @@ class NotebookParser(rst.Parser):
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace('/', '_')
 
-        exporter = Exporter(allow_errors=env.config.nbsphinx_allow_errors)
+        exporter = Exporter(allow_errors=env.config.nbsphinx_allow_errors,
+                            timeout=env.config.nbsphinx_timeout)
+
         try:
             rststring, resources = exporter.from_notebook_node(nb, resources)
         except NotebookError as e:
@@ -832,6 +836,7 @@ def setup(app):
     _add_notebook_parser(app)
 
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
+    app.add_config_value('nbsphinx_timeout', 30, rebuild='')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
