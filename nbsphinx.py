@@ -65,6 +65,8 @@ RST_TEMPLATE = """
 {% block input -%}
 .. nbinput:: {% if nb.metadata.language_info -%}
 {{ nb.metadata.language_info.pygments_lexer }}
+{%- else -%}
+{{ resources.codecell_lexer }}
 {%- endif -%}
 {{ insert_empty_lines(cell.source) }}
 {%- if cell.execution_count %}
@@ -336,10 +338,11 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self, allow_errors=False, timeout=30):
+    def __init__(self, allow_errors=False, timeout=30, codecell_lexer='none'):
         """Initialize the Exporter."""
         self._allow_errors = allow_errors
         self._timeout = timeout
+        self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
@@ -354,6 +357,9 @@ class Exporter(nbconvert.RSTExporter):
             resources = {}
         else:
             resources = copy.deepcopy(resources)
+        # Set default codecell lexer
+        resources['codecell_lexer'] = self._codecell_lexer
+
         nbsphinx_metadata = nb.metadata.get('nbsphinx', {})
 
         # Execute notebook only if there are code cells and no outputs:
@@ -409,7 +415,8 @@ class NotebookParser(rst.Parser):
         resources['unique_key'] = env.docname.replace('/', '_')
 
         exporter = Exporter(allow_errors=env.config.nbsphinx_allow_errors,
-                            timeout=env.config.nbsphinx_timeout)
+                            timeout=env.config.nbsphinx_timeout,
+                            codecell_lexer=env.config.nbsphinx_codecell_lexer)
 
         try:
             rststring, resources = exporter.from_notebook_node(nb, resources)
@@ -837,6 +844,7 @@ def setup(app):
 
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
+    app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)

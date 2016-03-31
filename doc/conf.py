@@ -13,7 +13,7 @@ extensions = [
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
-# Default language for syntax highlighting (e.g. in Markdown cells)
+# Default language for syntax highlighting in reST and Markdown cells
 highlight_language = 'none'
 
 # -- These set defaults that can be overridden through notebook metadata --
@@ -26,6 +26,9 @@ highlight_language = 'none'
 
 # Controls when a cell will time out (defaults to 30; use -1 for no timeout):
 #nbsphinx_timeout = 60
+
+# Default Pygments lexer for syntax highlighting in code cells
+#nbsphinx_codecell_lexer = 'ipython3'
 
 # -- The settings below this line are not specific to nbsphinx ------------
 
