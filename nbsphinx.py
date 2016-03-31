@@ -27,7 +27,9 @@ __version__ = '0.2.5'
 
 import copy
 import docutils
+from docutils import io
 from docutils.parsers import rst
+from docutils.parsers.rst import directives
 import jinja2
 import nbconvert
 import nbformat
@@ -541,6 +543,50 @@ class NbOutput(rst.Directive):
         return [container]
 
 
+class NbInclude(rst.Directive):
+    """Include a notebook in a reST document.
+
+    This directive uses :class:`NotebookParser`, which means that evaluated
+    notebooks will be included without modification, while notebooks with
+    no output cells will be evaluated before being included.
+
+    """
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+
+    def run(self):
+        if not self.state.document.settings.file_insertion_enabled:
+            raise self.warning('"%s" directive disabled.' % self.name)
+
+        # Read the notebook to a string
+        path = directives.path(self.arguments[0])
+        rst_file = self.state_machine.document.attributes['source']
+        rst_dir = os.path.abspath(os.path.dirname(rst_file))
+        path = os.path.normpath(os.path.join(rst_dir, path))
+        e_handler = self.state.document.settings.input_encoding_error_handler
+        try:
+            self.state.document.settings.record_dependencies.add(path)
+            include_file = io.FileInput(source_path=path,
+                                        encoding='utf-8',
+                                        error_handler=e_handler)
+        except IOError as error:
+            raise self.severe(u'Problems with "%s" directive path:\n%s.' %
+                              (self.name, error))
+        try:
+            rawtext = include_file.read()
+        except UnicodeError as error:
+            raise self.severe(u'Problem with "%s" directive:\n%s' %
+                              (self.name, error))
+
+        # Use the NotebookParser to convert to reST and evaluate if needed
+        nbparser = NotebookParser()
+        node = docutils.utils.new_document(path, self.state.document.settings)
+        nbparser.parse(rawtext, node)
+        return node.children
+
+
 def _extract_toctree(cell):
     """Extract links from Markdown cell and create toctree."""
     lines = ['.. toctree::']
@@ -848,6 +894,7 @@ def setup(app):
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
+    app.add_directive('nbinclude', NbInclude)
     app.add_node(CodeNode,
                  html=(do_nothing, depart_code_html),
                  latex=(visit_code_latex, depart_code_latex))
