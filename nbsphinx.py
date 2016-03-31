@@ -475,7 +475,7 @@ class NbInput(rst.Directive):
         text = '\n'.join(self.content.data)
         node = CodeNode.create(
             text, language=self.arguments[0] if self.arguments else 'none')
-        _set_emtpy_lines(node, self.options)
+        _set_empty_lines(node, self.options)
         node.attributes['latex_prompt'] = latex_prompt
         container += node
         return [container]
@@ -524,7 +524,7 @@ class NbOutput(rst.Directive):
         else:
             text = '\n'.join(self.content.data)
             node = CodeNode.create(text)
-            _set_emtpy_lines(node, self.options)
+            _set_empty_lines(node, self.options)
             node.attributes['latex_prompt'] = latex_prompt
             container += node
         return [container]
@@ -574,7 +574,7 @@ def _get_empty_lines(text):
     return before, after
 
 
-def _set_emtpy_lines(node, options):
+def _set_empty_lines(node, options):
     """Set "empty lines" attributes on a CodeNode.
 
     See http://stackoverflow.com/q/34050044/500098.
@@ -771,7 +771,7 @@ def depart_code_latex(self, node):
 
     * Remove the frame (by changing Verbatim -> OriginalVerbatim)
     * Add empty lines before and after the code
-    * Add prompt to the first line, emtpy space to the following lines
+    * Add prompt to the first line, empty space to the following lines
 
     """
     lines = self.body[-1].split('\n')
