@@ -29,10 +29,12 @@ import copy
 import docutils
 from docutils.parsers import rst
 import jinja2
+import json
 import nbconvert
 import nbformat
 import os
 import sphinx
+import subprocess
 try:
     from urllib.parse import unquote  # Python 3.x
 except ImportError:
@@ -363,6 +365,7 @@ class Exporter(nbconvert.RSTExporter):
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
             filters={
+                'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
             })
@@ -555,6 +558,63 @@ class NbOutput(rst.Directive):
             node.attributes['latex_prompt'] = latex_prompt
             container += node
         return [container]
+
+
+def markdown2rst(text):
+    """Convert a Markdown string to reST via pandoc.
+
+    This is very similar to nbconvert.filters.markdown.markdown2rst(),
+    except that it uses a pandoc filter to convert raw LaTeX blocks to
+    "math" directives (instead of "raw:: latex" directives).
+
+    """
+
+    def rawlatex2math_hook(obj):
+        if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
+            obj['t'] = 'Para'
+            obj['c'] = [{
+                't': 'Math',
+                'c': [
+                    {'t': 'DisplayMath', 'c': []},
+                    obj['c'][1],
+                ]
+            }]
+        return obj
+
+    def rawlatex2math(text):
+        json_data = json.loads(text, object_hook=rawlatex2math_hook)
+        return json.dumps(json_data)
+
+    return pandoc(text, 'markdown', 'rst', filter_func=rawlatex2math)
+
+
+def pandoc(source, fmt, to, filter_func=None):
+    """Convert a string in format `from` to format `to` via pandoc.
+
+    This is based on nbconvert.utils.pandoc.pandoc() and extended to
+    allow passing a filter function.
+
+    """
+    def encode(text):
+        return text if isinstance(text, bytes) else text.encode('utf-8')
+
+    def decode(data):
+        return data.decode('utf-8') if isinstance(data, bytes) else data
+
+    cmd1 = ['pandoc', '--from', fmt, '--to', 'json']
+    cmd2 = ['pandoc', '--from', 'json', '--to', to]
+
+    nbconvert.utils.pandoc.check_pandoc_version()
+
+    p = subprocess.Popen(cmd1, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    json_data, _ = p.communicate(encode(source))
+
+    if filter_func:
+        json_data = encode(filter_func(decode(json_data)))
+
+    p = subprocess.Popen(cmd2, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out, _ = p.communicate(json_data)
+    return decode(out).rstrip('\n')
 
 
 def _extract_toctree(cell):
