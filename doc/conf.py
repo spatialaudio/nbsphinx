@@ -13,11 +13,16 @@ extensions = [
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
-# If True, the build process is continued even if an exception occurs:
-#nbsphinx_allow_errors = True
-
 # Default language for syntax highlighting (e.g. in Markdown cells)
 highlight_language = 'none'
+
+# -- These set defaults that can be overridden through notebook metadata --
+
+# See http://nbsphinx.readthedocs.org/en/latest/allow-errors.html
+# for more details.
+
+# If True, the build process is continued even if an exception occurs:
+#nbsphinx_allow_errors = True
 
 # -- The settings below this line are not specific to nbsphinx ------------
 

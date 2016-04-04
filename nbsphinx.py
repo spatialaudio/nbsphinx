@@ -358,8 +358,8 @@ class Exporter(nbconvert.RSTExporter):
         # Execute notebook only if there are code cells and no outputs:
         if (any(c.source for c in nb.cells if c.cell_type == 'code') and
                 not any(c.outputs for c in nb.cells if 'outputs' in c)):
-            allow_errors = (self._allow_errors or
-                            nbsphinx_metadata.get('allow_errors', False))
+            allow_errors = nbsphinx_metadata.get(
+                'allow_errors', self._allow_errors)
             pp = nbconvert.preprocessors.ExecutePreprocessor(
                 allow_errors=allow_errors)
             nb, resources = pp.preprocess(nb, resources)
