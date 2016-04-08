@@ -26,10 +26,9 @@ http://nbsphinx.rtfd.org/
 __version__ = '0.2.5'
 
 import copy
+import io
 import docutils
-from docutils import io
 from docutils.parsers import rst
-from docutils.parsers.rst import directives
 import jinja2
 import nbconvert
 import nbformat
@@ -392,7 +391,8 @@ class NotebookParser(rst.Parser):
 
     Uses nbsphinx.Exporter to convert notebook content to a
     reStructuredText string, which is then parsed by Sphinx's built-in
-    reST parser.
+    reST parser. Evaluated notebooks will be included without modification,
+    while notebooks with no output will be evaluated during parsing.
 
     """
 
@@ -546,44 +546,41 @@ class NbOutput(rst.Directive):
 class NbInclude(rst.Directive):
     """Include a notebook in a reST document.
 
-    This directive uses :class:`NotebookParser`, which means that evaluated
-    notebooks will be included without modification, while notebooks with
-    no output cells will be evaluated before being included.
+    This directive uses :class:`NotebookParser` so that included notebooks
+    will be treated the same as those included in toctrees.
 
     """
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
     option_spec = {}
+    has_content = False
 
     def run(self):
-        if not self.state.document.settings.file_insertion_enabled:
-            raise self.warning('"%s" directive disabled.' % self.name)
+        settings = self.state.document.settings
+
+        if not settings.file_insertion_enabled:
+            raise self.warning('"nbinclude" directive disabled.')
 
         # Read the notebook to a string
-        path = directives.path(self.arguments[0])
+        path = rst.directives.path(self.arguments[0])
         rst_file = self.state_machine.document.attributes['source']
         rst_dir = os.path.abspath(os.path.dirname(rst_file))
         path = os.path.normpath(os.path.join(rst_dir, path))
-        e_handler = self.state.document.settings.input_encoding_error_handler
         try:
-            self.state.document.settings.record_dependencies.add(path)
-            include_file = io.FileInput(source_path=path,
-                                        encoding='utf-8',
-                                        error_handler=e_handler)
-        except IOError as error:
-            raise self.severe(u'Problems with "%s" directive path:\n%s.' %
-                              (self.name, error))
-        try:
-            rawtext = include_file.read()
-        except UnicodeError as error:
-            raise self.severe(u'Problem with "%s" directive:\n%s' %
-                              (self.name, error))
+            settings.record_dependencies.add(path)
+            with io.open(path, encoding='utf-8') as f:
+                rawtext = f.read()
+        except (IOError, UnicodeError) as error:
+            raise self.severe(
+                u'Problems with "nbinclude" directive:\n%s.' % error)
 
-        # Use the NotebookParser to convert to reST and evaluate if needed
+        # Use the NotebookParser to get doctree nodes
         nbparser = NotebookParser()
-        node = docutils.utils.new_document(path, self.state.document.settings)
+        node = docutils.utils.new_document(path, settings)
         nbparser.parse(rawtext, node)
+        if isinstance(node.children[0], docutils.nodes.field_list):
+            return node.children[1:]
         return node.children
 
 
