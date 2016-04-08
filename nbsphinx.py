@@ -575,6 +575,13 @@ class NbInclude(rst.Directive):
             raise self.severe(
                 u'Problems with "nbinclude" directive:\n%s.' % error)
 
+        # Add the docname to the `files_to_rebuild` dictionary,
+        # which maps from files to files that include that file in a toctree.
+        # This suppresses the warning that is usually raised when a file
+        # is not in any toctree.
+        name, _ = os.path.splitext(os.path.relpath(path, settings.env.srcdir))
+        settings.env.files_to_rebuild.setdefault(name, set())
+
         # Use the NotebookParser to get doctree nodes
         nbparser = NotebookParser()
         node = docutils.utils.new_document(path, settings)
