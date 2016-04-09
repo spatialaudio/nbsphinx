@@ -73,3 +73,23 @@ This was created with
         :execution-count: 42
 
         42
+
+Sphinx Directive for Including Notebooks
+----------------------------------------
+
+Notebooks can be included directly in an RST file
+using the ``nbinclude`` directive.
+Below, we include :ref:`subdir2/included.ipynb`.
+
+.. nbinclude:: subdir2/included.ipynb
+
+The notebook was included with:
+
+.. code-block:: rst
+
+    .. nbinclude:: subdir2/included.ipynb
+
+.. note::
+
+    * "``../``" is allowed here. In fact, you can include notebooks that are
+      outside of the documentation directory!

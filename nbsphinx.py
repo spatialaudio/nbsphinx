@@ -26,6 +26,7 @@ http://nbsphinx.rtfd.org/
 __version__ = '0.2.5'
 
 import copy
+import io
 import docutils
 from docutils.parsers import rst
 import jinja2
@@ -390,7 +391,8 @@ class NotebookParser(rst.Parser):
 
     Uses nbsphinx.Exporter to convert notebook content to a
     reStructuredText string, which is then parsed by Sphinx's built-in
-    reST parser.
+    reST parser. Evaluated notebooks will be included without modification,
+    while notebooks with no output will be evaluated during parsing.
 
     """
 
@@ -399,11 +401,12 @@ class NotebookParser(rst.Parser):
         return rst.Parser.get_transforms(self) + [ProcessLocalLinks,
                                                   CreateSectionLabels]
 
-    def parse(self, inputstring, document):
+    def parse(self, inputstring, document, srcdir=None):
         """Parse `inputstring`, write results to `document`."""
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
         env = document.settings.env
-        srcdir = os.path.dirname(env.doc2path(env.docname))
+        if srcdir is None:
+            srcdir = os.path.dirname(env.doc2path(env.docname))
         auxdir = os.path.join(env.doctreedir, 'nbsphinx')
         sphinx.util.ensuredir(auxdir)
 
@@ -539,6 +542,54 @@ class NbOutput(rst.Directive):
             node.attributes['latex_prompt'] = latex_prompt
             container += node
         return [container]
+
+
+class NbInclude(rst.Directive):
+    """Include a notebook in a reST document.
+
+    This directive uses :class:`NotebookParser` so that included notebooks
+    will be treated the same as those included in toctrees.
+
+    """
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+    has_content = False
+
+    def run(self):
+        settings = self.state.document.settings
+
+        if not settings.file_insertion_enabled:
+            raise self.warning('"nbinclude" directive disabled.')
+
+        # Read the notebook to a string
+        path = rst.directives.path(self.arguments[0])
+        rst_file = self.state_machine.document.attributes['source']
+        rst_dir = os.path.abspath(os.path.dirname(rst_file))
+        path = os.path.normpath(os.path.join(rst_dir, path))
+        try:
+            settings.record_dependencies.add(path)
+            with io.open(path, encoding='utf-8') as f:
+                rawtext = f.read()
+        except (IOError, UnicodeError) as error:
+            raise self.severe(
+                u'Problems with "nbinclude" directive:\n%s.' % error)
+
+        # Add the docname to the `files_to_rebuild` dictionary,
+        # which maps from files to files that include that file in a toctree.
+        # This suppresses the warning that is usually raised when a file
+        # is not in any toctree.
+        name, _ = os.path.splitext(os.path.relpath(path, settings.env.srcdir))
+        settings.env.files_to_rebuild.setdefault(name, set())
+
+        # Use the NotebookParser to get doctree nodes
+        nbparser = NotebookParser()
+        node = docutils.utils.new_document(path, settings)
+        nbparser.parse(rawtext, node, srcdir=os.path.dirname(path))
+        if isinstance(node.children[0], docutils.nodes.field_list):
+            return node.children[1:]
+        return node.children
 
 
 def _extract_toctree(cell):
@@ -848,6 +899,7 @@ def setup(app):
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
+    app.add_directive('nbinclude', NbInclude)
     app.add_node(CodeNode,
                  html=(do_nothing, depart_code_html),
                  latex=(visit_code_latex, depart_code_latex))
