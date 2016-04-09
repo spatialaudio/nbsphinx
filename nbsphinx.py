@@ -401,11 +401,12 @@ class NotebookParser(rst.Parser):
         return rst.Parser.get_transforms(self) + [ProcessLocalLinks,
                                                   CreateSectionLabels]
 
-    def parse(self, inputstring, document):
+    def parse(self, inputstring, document, srcdir=None):
         """Parse `inputstring`, write results to `document`."""
         nb = nbformat.reads(inputstring, as_version=_ipynbversion)
         env = document.settings.env
-        srcdir = os.path.dirname(env.doc2path(env.docname))
+        if srcdir is None:
+            srcdir = os.path.dirname(env.doc2path(env.docname))
         auxdir = os.path.join(env.doctreedir, 'nbsphinx')
         sphinx.util.ensuredir(auxdir)
 
@@ -585,7 +586,7 @@ class NbInclude(rst.Directive):
         # Use the NotebookParser to get doctree nodes
         nbparser = NotebookParser()
         node = docutils.utils.new_document(path, settings)
-        nbparser.parse(rawtext, node)
+        nbparser.parse(rawtext, node, srcdir=os.path.dirname(path))
         if isinstance(node.children[0], docutils.nodes.field_list):
             return node.children[1:]
         return node.children
