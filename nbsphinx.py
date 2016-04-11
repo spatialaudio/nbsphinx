@@ -236,6 +236,11 @@ div.nboutput div[class^=highlight] pre {
     box-shadow: none;
 }
 
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
 /* input/output containers */
 div.nbinput,
 div.nboutput {
