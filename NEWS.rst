@@ -1,3 +1,7 @@
+Version 0.2.6 (2016-04-12):
+ * Support for LaTeX math environments in Markdown cells
+ * Add options ``nbsphinx_timeout`` and ``nbsphinx_codecell_lexer``
+
 Version 0.2.5 (2016-03-15):
  * Add option ``nbsphinx_allow_errors`` to globally ignore exceptions
  * Separate class `nbsphinx.Exporter`
