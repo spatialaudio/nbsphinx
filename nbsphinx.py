@@ -238,7 +238,7 @@ div.nboutput div[class^=highlight] pre {
 
 /* avoid gaps between output lines */
 div.nboutput div[class^=highlight] pre {
-    line-height: unset;
+    line-height: normal;
 }
 
 /* input/output containers */
