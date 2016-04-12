@@ -807,9 +807,10 @@ def builder_inited(app):
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
-    """Add CSS string to HTML page."""
-    body = context.get('body', '')
-    if body:
+    """Add CSS string to HTML pages created from notebooks."""
+    body = context.get('body')
+    # page_source_suffix is available since Sphinx version 1.3.6
+    if body and context.get('page_source_suffix') in ('.ipynb', None):
         style = '\n<style>' + CSS_STRING + '</style>\n'
         context['body'] = style + body
 
