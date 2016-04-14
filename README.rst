@@ -6,7 +6,8 @@ Jupyter Notebook Tools for Sphinx
 Custom Sphinx directives are used to show `Jupyter Notebook`_ code cells (and of
 course their results) in both HTML and LaTeX output.
 Un-evaluated notebooks -- i.e. notebooks without stored output cells -- will be
-automatically executed during the Sphinx build process.
+automatically executed during the Sphinx build process unless disabled via
+config.
 
 .. _Sphinx: http://sphinx-doc.org/
 .. _Jupyter Notebook: http://jupyter.org/
