@@ -236,6 +236,14 @@ div.nboutput div[class^=highlight] pre {
     box-shadow: none;
 }
 
+/* avoid overly long output lines 
+   Whitespace is preserved by the browser. 
+   Text will wrap when necessary, and on line breaks. 
+*/
+div.nboutput div[class^=highlight] pre {
+    white-space: pre-wrap;
+}
+
 /* avoid gaps between output lines */
 div.nboutput div[class^=highlight] pre {
     line-height: normal;
