@@ -288,6 +288,7 @@ div.nboutput > :nth-child(2)[class^=highlight] {
     padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
+    overflow: auto;
 }
 
 /* input area */
