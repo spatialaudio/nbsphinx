@@ -236,14 +236,6 @@ div.nboutput div[class^=highlight] pre {
     box-shadow: none;
 }
 
-/* avoid overly long output lines 
-   Whitespace is preserved by the browser. 
-   Text will wrap when necessary, and on line breaks. 
-*/
-div.nboutput div[class^=highlight] pre {
-    white-space: pre-wrap;
-}
-
 /* avoid gaps between output lines */
 div.nboutput div[class^=highlight] pre {
     line-height: normal;
@@ -296,6 +288,7 @@ div.nboutput > :nth-child(2)[class^=highlight] {
     padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
+    overflow: auto;
 }
 
 /* input area */
