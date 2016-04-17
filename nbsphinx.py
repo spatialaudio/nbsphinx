@@ -514,6 +514,7 @@ class NbInput(rst.Directive):
         _set_empty_lines(node, self.options)
         node.attributes['latex_prompt'] = latex_prompt
         container += node
+        self.state.document['nbsphinx_include_css'] = True
         return [container]
 
 
@@ -563,6 +564,7 @@ class NbOutput(rst.Directive):
             _set_empty_lines(node, self.options)
             node.attributes['latex_prompt'] = latex_prompt
             container += node
+        self.state.document['nbsphinx_include_css'] = True
         return [container]
 
 
@@ -808,12 +810,10 @@ def builder_inited(app):
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
-    """Add CSS string to HTML pages created from notebooks."""
-    body = context.get('body')
-    # page_source_suffix is available since Sphinx version 1.3.6
-    if body and context.get('page_source_suffix') in ('.ipynb', None):
+    """Add CSS string to HTML pages that contain code cells."""
+    if doctree and doctree.get('nbsphinx_include_css'):
         style = '\n<style>' + CSS_STRING + '</style>\n'
-        context['body'] = style + body
+        context['body'] = style + context['body']
 
 
 def html_collect_pages(app):
