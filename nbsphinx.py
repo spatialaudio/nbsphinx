@@ -141,8 +141,9 @@ RST_TEMPLATE = """
 {%- elif datatype in ['text/latex'] %}
 
     .. math::
+        :nowrap:
 
-{{ output.data['text/latex'] | strip_dollars | indent | indent }}
+{{ output.data['text/latex'] | indent | indent }}
 {%- elif datatype == 'text/html' %}
 
     .. raw:: html
