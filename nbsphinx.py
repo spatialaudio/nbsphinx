@@ -33,6 +33,7 @@ import json
 import nbconvert
 import nbformat
 import os
+import re
 import sphinx
 import subprocess
 try:
@@ -593,7 +594,11 @@ def markdown2rst(text):
         json_data = json.loads(text, object_hook=rawlatex2math_hook)
         return json.dumps(json_data)
 
-    return pandoc(text, 'markdown', 'rst', filter_func=rawlatex2math)
+    rststring = pandoc(text, 'markdown', 'rst', filter_func=rawlatex2math)
+    return re.sub(r'^(\s*)\.\. math::$',
+                  r'\1.. math::\1   :nowrap:',
+                  rststring,
+                  flags=re.MULTILINE)
 
 
 def pandoc(source, fmt, to, filter_func=None):
