@@ -162,7 +162,11 @@ RST_TEMPLATE = """
 {%- if 'nbsphinx-toctree' in cell.metadata %}
 {{ cell | extract_toctree }}
 {%- else %}
+{%- if 'nbsphinx-directive' in cell.metadata %}
+{{ cell | wrap_cell}}
+{%- else %}
 {{ super() }}
+{% endif %}
 {% endif %}
 {% endblock markdowncell %}
 
@@ -375,6 +379,7 @@ class Exporter(nbconvert.RSTExporter):
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
+                'wrap_cell': _wrap_cell,
             })
 
     def from_notebook_node(self, nb, resources=None, **kw):
@@ -665,6 +670,24 @@ def _extract_toctree(cell):
         lines.append(ref.astext().replace('\n', '') +
                      ' <' + unquote(ref.get('refuri')) + '>')
     return '\n    '.join(lines)
+
+
+def _wrap_cell(cell):
+    """Wrap cell content from Markdown cell in sphinx directive."""
+    text = cell.source.split('\n', 2)
+
+    if len(text) > 2:
+        admon = text[0]
+        text = text[2]
+    else:
+        admon = 'note'
+        text = text[0]
+
+    text = nbconvert.filters.markdown2rst(text)
+    text = "".join([".. ", admon.lower(), "::\n\n\t",
+                    text.replace("\n", ' '), "\n"])
+
+    return text
 
 
 def _get_empty_lines(text):
