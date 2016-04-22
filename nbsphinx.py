@@ -676,16 +676,14 @@ def _wrap_cell(cell):
     """Wrap cell content from Markdown cell in sphinx directive."""
     text = cell.source.split('\n', 2)
 
-    if len(text) > 2:
-        admon = text[0]
-        text = text[2]
+    # wrap only if at least 3 lines exist
+    # and if first line corresponds to second line
+    if (len(text) > 2) and (text[1] == ('-' * len(text[0]))):
+        text = "".join([".. ", text[0].lower(), ":: \n\n   ",
+                        nbconvert.filters.markdown2rst(text[2])
+                       .replace("\n", '\n   '), "\n"])
     else:
-        admon = 'note'
-        text = text[0]
-
-    text = nbconvert.filters.markdown2rst(text)
-    text = "".join([".. ", admon.lower(), ":: \n\n   ",
-                    text.replace("\n", '\n   '), "\n"])
+        text = nbconvert.filters.markdown2rst(cell.source)
 
     return text
 
