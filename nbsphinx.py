@@ -684,8 +684,8 @@ def _wrap_cell(cell):
         text = text[0]
 
     text = nbconvert.filters.markdown2rst(text)
-    text = "".join([".. ", admon.lower(), "::\n\n\t",
-                    text.replace("\n", ' '), "\n"])
+    text = "".join([".. ", admon.lower(), ":: \n\n   ",
+                    text.replace("\n", '\n   '), "\n"])
 
     return text
 
