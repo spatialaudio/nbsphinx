@@ -479,6 +479,10 @@ class CodeNode(docutils.nodes.Element):
         return cls(text, node)
 
 
+class AdmonitionNode(docutils.nodes.Element):
+    """A custom node for info and warning boxes."""
+
+
 # See http://docutils.sourceforge.net/docs/howto/rst-directives.html
 
 class NbInput(rst.Directive):
@@ -567,6 +571,33 @@ class NbOutput(rst.Directive):
             container += node
         self.state.document['nbsphinx_include_css'] = True
         return [container]
+
+
+class _NbAdmonition(rst.Directive):
+    """Base class for NbInfo and NbWarning."""
+
+    required_arguments = 0
+    optional_arguments = 0
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        """This is called by the reST parser."""
+        node = AdmonitionNode(classes=['admonition', self._class])
+        self.state.nested_parse(self.content, self.content_offset, node)
+        return [node]
+
+
+class NbInfo(_NbAdmonition):
+    """An information box."""
+
+    _class = 'note'
+
+
+class NbWarning(_NbAdmonition):
+    """A warning box."""
+
+    _class = 'warning'
 
 
 def markdown2rst(text):
@@ -899,6 +930,24 @@ def depart_code_latex(self, node):
     self.body[-1] = '\n'.join(out)
 
 
+def visit_admonition_html(self, node):
+    self.body.append(self.starttag(node, 'div'))
+    self.set_first_last(node)
+
+
+def depart_admonition_html(self, node):
+    self.body.append('</div>\n')
+
+
+def visit_admonition_latex(self, node):
+    # See http://tex.stackexchange.com/q/305898/13684:
+    self.body.append('\n\\begin{notice}{' + node['classes'][1] + '}{}\\unskip')
+
+
+def depart_admonition_latex(self, node):
+    self.body.append('\\end{notice}\n')
+
+
 def do_nothing(self, node):
     pass
 
@@ -936,9 +985,14 @@ def setup(app):
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
+    app.add_directive('nbinfo', NbInfo)
+    app.add_directive('nbwarning', NbWarning)
     app.add_node(CodeNode,
                  html=(do_nothing, depart_code_html),
                  latex=(visit_code_latex, depart_code_latex))
+    app.add_node(AdmonitionNode,
+                 html=(visit_admonition_html, depart_admonition_html),
+                 latex=(visit_admonition_latex, depart_admonition_latex))
     app.connect('builder-inited', builder_inited)
     app.connect('html-page-context', html_page_context)
     app.connect('html-collect-pages', html_collect_pages)

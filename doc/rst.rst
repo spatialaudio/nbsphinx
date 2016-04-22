@@ -73,3 +73,27 @@ This was created with
         :execution-count: 42
 
         42
+
+Sphinx Directives for Info/Warning Boxes
+----------------------------------------
+
+.. nbwarning::
+    **Warning:** This is an experimental feature!
+
+    Its usage may change in the future or it might disappear completely, so
+    don't use it for now.
+
+With a bit of luck, it will be possible (some time in the future) to create
+info/warning boxes in Markdown cells, see
+https://github.com/jupyter/notebook/issues/1292.
+If this ever happens, ``nbsphinx`` will provide directives for creating such
+boxes.
+For now, there are two directives available: ``nbinfo`` and ``nbwarning``.
+This is how an info box looks like:
+
+.. nbinfo::
+    **Note:** This is an info box.
+
+    It may include nested formatting, even another info/warning box:
+
+    .. nbwarning:: **Warning:** You should probably not use nested boxes!
