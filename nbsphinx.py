@@ -162,12 +162,12 @@ RST_TEMPLATE = """
 {%- if 'nbsphinx-toctree' in cell.metadata %}
 {{ cell | extract_toctree }}
 {%- else %}
-{%- if 'nbsphinx-directive' in cell.metadata %}
+{%- if nb.metadata.nbsphinx.allow_directives or 'nbsphinx-directive' in cell.metadata %}
 {{ cell | wrap_cell}}
 {%- else %}
 {{ super() }}
-{% endif %}
-{% endif %}
+{%- endif %}
+{%- endif %}
 {% endblock markdowncell %}
 
 
@@ -367,9 +367,11 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self, allow_errors=False, timeout=30, codecell_lexer='none'):
+    def __init__(self, allow_errors=False, allow_directives=False,
+                 timeout=30, codecell_lexer='none'):
         """Initialize the Exporter."""
         self._allow_errors = allow_errors
+        self._allow_directives = allow_directives
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
@@ -402,6 +404,12 @@ class Exporter(nbconvert.RSTExporter):
             pp = nbconvert.preprocessors.ExecutePreprocessor(
                 allow_errors=allow_errors, timeout=timeout)
             nb, resources = pp.preprocess(nb, resources)
+
+        # check allow directive
+        allow_directives = nbsphinx_metadata.get('allow_directives',
+                                                 self._allow_directives)
+        nbsphinx_metadata['allow_directives'] = allow_directives
+        nb.metadata['nbsphinx'] = nbsphinx_metadata
 
         # Call into RSTExporter
         rststr, resources = super(Exporter, self).from_notebook_node(
@@ -446,6 +454,7 @@ class NotebookParser(rst.Parser):
         resources['unique_key'] = env.docname.replace('/', '_')
 
         exporter = Exporter(allow_errors=env.config.nbsphinx_allow_errors,
+                            allow_directives=env.config.nbsphinx_allow_directives,
                             timeout=env.config.nbsphinx_timeout,
                             codecell_lexer=env.config.nbsphinx_codecell_lexer)
 
@@ -680,10 +689,10 @@ def _wrap_cell(cell):
     # and if first line corresponds to second line
     if (len(text) > 2) and (text[1] == ('-' * len(text[0]))):
         text = "".join([".. ", text[0].lower(), ":: \n\n   ",
-                        nbconvert.filters.markdown2rst(text[2])
+                        markdown2rst(text[2])
                        .replace("\n", '\n   '), "\n"])
     else:
-        text = nbconvert.filters.markdown2rst(cell.source)
+        text = markdown2rst(cell.source)
 
     return text
 
@@ -952,6 +961,7 @@ def setup(app):
     _add_notebook_parser(app)
 
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
+    app.add_config_value('nbsphinx_allow_directives', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
 
