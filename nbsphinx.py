@@ -406,8 +406,10 @@ class Exporter(nbconvert.RSTExporter):
             nb, resources = pp.preprocess(nb, resources)
 
         # check allow directive
-        allow_directives = nbsphinx_metadata.get('allow_directives',
-                                                 self._allow_directives)
+        if self._allow_directives:
+            allow_directives = self._allow_directives
+        else:
+            allow_directives = nbsphinx_metadata.get('allow_directives', False)
         nbsphinx_metadata['allow_directives'] = allow_directives
         nb.metadata['nbsphinx'] = nbsphinx_metadata
 
