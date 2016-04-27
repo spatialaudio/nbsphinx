@@ -422,8 +422,8 @@ class NotebookParser(rst.Parser):
 
     def get_transforms(self):
         """List of transforms for documents parsed by this parser."""
-        return rst.Parser.get_transforms(self) + [ProcessLocalLinks,
-                                                  CreateSectionLabels]
+        return rst.Parser.get_transforms(self) + [
+            ProcessLocalLinks, CreateSectionLabels, ReplaceAlertDivs]
 
     def parse(self, inputstring, document):
         """Parse `inputstring`, write results to `document`."""
@@ -834,6 +834,60 @@ class CreateSectionLabels(docutils.transforms.Transform):
                 env.domaindata['std']['anonlabels'][label] = (
                     env.docname, '')
                 i_still_have_to_create_the_notebook_label = False
+
+
+class ReplaceAlertDivs(docutils.transforms.Transform):
+    """Replace certain <div> elements with AdmonitionNode containers.
+
+    This is a quick-and-dirty work-around until a proper
+    Mardown/CommonMark extension for note/warning boxes is available.
+
+    """
+
+    default_priority = 500  # Doesn't really matter
+
+    _start_re = re.compile(
+        r'\s*<div\s*class\s*=\s*(?P<q>"|\')([a-z\s-]*)(?P=q)\s*>\s*\Z',
+        flags=re.IGNORECASE)
+    _class_re = re.compile(r'\s*alert\s*alert-(info|warning)\s*\Z')
+    _end_re = re.compile(r'\s*</div\s*>\s*\Z', flags=re.IGNORECASE)
+
+    def apply(self):
+        start_tags = []
+        for node in self.document.traverse(docutils.nodes.raw):
+            if node['format'] != 'html':
+                continue
+            start_match = self._start_re.match(node.astext())
+            if not start_match:
+                continue
+            class_match = self._class_re.match(start_match.group(2))
+            if not class_match:
+                continue
+            admonition_class = class_match.group(1)
+            if admonition_class == 'info':
+                admonition_class = 'note'
+            start_tags.append((node, admonition_class))
+
+        # Reversed order to allow nested <div> elements:
+        for node, admonition_class in reversed(start_tags):
+            content = []
+            for sibling in node.traverse(include_self=False, descend=False,
+                                         siblings=True, ascend=False):
+                end_tag = (isinstance(sibling, docutils.nodes.raw) and
+                           sibling['format'] == 'html' and
+                           self._end_re.match(sibling.astext()))
+                if end_tag:
+                    admonition_node = AdmonitionNode(
+                        classes=['admonition', admonition_class])
+                    admonition_node.extend(content)
+                    parent = node.parent
+                    parent.replace(node, admonition_node)
+                    for n in content:
+                        parent.remove(n)
+                    parent.remove(sibling)
+                    break
+                else:
+                    content.append(sibling)
 
 
 def builder_inited(app):
