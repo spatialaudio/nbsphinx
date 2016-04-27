@@ -78,8 +78,9 @@ Sphinx Directives for Info/Warning Boxes
 ----------------------------------------
 
 .. nbwarning::
-    **Warning:** This is an experimental feature!
+    **Warning:**
 
+    This is an experimental feature!
     Its usage may change in the future or it might disappear completely, so
     don't use it for now.
 
@@ -92,7 +93,9 @@ For now, there are two directives available: ``nbinfo`` and ``nbwarning``.
 This is how an info box looks like:
 
 .. nbinfo::
-    **Note:** This is an info box.
+    **Note:**
+
+    This is an info box.
 
     It may include nested formatting, even another info/warning box:
 

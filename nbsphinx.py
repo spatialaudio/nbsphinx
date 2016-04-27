@@ -351,6 +351,40 @@ div.nboutput  > :nth-child(2).stderr {
 .ansi-bold { font-weight: bold; }
 """
 
+CSS_STRING_READTHEDOCS = """
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+"""
+
 
 class Exporter(nbconvert.RSTExporter):
     """Convert Jupyter notebooks to reStructuredText.
@@ -901,9 +935,13 @@ def builder_inited(app):
 
 def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
+    style = ''
     if doctree and doctree.get('nbsphinx_include_css'):
-        style = '\n<style>' + CSS_STRING + '</style>\n'
-        context['body'] = style + context['body']
+        style += CSS_STRING
+    if doctree and app.config.html_theme == 'sphinx_rtd_theme':
+        style += CSS_STRING_READTHEDOCS
+    if style:
+        context['body'] = '\n<style>' + style + '</style>\n' + context['body']
 
 
 def html_collect_pages(app):
@@ -987,6 +1025,11 @@ def depart_code_latex(self, node):
 def visit_admonition_html(self, node):
     self.body.append(self.starttag(node, 'div'))
     self.set_first_last(node)
+    if self.settings.env.config.html_theme == 'sphinx_rtd_theme':
+        if node.children:
+            classes = node.children[0]['classes']
+            if 'last' not in classes:
+                classes.extend(['fa', 'fa-exclamation-circle'])
 
 
 def depart_admonition_html(self, node):
