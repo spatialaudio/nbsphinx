@@ -24,6 +24,9 @@ highlight_language = 'none'
 # If True, the build process is continued even if an exception occurs:
 #nbsphinx_allow_errors = True
 
+# If True, this enables wrapping of markdown cells in sphinx-directives:
+#nbsphinx_allow_directives = True
+
 # Controls when a cell will time out (defaults to 30; use -1 for no timeout):
 #nbsphinx_timeout = 60
 
