@@ -847,20 +847,20 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
     default_priority = 500  # Doesn't really matter
 
     _start_re = re.compile(
-        r'\s*<div\s*class\s*=\s*(?P<q>"|\')([a-z\s-]*)(?P=q)\s*>\s*',
+        r'\s*<div\s*class\s*=\s*(?P<q>"|\')([a-z\s-]*)(?P=q)\s*>\s*\Z',
         flags=re.IGNORECASE)
-    _class_re = re.compile(r'\s*alert\s*alert-(info|warning)\s*')
-    _end_re = re.compile(r'\s*</div\s*>\s*', flags=re.IGNORECASE)
+    _class_re = re.compile(r'\s*alert\s*alert-(info|warning)\s*\Z')
+    _end_re = re.compile(r'\s*</div\s*>\s*\Z', flags=re.IGNORECASE)
 
     def apply(self):
         start_tags = []
         for node in self.document.traverse(docutils.nodes.raw):
             if node['format'] != 'html':
                 continue
-            start_match = self._start_re.fullmatch(node.astext())
+            start_match = self._start_re.match(node.astext())
             if not start_match:
                 continue
-            class_match = self._class_re.fullmatch(start_match.group(2))
+            class_match = self._class_re.match(start_match.group(2))
             if not class_match:
                 continue
             admonition_class = class_match.group(1)
@@ -875,7 +875,7 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
                                          siblings=True, ascend=False):
                 end_tag = (isinstance(sibling, docutils.nodes.raw) and
                            sibling['format'] == 'html' and
-                           self._end_re.fullmatch(sibling.astext()))
+                           self._end_re.match(sibling.astext()))
                 if end_tag:
                     admonition_node = AdmonitionNode(
                         classes=['admonition', admonition_class])
