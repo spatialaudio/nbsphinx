@@ -847,10 +847,10 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
     default_priority = 500  # Doesn't really matter
 
     _start_re = re.compile(
-        r"\s*<div\s*class\s*=\s*(?P<q>\"|')([a-z\s-]*)(?P=q)\s*>\s*",
+        r'\s*<div\s*class\s*=\s*(?P<q>"|\')([a-z\s-]*)(?P=q)\s*>\s*',
         flags=re.IGNORECASE)
-    _class_re = re.compile(r"\s*alert\s*alert-(info|warning)\s*")
-    _end_re = re.compile(r"\s*</div\s*>\s*", flags=re.IGNORECASE)
+    _class_re = re.compile(r'\s*alert\s*alert-(info|warning)\s*')
+    _end_re = re.compile(r'\s*</div\s*>\s*', flags=re.IGNORECASE)
 
     def apply(self):
         start_tags = []
