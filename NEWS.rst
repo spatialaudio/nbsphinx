@@ -1,3 +1,7 @@
+Version 0.2.7 (2016-05-04):
+ * Special CSS tuning for ``sphinx_rtd_theme``
+ * Replace info/warning ``<div>`` elements with ``nbinfo``/``nbwarning``
+
 Version 0.2.6 (2016-04-12):
  * Support for LaTeX math environments in Markdown cells
  * Add options ``nbsphinx_timeout`` and ``nbsphinx_codecell_lexer``
