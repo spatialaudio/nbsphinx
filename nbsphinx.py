@@ -43,6 +43,28 @@ except ImportError:
 
 _ipynbversion = 4
 
+# See nbconvert/exporters/html.py:
+DISPLAY_DATA_PRIORITY_HTML = (
+    'application/javascript',
+    'text/html',
+    'text/markdown',
+    'image/svg+xml',
+    'text/latex',
+    'image/png',
+    'image/jpeg',
+    'text/plain',
+)
+# See nbconvert/exporters/latex.py:
+DISPLAY_DATA_PRIORITY_LATEX = (
+    'text/latex',
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'image/svg+xml',
+    'text/markdown',
+    'text/plain',
+)
+
 RST_TEMPLATE = """
 {% extends 'rst.tpl' %}
 
@@ -85,17 +107,7 @@ RST_TEMPLATE = """
 {% endblock input %}
 
 
-{% block nboutput %}
-{%- if output.output_type == 'stream' %}
-    {%- set datatype = 'ansi' %}
-    {%- set outputdata = output.text[:-1] %}{# trailing \n is stripped #}
-{%- elif output.output_type == 'error' %}
-    {%- set datatype = 'ansi' %}
-    {%- set outputdata = '\n'.join(output.traceback) %}
-{%- else %}
-    {%- set datatype = (output.data | filter_data_type)[0] %}
-    {%- set outputdata = output.data[datatype] %}
-{%- endif -%}
+{% macro insert_nboutput(datatype, output, cell) -%}
 .. nboutput::
 {%- if datatype == 'text/plain' %}{# nothing #}
 {%- else %} rst
@@ -110,12 +122,12 @@ RST_TEMPLATE = """
     :class: stderr
 {%- endif %}
 {%- if datatype == 'text/plain' -%}
-{{ insert_empty_lines(outputdata) }}
+{{ insert_empty_lines(output.data[datatype]) }}
 
-{{ outputdata.strip(\n) | indent }}
+{{ output.data[datatype].strip(\n) | indent }}
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
-    .. image:: {{ output.metadata.filenames[datatype].rsplit('.', 1)[0] + '.*' | posix_path }}
+    .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
 {%- elif datatype in ['text/markdown'] %}
 
 {{ output.data['text/markdown'] | markdown2rst | indent }}
@@ -136,18 +148,33 @@ RST_TEMPLATE = """
     .. raw:: html
 
         <pre>
-{{ outputdata | ansi2html | indent | indent }}
+{{ output.data[datatype] | ansi2html | indent | indent }}
         </pre>
 
     .. raw:: latex
 
         % This comment is needed to force a line break for adjacent ANSI cells
         \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
-{{ outputdata | ansi2latex | indent | indent }}
+{{ output.data[datatype] | ansi2latex | indent | indent }}
         \\end{OriginalVerbatim}
 {% else %}
 
     WARNING! Data type not implemented: {{ datatype }}
+{%- endif %}
+{% endmacro %}
+
+
+{% block nboutput -%}
+{%- set html_datatype, latex_datatype = output | get_output_type %}
+{%- if html_datatype == latex_datatype %}
+{{ insert_nboutput(html_datatype, output, cell) }}
+{%- else %}
+.. only:: html
+
+{{ insert_nboutput(html_datatype, output, cell) | indent }}
+.. only:: latex
+
+{{ insert_nboutput(latex_datatype, output, cell) | indent }}
 {%- endif %}
 {% endblock nboutput %}
 
@@ -411,6 +438,7 @@ class Exporter(nbconvert.RSTExporter):
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
+                'get_output_type': _get_output_type,
             })
 
     def from_notebook_node(self, nb, resources=None, **kw):
@@ -745,6 +773,27 @@ def _get_empty_lines(text):
     before = len(text) - len(text.lstrip('\n'))
     after = len(text) - len(text.strip('\n')) - before
     return before, after
+
+
+def _get_output_type(output):
+    """Choose appropriate output data types for HTML and LaTeX."""
+    if output.output_type == 'stream':
+        html_datatype = latex_datatype = 'ansi'
+        text = output.text
+        output.data = {'ansi': text[:-1] if text.endswith('\n') else text}
+    elif output.output_type == 'error':
+        html_datatype = latex_datatype = 'ansi'
+        output.data = {'ansi': '\n'.join(output.traceback)}
+    else:
+        for datatype in DISPLAY_DATA_PRIORITY_HTML:
+            if datatype in output.data:
+                html_datatype = datatype
+                break
+        for datatype in DISPLAY_DATA_PRIORITY_LATEX:
+            if datatype in output.data:
+                latex_datatype = datatype
+                break
+    return html_datatype, latex_datatype
 
 
 def _set_empty_lines(node, options):
