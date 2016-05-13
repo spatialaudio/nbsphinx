@@ -397,8 +397,10 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self, allow_errors=False, timeout=30, codecell_lexer='none'):
+    def __init__(self, execute='auto', allow_errors=False, timeout=30,
+                 codecell_lexer='none'):
         """Initialize the Exporter."""
+        self._execute = execute
         self._allow_errors = allow_errors
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
@@ -422,9 +424,14 @@ class Exporter(nbconvert.RSTExporter):
 
         nbsphinx_metadata = nb.metadata.get('nbsphinx', {})
 
-        # Execute notebook only if there are code cells and no outputs:
-        if (any(c.source for c in nb.cells if c.cell_type == 'code') and
-                not any(c.outputs for c in nb.cells if 'outputs' in c)):
+        execute = nbsphinx_metadata.get('execute', self._execute)
+        if execute not in ('always', 'never', 'auto'):
+            raise NotebookError('invalid execute option: {!r}'.format(execute))
+        # Auto-execute notebook only if there are code cells and no outputs:
+        no_outputs = (
+            any(c.source for c in nb.cells if c.cell_type == 'code') and not
+            any(c.outputs for c in nb.cells if 'outputs' in c))
+        if execute == 'always' or (execute == 'auto' and no_outputs):
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
@@ -474,7 +481,8 @@ class NotebookParser(rst.Parser):
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace('/', '_')
 
-        exporter = Exporter(allow_errors=env.config.nbsphinx_allow_errors,
+        exporter = Exporter(execute=env.config.nbsphinx_execute,
+                            allow_errors=env.config.nbsphinx_allow_errors,
                             timeout=env.config.nbsphinx_timeout,
                             codecell_lexer=env.config.nbsphinx_codecell_lexer)
 
@@ -1076,6 +1084,7 @@ def setup(app):
     """Initialize Sphinx extension."""
     _add_notebook_parser(app)
 
+    app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
