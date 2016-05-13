@@ -21,6 +21,9 @@ highlight_language = 'none'
 # See http://nbsphinx.readthedocs.org/en/latest/allow-errors.html
 # and http://nbsphinx.readthedocs.org/en/latest/timeout.html for more details.
 
+# Execute notebooks before conversion: 'always', 'never', 'auto' (default)
+#nbsphinx_execute = 'never'
+
 # If True, the build process is continued even if an exception occurs:
 #nbsphinx_allow_errors = True
 
