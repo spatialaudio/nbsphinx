@@ -455,11 +455,14 @@ class Exporter(nbconvert.RSTExporter):
         execute = nbsphinx_metadata.get('execute', self._execute)
         if execute not in ('always', 'never', 'auto'):
             raise NotebookError('invalid execute option: {!r}'.format(execute))
-        # Auto-execute notebook only if there are code cells and no outputs:
-        no_outputs = (
-            any(c.source for c in nb.cells if c.cell_type == 'code') and not
-            any(c.outputs for c in nb.cells if 'outputs' in c))
-        if execute == 'always' or (execute == 'auto' and no_outputs):
+        auto_execute = (
+            # At least one code cell actually containing source code:
+            any(c.source for c in nb.cells if c.cell_type == 'code') and
+            # No outputs, not even a prompt number:
+            not any(c.get('outputs') or c.get('execution_count')
+                    for c in nb.cells if c.cell_type == 'code')
+        )
+        if execute == 'always' or (execute == 'auto' and auto_execute):
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
