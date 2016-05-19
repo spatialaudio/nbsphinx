@@ -424,10 +424,11 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self, execute='auto', allow_errors=False, timeout=30,
-                 codecell_lexer='none'):
+    def __init__(self, execute='auto', execute_arguments=[],
+                 allow_errors=False, timeout=30, codecell_lexer='none'):
         """Initialize the Exporter."""
         self._execute = execute
+        self._execute_arguments = execute_arguments
         self._allow_errors = allow_errors
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
@@ -467,6 +468,7 @@ class Exporter(nbconvert.RSTExporter):
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
             pp = nbconvert.preprocessors.ExecutePreprocessor(
+                extra_arguments=self._execute_arguments,
                 allow_errors=allow_errors, timeout=timeout)
             nb, resources = pp.preprocess(nb, resources)
 
@@ -512,10 +514,13 @@ class NotebookParser(rst.Parser):
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = env.docname.replace('/', '_')
 
-        exporter = Exporter(execute=env.config.nbsphinx_execute,
-                            allow_errors=env.config.nbsphinx_allow_errors,
-                            timeout=env.config.nbsphinx_timeout,
-                            codecell_lexer=env.config.nbsphinx_codecell_lexer)
+        exporter = Exporter(
+            execute=env.config.nbsphinx_execute,
+            execute_arguments=env.config.nbsphinx_execute_arguments,
+            allow_errors=env.config.nbsphinx_allow_errors,
+            timeout=env.config.nbsphinx_timeout,
+            codecell_lexer=env.config.nbsphinx_codecell_lexer,
+        )
 
         try:
             rststring, resources = exporter.from_notebook_node(nb, resources)
@@ -1137,6 +1142,7 @@ def setup(app):
     _add_notebook_parser(app)
 
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
+    app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
