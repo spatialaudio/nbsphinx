@@ -455,7 +455,7 @@ class Exporter(nbconvert.RSTExporter):
 
         execute = nbsphinx_metadata.get('execute', self._execute)
         if execute not in ('always', 'never', 'auto'):
-            raise NotebookError('invalid execute option: {!r}'.format(execute))
+            raise ValueError('invalid execute option: {!r}'.format(execute))
         auto_execute = (
             # At least one code cell actually containing source code:
             any(c.source for c in nb.cells if c.cell_type == 'code') and
@@ -480,7 +480,7 @@ class Exporter(nbconvert.RSTExporter):
         if orphan is True:
             rststr = ':orphan:\n\n' + rststr
         elif orphan is not False:
-            raise NotebookError('invalid orphan option: {!r}'.format(orphan))
+            raise ValueError('invalid orphan option: {!r}'.format(orphan))
 
         return rststr, resources
 
@@ -524,9 +524,17 @@ class NotebookParser(rst.Parser):
 
         try:
             rststring, resources = exporter.from_notebook_node(nb, resources)
-        except NotebookError as e:
-            env.warn(env.docname, str(e))
-            return  # document is unchanged (i.e. empty)
+        except nbconvert.preprocessors.execute.CellExecutionError as e:
+            lines = str(e).split('\n')
+            lines[0] = 'CellExecutionError in {}:'.format(
+                env.doc2path(env.docname, base=None))
+            lines.append("You can ignore this error by setting the following "
+                         "in conf.py:\n\n    nbsphinx_allow_errors = True\n")
+            raise NotebookError('\n'.join(lines))
+        except Exception as e:
+            raise NotebookError(type(e).__name__ + ' in ' +
+                                env.doc2path(env.docname, base=None) + ':\n' +
+                                str(e))
 
         # Create additional output files (figures etc.),
         # see nbconvert.writers.FilesWriter.write()
@@ -538,8 +546,10 @@ class NotebookParser(rst.Parser):
         rst.Parser.parse(self, rststring, document)
 
 
-class NotebookError(Exception):
+class NotebookError(sphinx.errors.SphinxError):
     """Error during notebook parsing."""
+
+    category = 'Notebook error'
 
 
 class CodeNode(docutils.nodes.Element):
@@ -752,7 +762,7 @@ def _extract_toctree(cell):
             else:
                 lines.append(':{}: {}'.format(option, value))
     except AttributeError:
-        raise NotebookError(
+        raise ValueError(
             'invalid nbsphinx-toctree option: {!r}'.format(options))
 
     text = nbconvert.filters.markdown2rst(cell.source)
