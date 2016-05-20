@@ -1,3 +1,7 @@
+Version 0.2.8 (2016-05-20):
+ * Add options ``nbsphinx_execute`` and ``nbsphinx_execute_arguments``
+ * Separate "display priority" for HTML and LaTeX
+
 Version 0.2.7 (2016-05-04):
  * Special CSS tuning for ``sphinx_rtd_theme``
  * Replace info/warning ``<div>`` elements with ``nbinfo``/``nbwarning``
