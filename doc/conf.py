@@ -64,7 +64,10 @@ html_title = project + ' version ' + release
 latex_elements = {
     'papersize': 'a4paper',
     'preamble': r"""
-\usepackage{lmodern}  % heavier typewriter font
+\usepackage[light,scaled=1.05]{zlmtt}  % light typewriter font from lmodern
+\usepackage[sc,osf]{mathpazo}
+\linespread{1.05}  % see http://www.tug.dk/FontCatalogue/urwpalladio/
+\renewcommand{\sfdefault}{pplj}  % Palatino instead of sans serif
 """,
 }
 
