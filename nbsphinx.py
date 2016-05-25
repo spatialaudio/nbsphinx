@@ -159,7 +159,7 @@ RST_TEMPLATE = """
         \\end{OriginalVerbatim}
 {% else %}
 
-    WARNING! Data type not implemented: {{ datatype }}
+    .. nbwarning:: Data type cannot be displayed: {{ datatype }}
 {%- endif %}
 {% endmacro %}
 
@@ -797,10 +797,14 @@ def _get_output_type(output):
             if datatype in output.data:
                 html_datatype = datatype
                 break
+        else:
+            html_datatype = ', '.join(output.data.keys())
         for datatype in DISPLAY_DATA_PRIORITY_LATEX:
             if datatype in output.data:
                 latex_datatype = datatype
                 break
+        else:
+            latex_datatype = ', '.join(output.data.keys())
     return html_datatype, latex_datatype
 
 
