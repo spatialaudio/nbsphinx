@@ -28,6 +28,7 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Sphinx',
+        'Framework :: Sphinx :: Extension',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
