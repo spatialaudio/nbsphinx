@@ -11,11 +11,11 @@ newest development version (a.k.a. "master") from Github_::
 
    git clone https://github.com/spatialaudio/nbsphinx.git
    cd nbsphinx
-   python setup.py develop --user
+   python3 setup.py develop --user
 
 This way, your installation always stays up-to-date, even if you pull new
-changes from the Github repository.  If you have both Python 2 and 3 installed,
-you might have to use the command ``python3`` instead of ``python``.
+changes from the Github repository.  If you have only Python 3 installed, you
+might have to use the command ``python`` instead of ``python3``.
 When installing ``nbsphinx`` this way, you can also quickly check other Git
 branches (in this example the branch is called "another-branch")::
 
@@ -33,13 +33,13 @@ To get the latest changes from Github, use::
 If you make changes to the documentation, you should create the HTML
 pages locally using Sphinx and check if they look OK::
 
-   python setup.py build_sphinx
+   python3 setup.py build_sphinx
 
 To check the LaTeX output, use::
 
-   python setup.py build_sphinx -b latex
+   python3 setup.py build_sphinx -b latex
 
-Again, you'll probably have to use ``python3`` instead of ``python``.
+Again, you'll probably have to use ``python`` instead of ``python3``.
 The generated files will be available in the directories ``build/sphinx/html/``
 and ``build/sphinx/latex/``, respectively.
 

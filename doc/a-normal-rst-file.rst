@@ -1,5 +1,5 @@
-A Normal reStructuredText File
-==============================
+Normal reStructuredText Files
+=============================
 
 This is a normal RST file.
 
@@ -8,27 +8,30 @@ This is a normal RST file.
 Links to Notebooks
 ------------------
 
-Links to notebooks can be easily created: :ref:`subdir/another.ipynb` (the
-notebook title is used as link text).
-You can also use :ref:`an alternative text <subdir/another.ipynb>`.
+Links to notebooks can be easily created:
+:ref:`subdir/a-notebook-in-a-subdir.ipynb`
+(the notebook title is used as link text).
+You can also use
+:ref:`an alternative text <subdir/a-notebook-in-a-subdir.ipynb>`.
 
 The above links were created with:
 
 .. code-block:: rst
 
-    :ref:`subdir/another.ipynb`
-    :ref:`an alternative text <subdir/another.ipynb>`
+    :ref:`subdir/a-notebook-in-a-subdir.ipynb`
+    :ref:`an alternative text <subdir/a-notebook-in-a-subdir.ipynb>`
 
-Links to subsections are also possible,
-e.g.  :ref:`subdir/another.ipynb#A-Sub-Section` (the subsection title is used
-as link text) and :ref:`alternative text <subdir/another.ipynb#A-Sub-Section>`.
+Links to subsections are also possible, e.g.
+:ref:`subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
+(the subsection title is used as link text) and
+:ref:`alternative text <subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section>`.
 
 These links were created with:
 
 .. code-block:: rst
 
-    :ref:`subdir/another.ipynb#A-Sub-Section`
-    :ref:`alternative text <subdir/another.ipynb#A-Sub-Section>`
+    :ref:`subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
+    :ref:`alternative text <subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section>`
 
 .. note::
 

@@ -16,16 +16,11 @@ exclude_patterns = ['_build', '**.ipynb_checkpoints']
 # Default language for syntax highlighting in reST and Markdown cells
 highlight_language = 'none'
 
-# List of arguments to be passed to the kernel that executes the notebooks:
-#nbsphinx_execute_arguments = ['--InlineBackend.figure_formats={"png", "pdf"}']
-
-# -- These set defaults that can be overridden through notebook metadata --
-
-# See http://nbsphinx.readthedocs.org/en/latest/allow-errors.html
-# and http://nbsphinx.readthedocs.org/en/latest/timeout.html for more details.
-
 # Execute notebooks before conversion: 'always', 'never', 'auto' (default)
 #nbsphinx_execute = 'never'
+
+# List of arguments to be passed to the kernel that executes the notebooks:
+#nbsphinx_execute_arguments = ['--InlineBackend.figure_formats={"png", "pdf"}']
 
 # If True, the build process is continued even if an exception occurs:
 #nbsphinx_allow_errors = True

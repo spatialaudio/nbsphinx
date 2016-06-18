@@ -12,9 +12,9 @@ automatically executed during the Sphinx build process.
 .. _Jupyter Notebook: http://jupyter.org/
 
 Documentation (and example of use):
-    http://nbsphinx.rtfd.org/
+    http://nbsphinx.readthedocs.io/
 
-Code:
+Source code repository (and issue tracker):
     https://github.com/spatialaudio/nbsphinx/
 
 Python Package Index:
@@ -26,7 +26,7 @@ License:
 Quick Start:
     #. Install ``nbsphinx``::
 
-           pip install nbsphinx --user
+           python3 -m pip install nbsphinx --user
 
     #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
 

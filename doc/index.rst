@@ -1,7 +1,7 @@
 .. include:: ../README.rst
 
-All content shown below -- except for the section :doc:`rst` -- was
-generated from Jupyter notebooks.
+All content shown below -- except for the section :doc:`a-normal-rst-file` --
+was generated from Jupyter notebooks.
 
 .. toctree::
     :maxdepth: 3
@@ -11,12 +11,10 @@ generated from Jupyter notebooks.
     markdown-cells.ipynb
     code-cells.ipynb
     raw-cells.ipynb
-    pre-executed.ipynb
-    allow-errors.ipynb
-    timeout.ipynb
     hidden-cells.ipynb
+    executing-notebooks.ipynb
     subdir/*
-    rst.rst
+    a-normal-rst-file.rst
     links.ipynb
 
 .. only:: html
