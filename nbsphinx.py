@@ -1069,8 +1069,12 @@ def depart_code_latex(self, node):
     out = []
     assert lines[0] == ''
     out.append(lines[0])
-    assert lines[1].startswith(r'\begin{Verbatim}')
-    out.append(lines[1].replace('Verbatim', 'OriginalVerbatim'))
+    if lines[1].startswith(r'\begin{sphinxVerbatim}'):  # Sphinx >= 1.5
+        out.append(lines[1].replace('sphinxVerbatim', 'Verbatim'))
+    elif lines[1].startswith(r'\begin{Verbatim}'):  # Sphinx < 1.5
+        out.append(lines[1].replace('Verbatim', 'OriginalVerbatim'))
+    else:
+        assert False
     code_lines = (
         [''] * node.get('empty-lines-before', 0) +
         lines[2:-2] +
@@ -1084,8 +1088,12 @@ def depart_code_latex(self, node):
     prefix = ' ' * len(prompt)
     for line in code_lines[1:]:
         out.append(prefix + line)
-    assert lines[-2].startswith(r'\end{Verbatim}')
-    out.append(lines[-2].replace('Verbatim', 'OriginalVerbatim'))
+    if lines[-2].startswith(r'\end{sphinxVerbatim}'):  # Sphinx >= 1.5
+        out.append(lines[-2].replace('sphinxVerbatim', 'Verbatim'))
+    elif lines[-2].startswith(r'\end{Verbatim}'):  # Sphinx < 1.5
+        out.append(lines[-2].replace('Verbatim', 'OriginalVerbatim'))
+    else:
+        assert False
     assert lines[-1] == ''
     out.append(lines[-1])
     self.body[-1] = '\n'.join(out)
