@@ -302,7 +302,7 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    min-width: %(nbsphinx_prompt_width)s;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -1016,7 +1016,7 @@ def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
     style = ''
     if doctree and doctree.get('nbsphinx_include_css'):
-        style += CSS_STRING
+        style += CSS_STRING % app.config
     if doctree and app.config.html_theme == 'sphinx_rtd_theme':
         style += CSS_STRING_READTHEDOCS
     if style:
@@ -1168,6 +1168,7 @@ def setup(app):
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
+    app.add_config_value('nbsphinx_prompt_width', '9ex', rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)

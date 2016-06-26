@@ -28,8 +28,11 @@ highlight_language = 'none'
 # Controls when a cell will time out (defaults to 30; use -1 for no timeout):
 #nbsphinx_timeout = 60
 
-# Default Pygments lexer for syntax highlighting in code cells
+# Default Pygments lexer for syntax highlighting in code cells:
 #nbsphinx_codecell_lexer = 'ipython3'
+
+# Width of input/output prompts used in CSS:
+#nbsphinx_prompt_width = '8ex'
 
 # -- The settings below this line are not specific to nbsphinx ------------
 
