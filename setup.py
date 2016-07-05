@@ -13,7 +13,7 @@ setup(
     install_requires=[
         'docutils',
         'jinja2',
-        'nbconvert',
+        'nbconvert[execute]',
         'nbformat',
         'sphinx',
     ],
