@@ -1,3 +1,6 @@
+Version 0.2.9 (2016-07-26):
+ * Add option ``nbsphinx_prompt_width``
+
 Version 0.2.8 (2016-05-20):
  * Add options ``nbsphinx_execute`` and ``nbsphinx_execute_arguments``
  * Separate "display priority" for HTML and LaTeX
