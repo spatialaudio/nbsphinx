@@ -1024,7 +1024,7 @@ def builder_inited(app):
             'redcloud': '8ex',
             'sphinx_py3doc_enhanced_theme': '8ex',
             'sphinx_rtd_theme': '8ex',
-            'traditional': '7ex',
+            'traditional': '6ex',
         }.get(app.config.html_theme, '9ex')
 
 
