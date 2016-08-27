@@ -1004,12 +1004,28 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
 
 
 def builder_inited(app):
-    """Add color definitions to LaTeX preamble."""
+    # Add color definitions to LaTeX preamble
     latex_elements = app.builder.config.latex_elements
     latex_elements['preamble'] = '\n'.join([
         LATEX_PREAMBLE,
         latex_elements.get('preamble', ''),
     ])
+
+    # Set default value for CSS prompt width
+    if app.config.nbsphinx_prompt_width is None:
+        app.config.nbsphinx_prompt_width = {
+            'agogo': '7ex',
+            'classic': '7ex',
+            'cloud': '8ex',
+            'dotted': '8ex',
+            'haiku': '7ex',
+            'nature': '8ex',
+            'pyramid': '8ex',
+            'redcloud': '8ex',
+            'sphinx_py3doc_enhanced_theme': '8ex',
+            'sphinx_rtd_theme': '8ex',
+            'traditional': '7ex',
+        }.get(app.config.html_theme, '9ex')
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
@@ -1168,7 +1184,8 @@ def setup(app):
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
-    app.add_config_value('nbsphinx_prompt_width', '9ex', rebuild='html')
+    # Default value is set in builder_inited():
+    app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
