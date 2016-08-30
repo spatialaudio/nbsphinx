@@ -92,7 +92,7 @@ RST_TEMPLATE = """
 .. nbinput:: {% if cell.metadata.magics_language -%}
 {{ cell.metadata.magics_language }}
 {%- elif nb.metadata.language_info -%}
-{{ nb.metadata.language_info.pygments_lexer }}
+{{ nb.metadata.language_info.pygments_lexer or nb.metadata.language_info.name }}
 {%- else -%}
 {{ resources.codecell_lexer }}
 {%- endif -%}
