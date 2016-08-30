@@ -36,6 +36,7 @@ import os
 import re
 import sphinx
 import subprocess
+import traitlets
 try:
     from urllib.parse import unquote  # Python 3.x
 except ImportError:
@@ -88,7 +89,9 @@ RST_TEMPLATE = """
 
 
 {% block input -%}
-.. nbinput:: {% if nb.metadata.language_info -%}
+.. nbinput:: {% if cell.metadata.magics_language -%}
+{{ cell.metadata.magics_language }}
+{%- elif nb.metadata.language_info -%}
 {{ nb.metadata.language_info.pygments_lexer }}
 {%- else -%}
 {{ resources.codecell_lexer }}
@@ -441,6 +444,13 @@ class Exporter(nbconvert.RSTExporter):
                 'extract_toctree': _extract_toctree,
                 'get_output_type': _get_output_type,
             })
+
+    @property
+    def default_config(self):
+        c = traitlets.config.Config(
+            {'HighlightMagicsPreprocessor': {'enabled': True}})
+        c.merge(super(Exporter, self).default_config)
+        return c
 
     def from_notebook_node(self, nb, resources=None, **kw):
         nb = copy.deepcopy(nb)

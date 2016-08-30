@@ -14,6 +14,7 @@ setup(
         'docutils',
         'jinja2',
         'nbconvert',
+        'traitlets',
         'nbformat',
         'sphinx',
     ],
