@@ -144,6 +144,16 @@ RST_TEMPLATE = """
     .. raw:: html
 
 {{ output.data['text/html'] | indent | indent }}
+{%- elif datatype == 'application/javascript' %}
+{% set div_id = uuid4() %}
+
+    .. raw:: html
+
+        <div id="{{ div_id }}"></div>
+        <script type="text/javascript">
+        var element = $('#{{ div_id }}');
+{{ output.data['application/javascript'] | indent | indent }}
+        </script>
 {%- elif datatype == 'ansi' %}
 
     .. rst-class:: highlight
