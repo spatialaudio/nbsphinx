@@ -151,7 +151,7 @@ RST_TEMPLATE = """
 
         <div id="{{ div_id }}"></div>
         <script type="text/javascript">
-        var element = $('#{{ div_id }}');
+        var element = document.getElementById('{{ div_id }}');
 {{ output.data['application/javascript'] | indent | indent }}
         </script>
 {%- elif datatype == 'ansi' %}
