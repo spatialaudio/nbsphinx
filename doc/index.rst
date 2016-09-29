@@ -1,8 +1,5 @@
 .. include:: ../README.rst
 
-User Manual
------------
-
 All content shown below -- except for the section :doc:`a-normal-rst-file` --
 was generated from Jupyter notebooks.
 
