@@ -26,21 +26,22 @@ http://nbsphinx.rtfd.org/
 __version__ = '0.2.9'
 
 import copy
-import docutils
-from docutils.parsers import rst
-import jinja2
 import json
-import nbconvert
-import nbformat
 import os
 import re
-import sphinx
 import subprocess
-import traitlets
 try:
     from urllib.parse import unquote  # Python 3.x
 except ImportError:
     from urllib2 import unquote  # Python 2.x
+
+import docutils
+from docutils.parsers import rst
+import jinja2
+import nbconvert
+import nbformat
+import sphinx
+import traitlets
 
 _ipynbversion = 4
 
