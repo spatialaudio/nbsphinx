@@ -1,3 +1,6 @@
+Version 0.2.10 (2016-10-16):
+ * Enable JavaScript output cells
+
 Version 0.2.9 (2016-07-26):
  * Add option ``nbsphinx_prompt_width``
 
