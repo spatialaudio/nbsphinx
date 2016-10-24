@@ -533,7 +533,7 @@ class NotebookParser(rst.Parser):
         resources['metadata'] = {'path': srcdir}
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
-        resources['unique_key'] = env.docname.replace('/', '_')
+        resources['unique_key'] = re.sub('[/ ]', '_', env.docname)
 
         exporter = Exporter(
             execute=env.config.nbsphinx_execute,
