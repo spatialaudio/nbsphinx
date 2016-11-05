@@ -1056,7 +1056,7 @@ def html_page_context(app, pagename, templatename, context, doctree):
     style = ''
     if doctree and doctree.get('nbsphinx_include_css'):
         style += CSS_STRING % app.config
-    if doctree and app.config.html_theme == 'sphinx_rtd_theme':
+    if doctree and app.config.html_theme in ('sphinx_rtd_theme', 'julia'):
         style += CSS_STRING_READTHEDOCS
     if style:
         context['body'] = '\n<style>' + style + '</style>\n' + context['body']
@@ -1151,7 +1151,7 @@ def depart_code_latex(self, node):
 def visit_admonition_html(self, node):
     self.body.append(self.starttag(node, 'div'))
     self.set_first_last(node)
-    if self.settings.env.config.html_theme == 'sphinx_rtd_theme':
+    if self.settings.env.config.html_theme in ('sphinx_rtd_theme', 'julia'):
         if node.children:
             classes = node.children[0]['classes']
             if 'last' not in classes:
