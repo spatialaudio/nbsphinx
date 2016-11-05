@@ -1041,6 +1041,7 @@ def builder_inited(app):
             'cloud': '8ex',
             'dotted': '8ex',
             'haiku': '7ex',
+            'julia': '7ex',
             'nature': '8ex',
             'pyramid': '8ex',
             'redcloud': '8ex',
