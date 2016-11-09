@@ -886,9 +886,10 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             elif uri.startswith('#') or uri.startswith('mailto:'):
                 continue  # Nothing to be done
 
+            unquoted_uri = unquote(uri)
             for suffix in env.config.source_suffix:
-                if uri.lower().endswith(suffix.lower()):
-                    target = uri[:-len(suffix)]
+                if unquoted_uri.lower().endswith(suffix.lower()):
+                    target = unquoted_uri[:-len(suffix)]
                     break
             else:
                 target = ''
@@ -899,13 +900,13 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 refdomain = None
             elif '.ipynb#' in uri.lower():
                 idx = uri.lower().find('.ipynb#')
-                target = uri[:idx]
+                target = unquote(uri[:idx])
                 target_ext = uri[idx:]
                 reftype = 'ref'
                 refdomain = 'std'
             else:
                 file = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), uri))
+                    os.path.join(os.path.dirname(env.docname), unquoted_uri))
                 if not os.path.isfile(os.path.join(env.srcdir, file)):
                     env.app.warn('file not found: {!r}'.format(file),
                                  env.doc2path(env.docname))
