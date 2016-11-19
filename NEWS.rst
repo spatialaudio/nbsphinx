@@ -1,3 +1,6 @@
+Version 0.2.11 (2016-11-19):
+ * Minor fixes
+
 Version 0.2.10 (2016-10-16):
  * Enable JavaScript output cells
 
