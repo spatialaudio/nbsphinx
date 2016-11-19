@@ -41,6 +41,7 @@ import jinja2
 import nbconvert
 import nbformat
 import sphinx
+import sphinx.errors
 import traitlets
 
 _ipynbversion = 4
