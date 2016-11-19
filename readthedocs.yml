@@ -1,0 +1,4 @@
+conda:
+    file: doc/readthedocs-environment.yml
+python:
+    setup_py_install: true

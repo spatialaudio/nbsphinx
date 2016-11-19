@@ -1,0 +1,12 @@
+channels:
+  - conda-forge
+dependencies:
+  - python>=3
+  - sphinx>=1.3
+  - sphinx_rtd_theme
+  - pandoc
+  - docutils
+  - nbconvert
+  - nbformat
+  - traitlets
+  - ipykernel
