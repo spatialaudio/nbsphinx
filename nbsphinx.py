@@ -291,6 +291,7 @@ div.nboutput {
     display: flex;
     align-items: flex-start;
     margin: 0;
+    width: 100%%;
 }
 
 /* input container */
