@@ -265,13 +265,15 @@ CSS_STRING = """
 
 /* remove conflicting styling from Sphinx themes */
 div.nbinput,
-div.nbinput > div,
-div.nbinput div[class^=highlight],
-div.nbinput div[class^=highlight] pre,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
 div.nboutput,
-div.nboutput > div,
-div.nboutput div[class^=highlight],
-div.nboutput div[class^=highlight] pre {
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -280,7 +282,7 @@ div.nboutput div[class^=highlight] pre {
 }
 
 /* avoid gaps between output lines */
-div.nboutput div[class^=highlight] pre {
+div.nboutput div[class*=highlight] pre {
     line-height: normal;
 }
 
@@ -311,19 +313,18 @@ div.nblast {
 }
 
 /* input prompt */
-div.nbinput > :first-child pre {
+div.nbinput div.prompt pre {
     color: #303F9F;
 }
 
 /* output prompt */
-div.nboutput > :first-child pre {
+div.nboutput div.prompt pre {
     color: #D84315;
 }
 
 /* all prompts */
-div.nbinput > :first-child[class^=highlight],
-div.nboutput > :first-child[class^=highlight],
-div.nboutput > :first-child {
+div.nbinput div.prompt,
+div.nboutput div.prompt {
     min-width: %(nbsphinx_prompt_width)s;
     padding-top: 0.4em;
     padding-right: 0.4em;
@@ -331,33 +332,33 @@ div.nboutput > :first-child {
     flex: 0;
 }
 @media (max-width: %(nbsphinx_responsive_width)s) {
-    div.nbinput > :first-child[class^=highlight],
-    div.nboutput > :first-child[class^=highlight],
-    div.nboutput > :first-child {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
         text-align: left;
         padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
     }
 }
 
 /* input/output area */
-div.nbinput > :nth-child(2)[class^=highlight],
-div.nboutput > :nth-child(2),
-div.nboutput > :nth-child(2)[class^=highlight] {
+div.nbinput div.input_area,
+div.nboutput div.output_area {
     padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
 }
 @media (max-width: %(nbsphinx_responsive_width)s) {
-    div.nbinput > :nth-child(2)[class^=highlight],
-    div.nboutput > :nth-child(2),
-    div.nboutput > :nth-child(2)[class^=highlight] {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
         width: 100%%;
     }
 }
 
 /* input area */
-div.nbinput > :nth-child(2)[class^=highlight] {
+div.nbinput div.input_area {
     border: 1px solid #cfcfcf;
     border-radius: 2px;
     background: #f7f7f7;
@@ -374,7 +375,7 @@ div.nboutput div.math p {
 }
 
 /* standard error */
-div.nboutput  > :nth-child(2).stderr {
+div.nboutput div.output_area.stderr {
     background: #fdd;
 }
 
@@ -600,14 +601,15 @@ class CodeNode(docutils.nodes.Element):
     """A custom node that contains a literal_block node."""
 
     @classmethod
-    def create(cls, text, language='none'):
+    def create(cls, text, language='none', **kwargs):
         """Create a new CodeNode containing a literal_block node.
 
         Apparently, this cannot be done in CodeNode.__init__(), see:
         https://groups.google.com/forum/#!topic/sphinx-dev/0chv7BsYuW0
 
         """
-        node = docutils.nodes.literal_block(text, text, language=language)
+        node = docutils.nodes.literal_block(text, text, language=language,
+                                            **kwargs)
         return cls(text, node)
 
 
@@ -641,13 +643,14 @@ class NbInput(rst.Directive):
 
         # Input prompt
         text = 'In [{}]:'.format(execution_count if execution_count else ' ')
-        container += CodeNode.create(text)
+        container += CodeNode.create(text, classes=['prompt'])
         latex_prompt = text + ' '
 
         # Input code area
         text = '\n'.join(self.content.data)
         node = CodeNode.create(
-            text, language=self.arguments[0] if self.arguments else 'none')
+            text, language=self.arguments[0] if self.arguments else 'none',
+            classes=['input_area'])
         _set_empty_lines(node, self.options)
         node.attributes['latex_prompt'] = latex_prompt
         container += node
@@ -682,22 +685,23 @@ class NbOutput(rst.Directive):
         # Optional output prompt
         if execution_count:
             text = 'Out[{}]:'.format(execution_count)
-            container += CodeNode.create(text)
+            container += CodeNode.create(text, classes=['prompt'])
             latex_prompt = text + ' '
         else:
-            container += rst.nodes.container()  # empty container for HTML
+            # Empty container for HTML:
+            container += rst.nodes.container(classes=['prompt', 'empty'])
             latex_prompt = ''
 
         # Output area
         if outputtype == 'rst':
-            classes = [self.options.get('class', '')]
+            classes = [self.options.get('class', ''), 'output_area']
             output_area = docutils.nodes.container(classes=classes)
             self.state.nested_parse(self.content, self.content_offset,
                                     output_area)
             container += output_area
         else:
             text = '\n'.join(self.content.data)
-            node = CodeNode.create(text)
+            node = CodeNode.create(text, classes=['output_area'])
             _set_empty_lines(node, self.options)
             node.attributes['latex_prompt'] = latex_prompt
             container += node
