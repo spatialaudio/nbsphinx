@@ -293,6 +293,12 @@ div.nboutput {
     margin: 0;
     width: 100%%;
 }
+@media (max-width: %(nbsphinx_responsive_width)s) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
 
 /* input container */
 div.nbinput {
@@ -324,6 +330,14 @@ div.nboutput > :first-child {
     text-align: right;
     flex: 0;
 }
+@media (max-width: %(nbsphinx_responsive_width)s) {
+    div.nbinput > :first-child[class^=highlight],
+    div.nboutput > :first-child[class^=highlight],
+    div.nboutput > :first-child {
+        text-align: left;
+        padding: 0.4em;
+    }
+}
 
 /* input/output area */
 div.nbinput > :nth-child(2)[class^=highlight],
@@ -333,6 +347,13 @@ div.nboutput > :nth-child(2)[class^=highlight] {
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
+}
+@media (max-width: %(nbsphinx_responsive_width)s) {
+    div.nbinput > :nth-child(2)[class^=highlight],
+    div.nboutput > :nth-child(2),
+    div.nboutput > :nth-child(2)[class^=highlight] {
+        width: 100%%;
+    }
 }
 
 /* input area */
@@ -1212,6 +1233,7 @@ def setup(app):
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
     # Default value is set in builder_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
+    app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)

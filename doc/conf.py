@@ -34,6 +34,9 @@ highlight_language = 'none'
 # Width of input/output prompts used in CSS:
 #nbsphinx_prompt_width = '8ex'
 
+# If window is narrower than this, input/output prompts are on separate lines:
+#nbsphinx_responsive_width = '700px'
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'
