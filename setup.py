@@ -1,8 +1,8 @@
 from setuptools import setup
 
 # "import" __version__
-for line in open("nbsphinx.py"):
-    if line.startswith("__version__"):
+for line in open('nbsphinx.py'):
+    if line.startswith('__version__'):
         exec(line)
         break
 
@@ -24,10 +24,9 @@ setup(
     long_description=open('README.rst').read(),
     license='MIT',
     keywords='Sphinx Jupyter notebook'.split(),
-    url='http://nbsphinx.rtfd.org/',
+    url='http://nbsphinx.rtfd.io/',
     platforms='any',
     classifiers=[
-        'Development Status :: 3 - Alpha',
         'Framework :: Sphinx',
         'Framework :: Sphinx :: Extension',
         'Intended Audience :: Education',
