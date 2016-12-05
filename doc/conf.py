@@ -16,6 +16,9 @@ exclude_patterns = ['_build', '**.ipynb_checkpoints']
 # Default language for syntax highlighting in reST and Markdown cells
 highlight_language = 'none'
 
+# Don't add .txt suffix to source files (available for Sphinx >= 1.5):
+html_sourcelink_suffix = ''
+
 # Execute notebooks before conversion: 'always', 'never', 'auto' (default)
 #nbsphinx_execute = 'never'
 
