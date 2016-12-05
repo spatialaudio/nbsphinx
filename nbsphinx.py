@@ -49,6 +49,8 @@ _ipynbversion = 4
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
     'application/javascript',
+    'application/vnd.jupyter.widget-view+json',
+    'application/vnd.jupyter.widget-state+json',
     'text/html',
     'text/markdown',
     'image/svg+xml',
@@ -156,6 +158,11 @@ RST_TEMPLATE = """
         var element = document.getElementById('{{ div_id }}');
 {{ output.data['application/javascript'] | indent | indent }}
         </script>
+{%- elif datatype.startswith('application') and datatype.endswith('+json') %}
+
+    .. raw:: html
+
+        <script type="{{ datatype }}">{{ output.data[datatype] }}</script>
 {%- elif datatype == 'ansi' %}
 
     .. rst-class:: highlight
