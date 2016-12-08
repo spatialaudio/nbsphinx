@@ -494,6 +494,8 @@ class Exporter(nbconvert.RSTExporter):
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
+            config= traitlets.config.Config(
+                {'HighlightMagicsPreprocessor': {'enabled': True}}),
             filters={
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
@@ -501,13 +503,6 @@ class Exporter(nbconvert.RSTExporter):
                 'get_output_type': _get_output_type,
                 'json_dumps': json.dumps,
             })
-
-    @property
-    def default_config(self):
-        c = traitlets.config.Config(
-            {'HighlightMagicsPreprocessor': {'enabled': True}})
-        c.merge(super(Exporter, self).default_config)
-        return c
 
     def from_notebook_node(self, nb, resources=None, **kw):
         nb = copy.deepcopy(nb)
