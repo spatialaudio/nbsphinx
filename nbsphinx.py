@@ -162,7 +162,7 @@ RST_TEMPLATE = """
 
     .. raw:: html
 
-        <script type="{{ datatype }}">{{ output.data[datatype] }}</script>
+        <script type="{{ datatype }}">{{ output.data[datatype] | json_dumps }}</script>
 {%- elif datatype == 'ansi' %}
 
     .. rst-class:: highlight
@@ -240,6 +240,20 @@ RST_TEMPLATE = """
 {{ cell.source }}
 {% endif %}
 {% endblock rawcell %}
+
+
+{% block footer %}
+
+{% if 'application/vnd.jupyter.widget-state+json' in nb.metadata.widgets %}
+
+.. raw:: html
+
+    <script type="application/vnd.jupyter.widget-state+json">
+    {{ nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] | json_dumps }}
+    </script>
+{% endif %}
+{{ super() }}
+{% endblock footer %}
 """
 
 
@@ -485,6 +499,7 @@ class Exporter(nbconvert.RSTExporter):
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
                 'get_output_type': _get_output_type,
+                'json_dumps': json.dumps,
             })
 
     @property
