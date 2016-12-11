@@ -11,7 +11,7 @@ setup(
     version=__version__,
     py_modules=['nbsphinx'],
     install_requires=[
-        'docutils',
+        'docutils<0.13.1',
         'jinja2',
         'nbconvert',
         'traitlets',
