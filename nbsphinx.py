@@ -1144,11 +1144,13 @@ def depart_code_html(self, node):
 def visit_code_latex(self, node):
     """Avoid creating a separate prompt node.
 
-    The prompt will be pre-pended in the main code node.
+    The prompt (which is stored in the "latex_prompt" attribute) will be
+    pre-pended in the main code node.
 
     """
     if 'latex_prompt' not in node.attributes:
         raise docutils.nodes.SkipNode()
+    self.pushbody([])  # See popbody() below
 
 
 def depart_code_latex(self, node):
@@ -1159,7 +1161,7 @@ def depart_code_latex(self, node):
     * Add prompt to the first line, empty space to the following lines
 
     """
-    lines = self.body[-1].split('\n')
+    lines = ''.join(self.popbody()).split('\n')
     out = []
     assert lines[0] == ''
     out.append(lines[0])
@@ -1190,7 +1192,7 @@ def depart_code_latex(self, node):
         assert False
     assert lines[-1] == ''
     out.append(lines[-1])
-    self.body[-1] = '\n'.join(out)
+    self.body.append('\n'.join(out))
 
 
 def visit_admonition_html(self, node):
