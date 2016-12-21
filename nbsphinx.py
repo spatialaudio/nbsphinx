@@ -519,13 +519,14 @@ class Exporter(nbconvert.RSTExporter):
         if execute not in ('always', 'never', 'auto'):
             raise ValueError('invalid execute option: {!r}'.format(execute))
         auto_execute = (
+            execute == 'auto' and
             # At least one code cell actually containing source code:
             any(c.source for c in nb.cells if c.cell_type == 'code') and
             # No outputs, not even a prompt number:
             not any(c.get('outputs') or c.get('execution_count')
                     for c in nb.cells if c.cell_type == 'code')
         )
-        if execute == 'always' or (execute == 'auto' and auto_execute):
+        if auto_execute or execute == 'always':
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
