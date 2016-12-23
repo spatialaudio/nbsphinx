@@ -1088,6 +1088,7 @@ def builder_inited(app):
     if app.config.nbsphinx_prompt_width is None:
         app.config.nbsphinx_prompt_width = {
             'agogo': '7ex',
+            'alabaster': '8ex',
             'better': '8ex',
             'classic': '7ex',
             'cloud': '8ex',
