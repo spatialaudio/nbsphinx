@@ -363,6 +363,12 @@ div.nboutput div.prompt {
     }
 }
 
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
 /* input/output area */
 div.nbinput div.input_area,
 div.nboutput div.output_area {
