@@ -563,6 +563,8 @@ class NotebookParser(rst.Parser):
 
     """
 
+    supported = ()
+
     def get_transforms(self):
         """List of transforms for documents parsed by this parser."""
         return rst.Parser.get_transforms(self) + [
