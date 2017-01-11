@@ -91,11 +91,11 @@ RST_TEMPLATE = """
 {% endif %}
 {%- endblock any_cell %}
 
-{% block input_group -%}                                                        
-{%- if cell.metadata.hide_input -%} 
-{%- else -%} 
-{{ super() }} 
-{%- endif -%} 
+{% block input_group -%}
+{%- if cell.metadata.hide_input -%}
+{%- else -%}
+{{ super() }}
+{%- endif -%}
 {% endblock input_group %}
 
 {% block input -%}
@@ -369,6 +369,12 @@ div.nboutput div.prompt {
     }
 }
 
++/* disable scrollbars on prompts */
++div.nbinput div.prompt pre,
++div.nboutput div.prompt pre {
++    overflow: hidden;
++}
++
 /* input/output area */
 div.nbinput div.input_area,
 div.nboutput div.output_area {
