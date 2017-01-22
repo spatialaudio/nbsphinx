@@ -497,7 +497,7 @@ class Exporter(nbconvert.RSTExporter):
         self._allow_errors = allow_errors
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
-        loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
+        loader = jinja2.DictLoader({'nbsphinx-rst': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
             config= traitlets.config.Config(
