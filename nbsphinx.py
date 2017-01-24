@@ -499,7 +499,7 @@ class Exporter(nbconvert.RSTExporter):
         self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
-            template_file='nbsphinx-rst', extra_loaders=[loader],
+            template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
             config= traitlets.config.Config(
                 {'HighlightMagicsPreprocessor': {'enabled': True}}),
             filters={
