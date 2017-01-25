@@ -1,3 +1,6 @@
+Version 0.2.13 (2017-01-25):
+ * Minor fixes
+
 Version 0.2.12 (2016-12-19):
  * Basic support for widgets
  * CSS is now "responsive", some new CSS classes
