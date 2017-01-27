@@ -1,3 +1,13 @@
+Version 0.2.12 (2016-12-19):
+ * Basic support for widgets
+ * CSS is now "responsive", some new CSS classes
+
+Version 0.2.11 (2016-11-19):
+ * Minor fixes
+
+Version 0.2.10 (2016-10-16):
+ * Enable JavaScript output cells
+
 Version 0.2.9 (2016-07-26):
  * Add option ``nbsphinx_prompt_width``
 

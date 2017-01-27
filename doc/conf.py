@@ -16,6 +16,9 @@ exclude_patterns = ['_build', '**.ipynb_checkpoints']
 # Default language for syntax highlighting in reST and Markdown cells
 highlight_language = 'none'
 
+# Don't add .txt suffix to source files (available for Sphinx >= 1.5):
+html_sourcelink_suffix = ''
+
 # Execute notebooks before conversion: 'always', 'never', 'auto' (default)
 #nbsphinx_execute = 'never'
 
@@ -33,6 +36,9 @@ highlight_language = 'none'
 
 # Width of input/output prompts used in CSS:
 #nbsphinx_prompt_width = '8ex'
+
+# If window is narrower than this, input/output prompts are on separate lines:
+#nbsphinx_responsive_width = '700px'
 
 # -- The settings below this line are not specific to nbsphinx ------------
 

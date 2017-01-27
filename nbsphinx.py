@@ -23,30 +23,34 @@
 http://nbsphinx.rtfd.org/
 
 """
-__version__ = '0.2.9'
+__version__ = '0.2.12'
 
 import copy
-import docutils
-from docutils.parsers import rst
-import jinja2
 import json
-import nbconvert
-import nbformat
 import os
 import re
-import sphinx
 import subprocess
-import traitlets
 try:
     from urllib.parse import unquote  # Python 3.x
 except ImportError:
     from urllib2 import unquote  # Python 2.x
+
+import docutils
+from docutils.parsers import rst
+import jinja2
+import nbconvert
+import nbformat
+import sphinx
+import sphinx.errors
+import traitlets
 
 _ipynbversion = 4
 
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
     'application/javascript',
+    'application/vnd.jupyter.widget-view+json',
+    'application/vnd.jupyter.widget-state+json',
     'text/html',
     'text/markdown',
     'image/svg+xml',
@@ -144,6 +148,21 @@ RST_TEMPLATE = """
     .. raw:: html
 
 {{ output.data['text/html'] | indent | indent }}
+{%- elif datatype == 'application/javascript' %}
+{% set div_id = uuid4() %}
+
+    .. raw:: html
+
+        <div id="{{ div_id }}"></div>
+        <script type="text/javascript">
+        var element = document.getElementById('{{ div_id }}');
+{{ output.data['application/javascript'] | indent | indent }}
+        </script>
+{%- elif datatype.startswith('application') and datatype.endswith('+json') %}
+
+    .. raw:: html
+
+        <script type="{{ datatype }}">{{ output.data[datatype] | json_dumps }}</script>
 {%- elif datatype == 'ansi' %}
 
     .. rst-class:: highlight
@@ -221,6 +240,20 @@ RST_TEMPLATE = """
 {{ cell.source }}
 {% endif %}
 {% endblock rawcell %}
+
+
+{% block footer %}
+
+{% if 'application/vnd.jupyter.widget-state+json' in nb.metadata.widgets %}
+
+.. raw:: html
+
+    <script type="application/vnd.jupyter.widget-state+json">
+    {{ nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] | json_dumps }}
+    </script>
+{% endif %}
+{{ super() }}
+{% endblock footer %}
 """
 
 
@@ -253,13 +286,15 @@ CSS_STRING = """
 
 /* remove conflicting styling from Sphinx themes */
 div.nbinput,
-div.nbinput > div,
-div.nbinput div[class^=highlight],
-div.nbinput div[class^=highlight] pre,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
 div.nboutput,
-div.nboutput > div,
-div.nboutput div[class^=highlight],
-div.nboutput div[class^=highlight] pre {
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -268,7 +303,7 @@ div.nboutput div[class^=highlight] pre {
 }
 
 /* avoid gaps between output lines */
-div.nboutput div[class^=highlight] pre {
+div.nboutput div[class*=highlight] pre {
     line-height: normal;
 }
 
@@ -279,6 +314,13 @@ div.nboutput {
     display: flex;
     align-items: flex-start;
     margin: 0;
+    width: 100%%;
+}
+@media (max-width: %(nbsphinx_responsive_width)s) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
 }
 
 /* input container */
@@ -292,38 +334,58 @@ div.nblast {
 }
 
 /* input prompt */
-div.nbinput > :first-child pre {
+div.nbinput div.prompt pre {
     color: #303F9F;
 }
 
 /* output prompt */
-div.nboutput > :first-child pre {
+div.nboutput div.prompt pre {
     color: #D84315;
 }
 
 /* all prompts */
-div.nbinput > :first-child[class^=highlight],
-div.nboutput > :first-child[class^=highlight],
-div.nboutput > :first-child {
+div.nbinput div.prompt,
+div.nboutput div.prompt {
     min-width: %(nbsphinx_prompt_width)s;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
     flex: 0;
 }
+@media (max-width: %(nbsphinx_responsive_width)s) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
 
 /* input/output area */
-div.nbinput > :nth-child(2)[class^=highlight],
-div.nboutput > :nth-child(2),
-div.nboutput > :nth-child(2)[class^=highlight] {
+div.nbinput div.input_area,
+div.nboutput div.output_area {
     padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
 }
+@media (max-width: %(nbsphinx_responsive_width)s) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%%;
+    }
+}
 
 /* input area */
-div.nbinput > :nth-child(2)[class^=highlight] {
+div.nbinput div.input_area {
     border: 1px solid #cfcfcf;
     border-radius: 2px;
     background: #f7f7f7;
@@ -340,7 +402,7 @@ div.nboutput div.math p {
 }
 
 /* standard error */
-div.nboutput  > :nth-child(2).stderr {
+div.nboutput div.output_area.stderr {
     background: #fdd;
 }
 
@@ -429,7 +491,7 @@ class Exporter(nbconvert.RSTExporter):
     """
 
     def __init__(self, execute='auto', execute_arguments=[],
-                 allow_errors=False, timeout=30, kernel_name='python', codecell_lexer='none'):
+                 allow_errors=False, timeout=30, kernel_name=None, codecell_lexer='none'):
         """Initialize the Exporter."""
         self._execute = execute
         self._execute_arguments = execute_arguments
@@ -440,19 +502,15 @@ class Exporter(nbconvert.RSTExporter):
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst', extra_loaders=[loader],
+            config= traitlets.config.Config(
+                {'HighlightMagicsPreprocessor': {'enabled': True}}),
             filters={
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
                 'get_output_type': _get_output_type,
+                'json_dumps': json.dumps,
             })
-
-    @property
-    def default_config(self):
-        c = traitlets.config.Config(
-            {'HighlightMagicsPreprocessor': {'enabled': True}})
-        c.merge(super(Exporter, self).default_config)
-        return c
 
     def from_notebook_node(self, nb, resources=None, **kw):
         nb = copy.deepcopy(nb)
@@ -469,21 +527,34 @@ class Exporter(nbconvert.RSTExporter):
         if execute not in ('always', 'never', 'auto'):
             raise ValueError('invalid execute option: {!r}'.format(execute))
         auto_execute = (
+            execute == 'auto' and
             # At least one code cell actually containing source code:
             any(c.source for c in nb.cells if c.cell_type == 'code') and
             # No outputs, not even a prompt number:
             not any(c.get('outputs') or c.get('execution_count')
                     for c in nb.cells if c.cell_type == 'code')
         )
-        if execute == 'always' or (execute == 'auto' and auto_execute):
+        if auto_execute or execute == 'always':
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
-            kernel_name = nbsphinx_metadata.get(
-                'kernel_name', self._kernel_name)
-            pp = nbconvert.preprocessors.ExecutePreprocessor(
-                extra_arguments=self._execute_arguments,
-                allow_errors=allow_errors, timeout=timeout, kernel_name=kernel_name)
+            
+            #ExecutePreprocessor kwargs
+            kw_ep = dict(extra_arguments=self._execute_arguments,
+                      allow_errors=allow_errors, 
+                      timeout=timeout)
+                    
+            # if kernel name is given in conf set it. 
+            if self._kernel_name is not None:
+                kernel_name = self._kernel_name
+                
+            else: # check if its in metadata
+                kernel_name=nbsphinx_metadata.get('kernel_name')
+            
+            if kernel_name is not None:
+                kw_ep.update({'kernel_name':kernel_name})
+                
+            pp = nbconvert.preprocessors.ExecutePreprocessor(**kw_ep)
             nb, resources = pp.preprocess(nb, resources)
 
         # Call into RSTExporter
@@ -508,6 +579,8 @@ class NotebookParser(rst.Parser):
 
     """
 
+    supported = ()
+
     def get_transforms(self):
         """List of transforms for documents parsed by this parser."""
         return rst.Parser.get_transforms(self) + [
@@ -526,12 +599,12 @@ class NotebookParser(rst.Parser):
         resources['metadata'] = {'path': srcdir}
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
-        resources['unique_key'] = env.docname.replace('/', '_')
+        resources['unique_key'] = re.sub('[/ ]', '_', env.docname)
 
         exporter = Exporter(
             execute=env.config.nbsphinx_execute,
             execute_arguments=env.config.nbsphinx_execute_arguments,
-            kernel_name=env.config.nbspninx_kernel_name,
+            kernel_name=env.config.nbsphinx_kernel_name,
             allow_errors=env.config.nbsphinx_allow_errors,
             timeout=env.config.nbsphinx_timeout,
             codecell_lexer=env.config.nbsphinx_codecell_lexer,
@@ -571,14 +644,15 @@ class CodeNode(docutils.nodes.Element):
     """A custom node that contains a literal_block node."""
 
     @classmethod
-    def create(cls, text, language='none'):
+    def create(cls, text, language='none', **kwargs):
         """Create a new CodeNode containing a literal_block node.
 
         Apparently, this cannot be done in CodeNode.__init__(), see:
         https://groups.google.com/forum/#!topic/sphinx-dev/0chv7BsYuW0
 
         """
-        node = docutils.nodes.literal_block(text, text, language=language)
+        node = docutils.nodes.literal_block(text, text, language=language,
+                                            **kwargs)
         return cls(text, node)
 
 
@@ -612,13 +686,14 @@ class NbInput(rst.Directive):
 
         # Input prompt
         text = 'In [{}]:'.format(execution_count if execution_count else ' ')
-        container += CodeNode.create(text)
+        container += CodeNode.create(text, classes=['prompt'])
         latex_prompt = text + ' '
 
         # Input code area
         text = '\n'.join(self.content.data)
         node = CodeNode.create(
-            text, language=self.arguments[0] if self.arguments else 'none')
+            text, language=self.arguments[0] if self.arguments else 'none',
+            classes=['input_area'])
         _set_empty_lines(node, self.options)
         node.attributes['latex_prompt'] = latex_prompt
         container += node
@@ -653,22 +728,23 @@ class NbOutput(rst.Directive):
         # Optional output prompt
         if execution_count:
             text = 'Out[{}]:'.format(execution_count)
-            container += CodeNode.create(text)
+            container += CodeNode.create(text, classes=['prompt'])
             latex_prompt = text + ' '
         else:
-            container += rst.nodes.container()  # empty container for HTML
+            # Empty container for HTML:
+            container += rst.nodes.container(classes=['prompt', 'empty'])
             latex_prompt = ''
 
         # Output area
         if outputtype == 'rst':
-            classes = [self.options.get('class', '')]
+            classes = [self.options.get('class', ''), 'output_area']
             output_area = docutils.nodes.container(classes=classes)
             self.state.nested_parse(self.content, self.content_offset,
                                     output_area)
             container += output_area
         else:
             text = '\n'.join(self.content.data)
-            node = CodeNode.create(text)
+            node = CodeNode.create(text, classes=['output_area'])
             _set_empty_lines(node, self.options)
             node.attributes['latex_prompt'] = latex_prompt
             container += node
@@ -880,9 +956,10 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             elif uri.startswith('#') or uri.startswith('mailto:'):
                 continue  # Nothing to be done
 
+            unquoted_uri = unquote(uri)
             for suffix in env.config.source_suffix:
-                if uri.lower().endswith(suffix.lower()):
-                    target = uri[:-len(suffix)]
+                if unquoted_uri.lower().endswith(suffix.lower()):
+                    target = unquoted_uri[:-len(suffix)]
                     break
             else:
                 target = ''
@@ -893,13 +970,13 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 refdomain = None
             elif '.ipynb#' in uri.lower():
                 idx = uri.lower().find('.ipynb#')
-                target = uri[:idx]
+                target = unquote(uri[:idx])
                 target_ext = uri[idx:]
                 reftype = 'ref'
                 refdomain = 'std'
             else:
                 file = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), uri))
+                    os.path.join(os.path.dirname(env.docname), unquoted_uri))
                 if not os.path.isfile(os.path.join(env.srcdir, file)):
                     env.app.warn('file not found: {!r}'.format(file),
                                  env.doc2path(env.docname))
@@ -1030,10 +1107,13 @@ def builder_inited(app):
     if app.config.nbsphinx_prompt_width is None:
         app.config.nbsphinx_prompt_width = {
             'agogo': '7ex',
+            'alabaster': '8ex',
+            'better': '8ex',
             'classic': '7ex',
             'cloud': '8ex',
             'dotted': '8ex',
             'haiku': '7ex',
+            'julia': '7ex',
             'nature': '8ex',
             'pyramid': '8ex',
             'redcloud': '8ex',
@@ -1048,7 +1128,7 @@ def html_page_context(app, pagename, templatename, context, doctree):
     style = ''
     if doctree and doctree.get('nbsphinx_include_css'):
         style += CSS_STRING % app.config
-    if doctree and app.config.html_theme == 'sphinx_rtd_theme':
+    if doctree and app.config.html_theme in ('sphinx_rtd_theme', 'julia'):
         style += CSS_STRING_READTHEDOCS
     if style:
         context['body'] = '\n<style>' + style + '</style>\n' + context['body']
@@ -1091,11 +1171,13 @@ def depart_code_html(self, node):
 def visit_code_latex(self, node):
     """Avoid creating a separate prompt node.
 
-    The prompt will be pre-pended in the main code node.
+    The prompt (which is stored in the "latex_prompt" attribute) will be
+    pre-pended in the main code node.
 
     """
     if 'latex_prompt' not in node.attributes:
         raise docutils.nodes.SkipNode()
+    self.pushbody([])  # See popbody() below
 
 
 def depart_code_latex(self, node):
@@ -1106,7 +1188,7 @@ def depart_code_latex(self, node):
     * Add prompt to the first line, empty space to the following lines
 
     """
-    lines = self.body[-1].split('\n')
+    lines = ''.join(self.popbody()).split('\n')
     out = []
     assert lines[0] == ''
     out.append(lines[0])
@@ -1137,13 +1219,13 @@ def depart_code_latex(self, node):
         assert False
     assert lines[-1] == ''
     out.append(lines[-1])
-    self.body[-1] = '\n'.join(out)
+    self.body.append('\n'.join(out))
 
 
 def visit_admonition_html(self, node):
     self.body.append(self.starttag(node, 'div'))
     self.set_first_last(node)
-    if self.settings.env.config.html_theme == 'sphinx_rtd_theme':
+    if self.settings.env.config.html_theme in ('sphinx_rtd_theme', 'julia'):
         if node.children:
             classes = node.children[0]['classes']
             if 'last' not in classes:
@@ -1202,6 +1284,7 @@ def setup(app):
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
     # Default value is set in builder_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
+    app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)

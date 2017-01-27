@@ -23,16 +23,14 @@ Python Package Index:
 License:
     MIT -- see the file ``LICENSE`` for details.
 
-Quick Start
------------
+Quick Start:
+    #. Install ``nbsphinx``::
 
-#. Install ``nbsphinx``::
+           python3 -m pip install nbsphinx --user
 
-       python3 -m pip install nbsphinx --user
+    #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
 
-#. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
+    #. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
+       to the ``toctree``.
 
-#. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
-   to the ``toctree``.
-
-#. Run Sphinx!
+    #. Run Sphinx!
