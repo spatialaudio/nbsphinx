@@ -22,6 +22,9 @@ html_sourcelink_suffix = ''
 # Execute notebooks before conversion: 'always', 'never', 'auto' (default)
 #nbsphinx_execute = 'never'
 
+# Use this kernel instead of the one stored in the notebook metadata:
+#nbsphinx_kernel_name = 'python3'
+
 # List of arguments to be passed to the kernel that executes the notebooks:
 #nbsphinx_execute_arguments = ['--InlineBackend.figure_formats={"png", "pdf"}']
 

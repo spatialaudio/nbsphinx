@@ -489,10 +489,11 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
-    def __init__(self, execute='auto', execute_arguments=[],
+    def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
                  allow_errors=False, timeout=30, codecell_lexer='none'):
         """Initialize the Exporter."""
         self._execute = execute
+        self._kernel_name = kernel_name
         self._execute_arguments = execute_arguments
         self._allow_errors = allow_errors
         self._timeout = timeout
@@ -537,6 +538,7 @@ class Exporter(nbconvert.RSTExporter):
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
             pp = nbconvert.preprocessors.ExecutePreprocessor(
+                kernel_name=self._kernel_name,
                 extra_arguments=self._execute_arguments,
                 allow_errors=allow_errors, timeout=timeout)
             nb, resources = pp.preprocess(nb, resources)
@@ -587,6 +589,7 @@ class NotebookParser(rst.Parser):
 
         exporter = Exporter(
             execute=env.config.nbsphinx_execute,
+            kernel_name=env.config.nbsphinx_kernel_name,
             execute_arguments=env.config.nbsphinx_execute_arguments,
             allow_errors=env.config.nbsphinx_allow_errors,
             timeout=env.config.nbsphinx_timeout,
@@ -1260,6 +1263,7 @@ def setup(app):
     _add_notebook_parser(app)
 
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
+    app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
     app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
