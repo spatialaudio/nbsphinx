@@ -478,6 +478,7 @@ CSS_STRING_READTHEDOCS = """
 """
 
 
+
 class Exporter(nbconvert.RSTExporter):
     """Convert Jupyter notebooks to reStructuredText.
 
@@ -490,12 +491,13 @@ class Exporter(nbconvert.RSTExporter):
     """
 
     def __init__(self, execute='auto', execute_arguments=[],
-                 allow_errors=False, timeout=30, codecell_lexer='none'):
+                 allow_errors=False, timeout=30, kernel_name=None, codecell_lexer='none'):
         """Initialize the Exporter."""
         self._execute = execute
         self._execute_arguments = execute_arguments
         self._allow_errors = allow_errors
         self._timeout = timeout
+        self._kernel_name = kernel_name
         self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
@@ -536,9 +538,23 @@ class Exporter(nbconvert.RSTExporter):
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
-            pp = nbconvert.preprocessors.ExecutePreprocessor(
-                extra_arguments=self._execute_arguments,
-                allow_errors=allow_errors, timeout=timeout)
+            
+            #ExecutePreprocessor kwargs
+            kw_ep = dict(extra_arguments=self._execute_arguments,
+                      allow_errors=allow_errors, 
+                      timeout=timeout)
+                    
+            # if kernel name is given in conf set it. 
+            if self._kernel_name is not None:
+                kernel_name = self._kernel_name
+                
+            else: # check if its in metadata
+                kernel_name=nbsphinx_metadata.get('kernel_name')
+            
+            if kernel_name is not None:
+                kw_ep.update({'kernel_name':kernel_name})
+                
+            pp = nbconvert.preprocessors.ExecutePreprocessor(**kw_ep)
             nb, resources = pp.preprocess(nb, resources)
 
         # Call into RSTExporter
@@ -588,6 +604,7 @@ class NotebookParser(rst.Parser):
         exporter = Exporter(
             execute=env.config.nbsphinx_execute,
             execute_arguments=env.config.nbsphinx_execute_arguments,
+            kernel_name=env.config.nbsphinx_kernel_name,
             allow_errors=env.config.nbsphinx_allow_errors,
             timeout=env.config.nbsphinx_timeout,
             codecell_lexer=env.config.nbsphinx_codecell_lexer,
@@ -1260,6 +1277,7 @@ def setup(app):
     _add_notebook_parser(app)
 
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
+    app.add_config_value('nbsphinx_kernel_name', 'python', rebuild='env')
     app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
