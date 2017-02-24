@@ -500,7 +500,7 @@ class Exporter(nbconvert.RSTExporter):
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
-            config= traitlets.config.Config(
+            config=traitlets.config.Config(
                 {'HighlightMagicsPreprocessor': {'enabled': True}}),
             filters={
                 'markdown2rst': markdown2rst,
