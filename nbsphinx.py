@@ -504,6 +504,7 @@ class Exporter(nbconvert.RSTExporter):
             config=traitlets.config.Config(
                 {'HighlightMagicsPreprocessor': {'enabled': True}}),
             filters={
+                'convert_pandoc': convert_pandoc,
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
@@ -763,6 +764,18 @@ class NbWarning(_NbAdmonition):
     """A warning box."""
 
     _class = 'warning'
+
+
+def convert_pandoc(text, from_format, to_format):
+    """Simple wrapper for markdown2rst.
+
+    In nbconvert version 5.0, the use of markdown2rst in the RST
+    template was replaced by the new filter function convert_pandoc.
+
+    """
+    if from_format != 'markdown' and to_format != 'rst':
+        raise ValueError('Unsupported conversion')
+    return markdown2rst(text)
 
 
 def markdown2rst(text):
