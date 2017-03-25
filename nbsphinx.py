@@ -483,6 +483,32 @@ CSS_STRING_READTHEDOCS = """
 }
 """
 
+CSS_STRING_CLOUD = """
+/* CSS overrides for cloud theme */
+
+/* nicer titles and more space for info and warning logos */
+
+div.admonition > .first {
+    background: rgba(0, 0, 0, .05);
+    margin: .5em -1em;
+    margin-top: -.5em !important;
+    padding: .5em .5em .5em 2.65em;
+}
+
+/* indent single paragraph */
+div.admonition {
+    text-indent: 20px;
+}
+/* don't indent multiple paragraphs */
+div.admonition > p {
+    text-indent: 0;
+}
+/* remove excessive padding */
+div.admonition.inline-title p.admonition-title {
+    padding-left: .2em;
+}
+"""
+
 
 class Exporter(nbconvert.RSTExporter):
     """Convert Jupyter notebooks to reStructuredText.
@@ -1136,6 +1162,8 @@ def html_page_context(app, pagename, templatename, context, doctree):
         style += CSS_STRING % app.config
     if doctree and app.config.html_theme in ('sphinx_rtd_theme', 'julia'):
         style += CSS_STRING_READTHEDOCS
+    if doctree and app.config.html_theme in ('cloud', 'redcloud'):
+        style += CSS_STRING_CLOUD
     if style:
         context['body'] = '\n<style>' + style + '</style>\n' + context['body']
 
