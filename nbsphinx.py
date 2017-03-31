@@ -179,6 +179,7 @@ RST_TEMPLATE = """
         \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | ansi2latex | indent | indent }}
         \\end{OriginalVerbatim}
+        \\relax
 {% else %}
 
     .. nbwarning:: Data type cannot be displayed: {{ datatype }}
