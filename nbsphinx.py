@@ -175,10 +175,13 @@ RST_TEMPLATE = """
 
     .. raw:: latex
 
-        % This comment is needed to force a line break for adjacent ANSI cells
+        %
         \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | ansi2latex | indent | indent }}
         \\end{OriginalVerbatim}
+        % The following \\relax is needed to avoid problems with adjacent ANSI
+        % cells and some other stuff (e.g. bullet lists) following ANSI cells.
+        % See https://github.com/sphinx-doc/sphinx/issues/3594
         \\relax
 {% else %}
 
@@ -226,6 +229,7 @@ RST_TEMPLATE = """
 
 .. raw:: latex
 
+    %
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/html' %}
 .. raw:: html
@@ -234,6 +238,7 @@ RST_TEMPLATE = """
 {%- elif raw_mimetype == 'text/latex' %}
 .. raw:: latex
 
+    %
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
 {{ cell.source | markdown2rst }}
