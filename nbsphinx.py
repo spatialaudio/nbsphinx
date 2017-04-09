@@ -800,7 +800,8 @@ def markdown2rst(text):
                 't': 'Math',
                 'c': [
                     {'t': 'DisplayMath', 'c': []},
-                    obj['c'][1],
+                    # Special marker characters are removed below:
+                    '\x0e:nowrap:\x0f\n\n' + obj['c'][1],
                 ]
             }]
         return obj
@@ -810,8 +811,8 @@ def markdown2rst(text):
         return json.dumps(json_data)
 
     rststring = pandoc(text, 'markdown', 'rst', filter_func=rawlatex2math)
-    return re.sub(r'^(\s*)\.\. math::$',
-                  r'\1.. math::\1   :nowrap:',
+    return re.sub(r'^\n( *)\x0e:nowrap:\x0f$',
+                  r'\1:nowrap:',
                   rststring,
                   flags=re.MULTILINE)
 
