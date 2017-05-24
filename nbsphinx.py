@@ -1174,7 +1174,7 @@ def html_collect_pages(app):
     files = set()
     for file_list in getattr(app.env, 'nbsphinx_files', {}).values():
         files.update(file_list)
-    for file in app.status_iterator(files, 'copying linked files... ',
+    for file in sphinx.util.status_iterator(files, 'copying linked files... ',
                                     sphinx.util.console.brown, len(files)):
         target = os.path.join(app.builder.outdir, file)
         sphinx.util.ensuredir(os.path.dirname(target))
