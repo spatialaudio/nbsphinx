@@ -1,3 +1,6 @@
+Version 0.2.14 (2017-06-09):
+ * Add option ``nbsphinx_kernel_name``
+
 Version 0.2.13 (2017-01-25):
  * Minor fixes
 
