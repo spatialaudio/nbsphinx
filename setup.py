@@ -29,6 +29,7 @@ setup(
     classifiers=[
         'Framework :: Sphinx',
         'Framework :: Sphinx :: Extension',
+        'Framework :: Jupyter',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
