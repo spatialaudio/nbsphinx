@@ -1174,8 +1174,12 @@ def html_collect_pages(app):
     files = set()
     for file_list in getattr(app.env, 'nbsphinx_files', {}).values():
         files.update(file_list)
-    for file in app.status_iterator(files, 'copying linked files... ',
-                                    sphinx.util.console.brown, len(files)):
+    try:
+        status_iterator = sphinx.util.status_iterator
+    except AttributeError:
+        status_iterator = app.status_iterator  # For Sphinx < 1.6
+    for file in status_iterator(files, 'copying linked files... ',
+                                sphinx.util.console.brown, len(files)):
         target = os.path.join(app.builder.outdir, file)
         sphinx.util.ensuredir(os.path.dirname(target))
         try:
