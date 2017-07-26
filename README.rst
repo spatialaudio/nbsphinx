@@ -23,6 +23,8 @@ Python Package Index:
 License:
     MIT -- see the file ``LICENSE`` for details.
 
+.. _quick-start:
+
 Quick Start:
     #. Install ``nbsphinx``::
 
@@ -32,5 +34,8 @@ Quick Start:
 
     #. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
        to the ``toctree``.
+
+    #. For Notebooks to be executed each time documentation is built, use
+       Jupyter to clear output in all cells, and save the ``ipynb``.
 
     #. Run Sphinx!
