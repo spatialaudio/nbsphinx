@@ -23,8 +23,6 @@ Python Package Index:
 License:
     MIT -- see the file ``LICENSE`` for details.
 
-.. _quick-start:
-
 Quick Start:
     #. Install ``nbsphinx``::
 
