@@ -285,6 +285,15 @@ LATEX_PREAMBLE = r"""
 \definecolor{ansi-cyan-intense}{HTML}{258F8F}
 \definecolor{ansi-white}{HTML}{C5C1B4}
 \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+
+% Define "notice" environment, which was removed in Sphinx 1.7.
+% At some point, "notice" should be replaced by "sphinxadmonition",
+% which is available since Sphinx 1.5.
+\makeatletter
+\@ifundefined{notice}{%
+\newenvironment{notice}{\begin{sphinxadmonition}}{\end{sphinxadmonition}}%
+}{}
+\makeatother
 """
 
 
@@ -1129,7 +1138,7 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
 
 
 def builder_inited(app):
-    # Add color definitions to LaTeX preamble
+    # Add LaTeX definitions to preamble
     latex_elements = app.builder.config.latex_elements
     latex_elements['preamble'] = '\n'.join([
         LATEX_PREAMBLE,
