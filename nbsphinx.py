@@ -178,7 +178,7 @@ RST_TEMPLATE = """
 
         %
         \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
-{{ output.data[datatype] | ansi2latex | indent | indent }}
+{{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
         \\end{OriginalVerbatim}
         % The following \\relax is needed to avoid problems with adjacent ANSI
         % cells and some other stuff (e.g. bullet lists) following ANSI cells.
