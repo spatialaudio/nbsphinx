@@ -1017,6 +1017,12 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 reftype = 'ref'
                 refdomain = 'std'
             else:
+                # .rst element reference in .ipynb, for instance:
+                # (A section)[document.rst#a-section]
+                if '.rst#' in uri:
+                    uri = uri.replace('.rst#', '.html#')
+                    node.replace_attr('refuri', uri, force=True)
+                    continue
                 file = os.path.normpath(
                     os.path.join(os.path.dirname(env.docname), unquoted_uri))
                 if not os.path.isfile(os.path.join(env.srcdir, file)):
