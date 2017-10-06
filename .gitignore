@@ -4,3 +4,4 @@ build/
 dist/
 nbsphinx.egg-info/
 .ipynb_checkpoints/
+.python-version
