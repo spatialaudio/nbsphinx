@@ -1016,6 +1016,12 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 target_ext = uri[idx:]
                 reftype = 'ref'
                 refdomain = 'std'
+            elif uri.lower().startswith('py:'):
+                target_ext = ''
+                idx = 3 + uri[3:].find(':')
+                target = uri[idx+1:]
+                reftype = uri[3:idx]
+                refdomain = 'py'
             else:
                 file = os.path.normpath(
                     os.path.join(os.path.dirname(env.docname), unquoted_uri))
@@ -1033,8 +1039,11 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 env.nbsphinx_files.setdefault(env.docname, []).append(file)
                 continue  # We're done here
 
-            target_docname = os.path.normpath(
-                os.path.join(os.path.dirname(env.docname), target))
+            if uri.lower().startswith('py:'):
+                target_docname = env.domaindata['py']['objects'][target][0]
+            else:
+                target_docname = os.path.normpath(
+                    os.path.join(os.path.dirname(env.docname), target))
             if target_docname in env.found_docs:
                 if target_ext:
                     target = target_docname + target_ext
