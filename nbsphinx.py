@@ -46,7 +46,6 @@ import traitlets
 
 _ipynbversion = 4
 
-global nbsphinx_args_output_prompt
 
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
@@ -650,9 +649,6 @@ class NotebookParser(rst.Parser):
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = re.sub('[/ ]', '_', env.docname)
 
-        global nbsphinx_args_output_prompt
-        nbsphinx_args_output_prompt = env.config.nbsphinx_exclude_output_prompt
-
         exporter = Exporter(
             execute=env.config.nbsphinx_execute,
             kernel_name=env.config.nbsphinx_kernel_name,
@@ -786,8 +782,7 @@ class NbOutput(rst.Directive):
 
         # Optional output prompt
         if execution_count:
-            global nbsphinx_args_output_prompt
-            if nbsphinx_args_output_prompt:
+            if self.state.document.settings.env.config.nbsphinx_exclude_output_prompt:
                 text = ''
             else:
                 text = 'Out[{}]:'.format(execution_count)
