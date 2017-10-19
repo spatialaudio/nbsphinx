@@ -65,3 +65,13 @@ This is how an info box looks like:
     It may include nested formatting, even another info/warning box:
 
     .. nbwarning:: **Warning:** You should probably not use nested boxes!
+
+Domain Objects
+--------------
+
+.. py:function:: example_python_function(foo)
+
+   This is just for testing domain object links. See
+   `this section <markdown-cells.html#Links-to-Domain-Objects>`_.
+
+   :param str foo: Example string parameter
