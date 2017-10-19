@@ -1008,7 +1008,7 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             else:
                 target = ''
 
-            subsection_matches = re.match(self._subsection_re, uri)
+            subsection_matches = self._subsection_re.match(uri)
             if target:
                 target_ext = ''
                 reftype = 'doc'
@@ -1050,10 +1050,13 @@ class ProcessLocalLinks(docutils.transforms.Transform):
 
 
 class CreateSectionLabels(docutils.transforms.Transform):
-    """Make labels for each notebook and each section thereof.
+    """Make labels for each document parsed by Sphinx, each section thereof,
+    and each Sphinx domain object.
 
     These labels are referenced in ProcessLocalLinks.
-    Note: Sphinx lower-cases the HTML section IDs, Jupyter doesn't.
+
+    Note: Sphinx lower-cases the HTML section IDs, Jupyter doesn't. This
+    function creates labels in the Jupyter (non-lower-case) style.
 
     """
 
@@ -1062,7 +1065,7 @@ class CreateSectionLabels(docutils.transforms.Transform):
     def apply(self):
         env = self.document.settings.env
         file_ext = os.path.splitext(env.doc2path(env.docname))[1]
-        i_still_have_to_create_the_notebook_label = True
+        i_still_have_to_create_the_document_label = True
         for section in self.document.traverse(docutils.nodes.section):
             assert section.children
             assert isinstance(section.children[0], docutils.nodes.title)
@@ -1076,14 +1079,14 @@ class CreateSectionLabels(docutils.transforms.Transform):
             env.domaindata['std']['anonlabels'][label] = (
                 env.docname, link_id)
 
-            # Create a label for the whole notebook using the first section:
-            if i_still_have_to_create_the_notebook_label:
+            # Create a label for the whole document using the first section:
+            if i_still_have_to_create_the_document_label:
                 label = env.docname.lower() + file_ext
                 env.domaindata['std']['labels'][label] = (
                     env.docname, '', title)
                 env.domaindata['std']['anonlabels'][label] = (
                     env.docname, '')
-                i_still_have_to_create_the_notebook_label = False
+                i_still_have_to_create_the_document_label = False
 
         # Create labels for domain-specific object signatures
         for sig in self.document.traverse(sphinx.addnodes.desc_signature):
