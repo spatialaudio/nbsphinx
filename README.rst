@@ -24,9 +24,7 @@ License:
     MIT -- see the file ``LICENSE`` for details.
 
 Quick Start:
-    #. Install ``nbsphinx``::
-
-           python3 -m pip install nbsphinx --user
+    #. Install ``nbsphinx``
 
     #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
 
