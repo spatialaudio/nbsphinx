@@ -9,35 +9,35 @@ Links to Notebooks
 ------------------
 
 Links to notebooks can be easily created:
-:ref:`subdir/a-notebook-in-a-subdir.ipynb`
+:ref:`/subdir/a-notebook-in-a-subdir.ipynb`
 (the notebook title is used as link text).
 You can also use
-:ref:`an alternative text <subdir/a-notebook-in-a-subdir.ipynb>`.
+:ref:`an alternative text </subdir/a-notebook-in-a-subdir.ipynb>`.
 
 The above links were created with:
 
 .. code-block:: rst
 
-    :ref:`subdir/a-notebook-in-a-subdir.ipynb`
-    :ref:`an alternative text <subdir/a-notebook-in-a-subdir.ipynb>`
+    :ref:`/subdir/a-notebook-in-a-subdir.ipynb`
+    :ref:`an alternative text </subdir/a-notebook-in-a-subdir.ipynb>`
 
 Links to subsections are also possible, e.g.
-:ref:`subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
+:ref:`/subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
 (the subsection title is used as link text) and
-:ref:`alternative text <subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section>`.
+:ref:`alternative text </subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section>`.
 
 These links were created with:
 
 .. code-block:: rst
 
-    :ref:`subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
-    :ref:`alternative text <subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section>`
+    :ref:`/subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
+    :ref:`alternative text </subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section>`
 
 .. note::
 
     * Spaces in the section title have to be replaced by hyphens!
-    * "``../``" is not allowed, you have to specify the full path even if the
-      current source file is in a subdirectory!
+    * Notebook paths have to be relative to the top source directory and they
+      have to start with a slash (``/``).
 
 Sphinx Directives for Info/Warning Boxes
 ----------------------------------------
@@ -72,6 +72,6 @@ Domain Objects
 .. py:function:: example_python_function(foo)
 
     This is just for testing domain object links. See
-    :ref:`this section <markdown-cells.ipynb#Links-to-Domain-Objects>`.
+    :ref:`this section </markdown-cells.ipynb#Links-to-Domain-Objects>`.
 
     :param str foo: Example string parameter

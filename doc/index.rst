@@ -20,4 +20,4 @@ was generated from Jupyter notebooks.
 
 .. only:: html
 
-    There is also :ref:`orphan.ipynb`, just for the sake of it.
+    There is also :ref:`/orphan.ipynb`, just for the sake of it.
