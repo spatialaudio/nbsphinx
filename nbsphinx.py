@@ -457,6 +457,7 @@ div.nboutput div.output_area.stderr {
 .ansi-white-intense-bg { background-color: #A1A6B2; }
 
 .ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
 """
 
 CSS_STRING_READTHEDOCS = """
