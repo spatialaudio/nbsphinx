@@ -7,6 +7,7 @@ was generated from Jupyter notebooks.
     :maxdepth: 3
     :glob:
 
+    installation.ipynb
     usage.ipynb
     markdown-cells.ipynb
     code-cells.ipynb
