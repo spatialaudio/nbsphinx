@@ -285,6 +285,8 @@ LATEX_PREAMBLE = r"""
 \definecolor{ansi-cyan-intense}{HTML}{258F8F}
 \definecolor{ansi-white}{HTML}{C5C1B4}
 \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+\definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+\definecolor{ansi-default-inverse-bg}{HTML}{000000}
 
 % Define "notice" environment, which was removed in Sphinx 1.7.
 % At some point, "notice" should be replaced by "sphinxadmonition",
@@ -455,6 +457,9 @@ div.nboutput div.output_area.stderr {
 .ansi-white-bg { background-color: #C5C1B4; }
 .ansi-white-intense-fg { color: #A1A6B2; }
 .ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
