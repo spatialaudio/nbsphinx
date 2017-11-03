@@ -1,3 +1,6 @@
+Version 0.2.15 (2017-11-03):
+ * Links to subsections are now possible in all source files
+
 Version 0.2.14 (2017-06-09):
  * Add option ``nbsphinx_kernel_name``
 
