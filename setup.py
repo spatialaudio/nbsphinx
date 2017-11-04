@@ -1,6 +1,7 @@
 from setuptools import setup
 
 # "import" __version__
+__version__ = 'unknown'
 for line in open('nbsphinx.py'):
     if line.startswith('__version__'):
         exec(line)
