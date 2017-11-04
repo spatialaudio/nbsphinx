@@ -24,7 +24,7 @@ setup(
     long_description=open('README.rst').read(),
     license='MIT',
     keywords='Sphinx Jupyter notebook'.split(),
-    url='http://nbsphinx.rtfd.io/',
+    url='http://nbsphinx.readthedocs.io/',
     platforms='any',
     classifiers=[
         'Framework :: Sphinx',
