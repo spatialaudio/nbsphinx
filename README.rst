@@ -17,9 +17,6 @@ Documentation (and example of use):
 Source code repository (and issue tracker):
     https://github.com/spatialaudio/nbsphinx/
 
-Python Package Index:
-    https://pypi.python.org/pypi/nbsphinx/
-
 License:
     MIT -- see the file ``LICENSE`` for details.
 
