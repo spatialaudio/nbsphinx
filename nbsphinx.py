@@ -150,11 +150,10 @@ RST_TEMPLATE = """
 
 {{ output.data['text/html'] | indent | indent }}
 {%- elif datatype == 'application/javascript' %}
-{% set div_id = uuid4() %}
 
     .. raw:: html
 
-        <div id="{{ div_id }}"></div>
+        <div id="{{ '17e41401-056b-4c7f-8bf7-a5ed668e35ea' }}"></div>
         <script type="text/javascript">
         var element = document.getElementById('{{ div_id }}');
 {{ output.data['application/javascript'] | indent | indent }}
