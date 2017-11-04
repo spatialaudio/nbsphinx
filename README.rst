@@ -8,18 +8,6 @@ course their results) in both HTML and LaTeX output.
 Un-evaluated notebooks -- i.e. notebooks without stored output cells -- will be
 automatically executed during the Sphinx build process.
 
-.. _Sphinx: http://sphinx-doc.org/
-.. _Jupyter Notebook: http://jupyter.org/
-
-Documentation (and example of use):
-    http://nbsphinx.readthedocs.io/
-
-Source code repository (and issue tracker):
-    https://github.com/spatialaudio/nbsphinx/
-
-License:
-    MIT -- see the file ``LICENSE`` for details.
-
 Quick Start:
     #. Install ``nbsphinx``
 
@@ -29,3 +17,15 @@ Quick Start:
        to the ``toctree``.
 
     #. Run Sphinx!
+
+Online documentation (and example of use):
+    http://nbsphinx.readthedocs.io/
+
+Source code repository (and issue tracker):
+    https://github.com/spatialaudio/nbsphinx/
+
+License:
+    MIT -- see the file ``LICENSE`` for details.
+
+.. _Sphinx: http://sphinx-doc.org/
+.. _Jupyter Notebook: http://jupyter.org/
