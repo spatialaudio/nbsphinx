@@ -230,7 +230,6 @@ RST_TEMPLATE = """
 
 .. raw:: latex
 
-    %
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/html' %}
 .. raw:: html
@@ -239,7 +238,6 @@ RST_TEMPLATE = """
 {%- elif raw_mimetype == 'text/latex' %}
 .. raw:: latex
 
-    %
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
 {{ cell.source | markdown2rst }}
