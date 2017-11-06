@@ -1094,7 +1094,11 @@ class CreateSectionLabels(docutils.transforms.Transform):
 
         # Create labels for domain-specific object signatures
         for sig in self.document.traverse(sphinx.addnodes.desc_signature):
-            title = sig['ids'][0]
+            try:
+                title = sig['ids'][0]
+            except IndexError:
+                # Object has same name as another, so skip it
+                continue
             link_id = title.replace(' ', '-')
             sig['ids'] = [link_id]
             label = env.docname + file_ext + '#' + link_id
