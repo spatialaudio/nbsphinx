@@ -2,7 +2,7 @@ from setuptools import setup
 
 # "import" __version__
 __version__ = 'unknown'
-for line in open('nbsphinx.py'):
+for line in open('src/nbsphinx.py'):
     if line.startswith('__version__'):
         exec(line)
         break
@@ -10,6 +10,7 @@ for line in open('nbsphinx.py'):
 setup(
     name='nbsphinx',
     version=__version__,
+    package_dir={'': 'src'},
     py_modules=['nbsphinx'],
     install_requires=[
         'docutils',
