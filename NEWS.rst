@@ -1,3 +1,6 @@
+Version 0.2.16 (2017-11-07):
+ * Fix issue #142
+
 Version 0.2.15 (2017-11-03):
  * Links to subsections are now possible in all source files
 
