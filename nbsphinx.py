@@ -150,13 +150,12 @@ RST_TEMPLATE = """
 
 {{ output.data['text/html'] | indent | indent }}
 {%- elif datatype == 'application/javascript' %}
-{% set div_id = uuid4() %}
 
     .. raw:: html
 
-        <div id="{{ div_id }}"></div>
+        <div></div>
         <script type="text/javascript">
-        var element = document.getElementById('{{ div_id }}');
+        var element = document.currentScript.previousSibling.previousSibling;
 {{ output.data['application/javascript'] | indent | indent }}
         </script>
 {%- elif datatype.startswith('application') and datatype.endswith('+json') %}
