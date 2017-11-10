@@ -1058,8 +1058,9 @@ class CreateSectionLabels(docutils.transforms.Transform):
 
     These labels are referenced in ProcessLocalLinks.
 
-    Note: Sphinx lower-cases the HTML section IDs, Jupyter doesn't. This
-    function creates labels in the Jupyter (non-lower-case) style.
+    Note: Sphinx lower-cases the HTML section IDs, Jupyter doesn't.
+    This transform creates labels in the Jupyter style for Jupyter
+    notebooks, but keeps the Sphinx style for all other source files.
 
     """
 
@@ -1073,8 +1074,11 @@ class CreateSectionLabels(docutils.transforms.Transform):
             assert section.children
             assert isinstance(section.children[0], docutils.nodes.title)
             title = section.children[0].astext()
-            link_id = title.replace(' ', '-')
-            section['ids'] = [link_id]
+            if file_ext.lower() == '.ipynb':
+                link_id = title.replace(' ', '-')
+                section['ids'] = [link_id]
+            else:
+                link_id = section['ids'][0]
             label = env.docname + file_ext + '#' + link_id
             label = label.lower()
             env.domaindata['std']['labels'][label] = (
