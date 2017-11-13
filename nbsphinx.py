@@ -1373,6 +1373,9 @@ def setup(app):
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
                  latex=(visit_admonition_latex, depart_admonition_latex))
+
+    app.add_javascript('https://unpkg.com/jupyter-js-widgets@^2.1.4/dist/embed.js')
+
     app.connect('builder-inited', builder_inited)
     app.connect('html-page-context', html_page_context)
     app.connect('html-collect-pages', html_collect_pages)
