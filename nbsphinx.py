@@ -158,7 +158,7 @@ RST_TEMPLATE = """
         var element = document.currentScript.previousSibling.previousSibling;
 {{ output.data['application/javascript'] | indent | indent }}
         </script>
-{%- elif datatype.startswith('application') and datatype.endswith('+json') %}
+{%- elif datatype.startswith('application/vnd.jupyter') and datatype.endswith('+json') %}
 
     .. raw:: html
 
