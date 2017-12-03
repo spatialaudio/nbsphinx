@@ -1,3 +1,6 @@
+Version 0.2.18 (2017-12-03):
+ * Fix issue #148
+
 Version 0.2.17 (2017-11-12):
  * Fix issue #146
 
