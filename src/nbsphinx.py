@@ -666,7 +666,17 @@ class NotebookParser(rst.Parser):
         if resources.get('nbsphinx_orphan', False):
             env.metadata[env.docname]['orphan'] = ''
 
+        if env.config.nbsphinx_prolog:
+            rst.Parser.parse(
+                self,
+                jinja2.Template(env.config.nbsphinx_prolog).render(env=env),
+                document)
         rst.Parser.parse(self, rststring, document)
+        if env.config.nbsphinx_epilog:
+            rst.Parser.parse(
+                self,
+                jinja2.Template(env.config.nbsphinx_epilog).render(env=env),
+                document)
 
 
 class NotebookError(sphinx.errors.SphinxError):
@@ -1366,6 +1376,8 @@ def setup(app):
     # Default value is set in builder_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
+    app.add_config_value('nbsphinx_prolog', None, rebuild='env')
+    app.add_config_value('nbsphinx_epilog', None, rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)

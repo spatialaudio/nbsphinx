@@ -14,6 +14,7 @@ was generated from Jupyter notebooks.
     raw-cells.ipynb
     hidden-cells.ipynb
     executing-notebooks.ipynb
+    prolog-and-epilog.ipynb
     subdir/*
     a-normal-rst-file.rst
     links.ipynb
