@@ -595,7 +595,7 @@ class Exporter(nbconvert.RSTExporter):
 
         orphan = nbsphinx_metadata.get('orphan', False)
         if orphan is True:
-            rststr = ':orphan:\n\n' + rststr
+            resources['nbsphinx_orphan'] = True
         elif orphan is not False:
             raise ValueError('invalid orphan option: {!r}'.format(orphan))
 
@@ -662,6 +662,9 @@ class NotebookParser(rst.Parser):
             dest = os.path.normpath(os.path.join(srcdir, filename))
             with open(dest, 'wb') as f:
                 f.write(data)
+
+        if resources.get('nbsphinx_orphan', False):
+            env.metadata[env.docname]['orphan'] = ''
 
         rst.Parser.parse(self, rststring, document)
 
