@@ -108,6 +108,7 @@ html_title = project + ' version ' + release
 
 latex_elements = {
     'papersize': 'a4paper',
+    'printindex': '',
     'preamble': r"""
 \usepackage[sc,osf]{mathpazo}
 \linespread{1.05}  % see http://www.tug.dk/FontCatalogue/urwpalladio/
