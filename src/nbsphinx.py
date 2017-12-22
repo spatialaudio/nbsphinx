@@ -784,8 +784,8 @@ class NbOutput(rst.Directive):
         if outputtype == 'rst':
             classes = [self.options.get('class', ''), 'output_area']
             output_area = docutils.nodes.container(classes=classes)
-            self.state.nested_parse(self.content, self.content_offset,
-                                    output_area)
+            sphinx.util.nodes.nested_parse_with_titles(
+                self.state, self.content, output_area)
             container += output_area
         else:
             text = '\n'.join(self.content.data)
