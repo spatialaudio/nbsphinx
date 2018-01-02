@@ -1,3 +1,7 @@
+Version 0.3.0 (2018-01-02):
+ * Add options ``nbsphinx_prolog`` and ``nbsphinx_epilog``
+ * Links from ``*.rst`` files to notebooks have to start with a slash
+
 Version 0.2.18 (2017-12-03):
  * Fix issue #148
 
