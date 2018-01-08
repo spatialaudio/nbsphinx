@@ -619,8 +619,27 @@ class NotebookParser(rst.Parser):
             ProcessLocalLinks, ReplaceAlertDivs]
 
     def parse(self, inputstring, document):
-        """Parse `inputstring`, write results to `document`."""
-        nb = nbformat.reads(inputstring, as_version=_ipynbversion)
+        """Parse *inputstring*, write results to *document*.
+
+        *inputstring* is either the JSON representation of a notebook,
+        or a paragraph of text coming from the Sphinx translation
+        machinery.
+
+        Note: For now, the translation strings use reST formatting,
+        because the NotebookParser uses reST as intermediate
+        representation.
+        However, there are plans to remove this intermediate step
+        (https://github.com/spatialaudio/nbsphinx/issues/36), and after
+        that, the translated strings will most likely be parsed as
+        CommonMark.
+
+        """
+        try:
+            nb = nbformat.reads(inputstring, as_version=_ipynbversion)
+        except Exception:
+            # NB: The use of the RST parser is temporary!
+            rst.Parser.parse(self, inputstring, document)
+            return
         env = document.settings.env
         srcdir = os.path.dirname(env.doc2path(env.docname))
         auxdir = os.path.join(env.doctreedir, 'nbsphinx')
