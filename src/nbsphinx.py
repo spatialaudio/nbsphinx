@@ -1302,6 +1302,9 @@ def depart_code_latex(self, node):
     out = []
     assert lines[0] == ''
     out.append(lines[0])
+    if lines[1].startswith(r'\fvset{'):  # Sphinx >= 1.6.6
+        out.append(lines[1])
+        del lines[1]
     if lines[1].startswith(r'\begin{sphinxVerbatim}'):  # Sphinx >= 1.5
         out.append(lines[1].replace('sphinxVerbatim', 'Verbatim'))
     elif lines[1].startswith(r'\begin{Verbatim}'):  # Sphinx < 1.5
