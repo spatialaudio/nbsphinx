@@ -901,10 +901,14 @@ def pandoc(source, fmt, to, filter_func=None):
     def decode(data):
         return data.decode('utf-8') if isinstance(data, bytes) else data
 
-    cmd1 = ['pandoc', '--from', fmt, '--to', 'json']
-    cmd2 = ['pandoc', '--from', 'json', '--to', to]
-
     nbconvert.utils.pandoc.check_pandoc_version()
+    v = nbconvert.utils.pandoc.get_pandoc_version()
+    cmd = ['pandoc']
+    if nbconvert.utils.version.check_version(v, '2.0'):
+        # see issue #155
+        cmd += ['--eol', 'lf']
+    cmd1 = cmd + ['--from', fmt, '--to', 'json']
+    cmd2 = cmd + ['--from', 'json', '--to', to]
 
     p = subprocess.Popen(cmd1, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     json_data, _ = p.communicate(encode(source))
