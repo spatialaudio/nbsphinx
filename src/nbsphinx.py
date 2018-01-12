@@ -895,26 +895,22 @@ def pandoc(source, fmt, to, filter_func=None):
     allow passing a filter function.
 
     """
-    def encode(text):
-        return text if isinstance(text, bytes) else text.encode('utf-8')
-
-    def decode(data):
-        return data.decode('utf-8') if isinstance(data, bytes) else data
-
     cmd1 = ['pandoc', '--from', fmt, '--to', 'json']
     cmd2 = ['pandoc', '--from', 'json', '--to', to]
 
     nbconvert.utils.pandoc.check_pandoc_version()
 
-    p = subprocess.Popen(cmd1, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    json_data, _ = p.communicate(encode(source))
+    p = subprocess.Popen(cmd1, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         universal_newlines=True, encoding='utf-8')
+    json_data, _ = p.communicate(source)
 
     if filter_func:
-        json_data = encode(filter_func(decode(json_data)))
+        json_data = filter_func(json_data)
 
-    p = subprocess.Popen(cmd2, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(cmd2, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         universal_newlines=True, encoding='utf-8')
     out, _ = p.communicate(json_data)
-    return decode(out).rstrip('\n')
+    return out.rstrip('\n')
 
 
 def _extract_toctree(cell):
