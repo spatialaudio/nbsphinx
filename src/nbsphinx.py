@@ -683,8 +683,7 @@ class NotebookParser(rst.Parser):
                 f.write(data)
 
         if resources.get('nbsphinx_orphan', False):
-            env.metadata[env.docname]['orphan'] = ''
-
+            rst.Parser.parse(self, ':orphan:', document)
         if env.config.nbsphinx_prolog:
             rst.Parser.parse(
                 self,
