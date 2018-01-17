@@ -1,3 +1,6 @@
+Version 0.3.1 (2018-01-17):
+ * Enable notebook translations (NB: The use of reST strings is temporary!)
+
 Version 0.3.0 (2018-01-02):
  * Add options ``nbsphinx_prolog`` and ``nbsphinx_epilog``
  * Links from ``*.rst`` files to notebooks have to start with a slash
