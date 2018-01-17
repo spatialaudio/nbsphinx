@@ -18,7 +18,7 @@ setup(
         'nbconvert',
         'traitlets',
         'nbformat',
-        'sphinx>=1.3.2,!=1.5.0',
+        'sphinx>=1.3.2',
     ],
     author='Matthias Geier',
     author_email='Matthias.Geier@gmail.com',
