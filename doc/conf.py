@@ -87,7 +87,7 @@ master_doc = 'index'
 
 project = 'nbsphinx'
 author = 'Matthias Geier'
-copyright = '2017, ' + author
+copyright = '2018, ' + author
 
 linkcheck_ignore = [r'http://localhost:\d+/']
 
