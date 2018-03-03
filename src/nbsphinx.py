@@ -1073,8 +1073,8 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 env.nbsphinx_files.setdefault(env.docname, []).append(file)
                 continue  # We're done here
 
-            target_docname = os.path.normpath(
-                os.path.join(os.path.dirname(env.docname), target))
+            target_docname = nbconvert.filters.posix_path(os.path.normpath(
+                os.path.join(os.path.dirname(env.docname), target)))
             if target_docname in env.found_docs:
                 if target_ext:
                     target = target_docname + target_ext
