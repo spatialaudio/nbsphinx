@@ -1025,7 +1025,7 @@ class ProcessLocalLinks(docutils.transforms.Transform):
 
     default_priority = 400  # Should probably be adjusted?
 
-    _subsection_re = re.compile(r'^(.+)(\..+#.+)$')
+    _subsection_re = re.compile(r'^([^#]+)((\.[^#]+)#.+)$')
 
     def apply(self):
         env = self.document.settings.env
@@ -1038,27 +1038,30 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             elif uri.startswith('#') or uri.startswith('mailto:'):
                 continue  # Nothing to be done
 
-            unquoted_uri = unquote(uri)
+            # NB: We look for "fragment identifier" before unquoting
+            fragment = self._subsection_re.match(uri)
+            uri = unquote(uri)
             for suffix in env.config.source_suffix:
-                if unquoted_uri.lower().endswith(suffix.lower()):
-                    target = unquoted_uri[:-len(suffix)]
-                    break
+                if fragment:
+                    if fragment.group(3).lower() == suffix.lower():
+                        target = unquote(fragment.group(1))
+                        # NB: The "fragment identifier" is not unquoted
+                        target_ext = fragment.group(2)
+                        reftype = 'ref'
+                        refdomain = 'std'
+                        break
+                else:
+                    if uri.lower().endswith(suffix.lower()):
+                        target = uri[:-len(suffix)]
+                        target_ext = ''
+                        reftype = 'doc'
+                        refdomain = None
+                        break
             else:
-                target = ''
-
-            subsection_matches = self._subsection_re.match(uri)
-            if target:
-                target_ext = ''
-                reftype = 'doc'
-                refdomain = None
-            elif subsection_matches:
-                target = subsection_matches.group(1)
-                target_ext = subsection_matches.group(2)
-                reftype = 'ref'
-                refdomain = 'std'
-            else:
+                if fragment:
+                    uri = unquote(fragment.group(1)) + fragment.group(3)
                 file = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), unquoted_uri))
+                    os.path.join(os.path.dirname(env.docname), uri))
                 if not os.path.isfile(os.path.join(env.srcdir, file)):
                     env.app.warn('file not found: {!r}'.format(file),
                                  env.doc2path(env.docname))
@@ -1076,11 +1079,11 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             target_docname = nbconvert.filters.posix_path(os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), target)))
             if target_docname in env.found_docs:
-                target = target_docname + target_ext
-                target = '/' + target.lower()
+                reftarget = target_docname + target_ext
+                reftarget = '/' + reftarget.lower()
                 linktext = node.astext()
                 xref = sphinx.addnodes.pending_xref(
-                    reftype=reftype, reftarget=target, refdomain=refdomain,
+                    reftype=reftype, reftarget=reftarget, refdomain=refdomain,
                     refwarn=True, refexplicit=True, refdoc=env.docname)
                 xref += docutils.nodes.Text(linktext, linktext)
                 node.replace_self(xref)
