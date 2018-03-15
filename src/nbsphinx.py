@@ -1076,10 +1076,8 @@ class ProcessLocalLinks(docutils.transforms.Transform):
             target_docname = nbconvert.filters.posix_path(os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), target)))
             if target_docname in env.found_docs:
-                if target_ext:
-                    target = target_docname + target_ext
-                    target = target.lower()
-                target = '/' + target
+                target = target_docname + target_ext
+                target = '/' + target.lower()
                 linktext = node.astext()
                 xref = sphinx.addnodes.pending_xref(
                     reftype=reftype, reftarget=target, refdomain=refdomain,
