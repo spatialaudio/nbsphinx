@@ -616,7 +616,9 @@ class NotebookParser(rst.Parser):
     def get_transforms(self):
         """List of transforms for documents parsed by this parser."""
         return rst.Parser.get_transforms(self) + [
-            ProcessLocalLinks, ReplaceAlertDivs]
+            CreateNotebookSectionAnchors,
+            ReplaceAlertDivs,
+        ]
 
     def parse(self, inputstring, document):
         """Parse *inputstring*, write results to *document*.
@@ -1005,12 +1007,12 @@ class ProcessLocalLinks(docutils.transforms.Transform):
     """Process links to local files.
 
     Marks local files to be copied to the HTML output directory and
-    turns links to local notebooks into ``:doc:``/``:ref:`` links.
+    turns links to source files into ``:doc:``/``:ref:`` links.
 
     Links to subsections are possible with ``...#Subsection-Title``.
     These links use the labels created by CreateSectionLabels.
 
-    Links to subsections use ``:ref:``, links to whole notebooks use
+    Links to subsections use ``:ref:``, links to whole source files use
     ``:doc:``.  Latter can be useful if you have an ``index.rst`` but
     also want a distinct ``index.ipynb`` for use with Jupyter.
     In this case you can use such a link in a notebook::
@@ -1023,24 +1025,37 @@ class ProcessLocalLinks(docutils.transforms.Transform):
 
     """
 
-    default_priority = 400  # Should probably be adjusted?
+    default_priority = 500  # After AnonymousHyperlinks (440)
 
     _subsection_re = re.compile(r'^([^#]+)((\.[^#]+)#.+)$')
 
     def apply(self):
         env = self.document.settings.env
         for node in self.document.traverse(docutils.nodes.reference):
-            uri = node.get('refuri', '')
-            if not uri:
-                continue  # No URI (e.g. named reference)
-            elif '://' in uri:
+            # NB: Anonymous hyperlinks must be already resolved at this point!
+            refuri = node.get('refuri')
+            if not refuri:
+                refname = node.get('refname')
+                if refname:
+                    refid = self.document.nameids.get(refname)
+                else:
+                    # NB: This can happen for anonymous hyperlinks
+                    refid = node.get('refid')
+                target = self.document.ids.get(refid)
+                if not target:
+                    continue  # No corresponding target, Sphinx may warn later
+                refuri = target.get('refuri')
+                if not refuri:
+                    continue  # Target doesn't have URI
+
+            if '://' in refuri:
                 continue  # Not a local link
-            elif uri.startswith('#') or uri.startswith('mailto:'):
+            elif refuri.startswith('#') or refuri.startswith('mailto:'):
                 continue  # Nothing to be done
 
             # NB: We look for "fragment identifier" before unquoting
-            fragment = self._subsection_re.match(uri)
-            uri = unquote(uri)
+            fragment = self._subsection_re.match(refuri)
+            refuri = unquote(refuri)
             for suffix in env.config.source_suffix:
                 if fragment:
                     if fragment.group(3).lower() == suffix.lower():
@@ -1051,17 +1066,17 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                         refdomain = 'std'
                         break
                 else:
-                    if uri.lower().endswith(suffix.lower()):
-                        target = uri[:-len(suffix)]
+                    if refuri.lower().endswith(suffix.lower()):
+                        target = refuri[:-len(suffix)]
                         target_ext = ''
                         reftype = 'doc'
                         refdomain = None
                         break
             else:
                 if fragment:
-                    uri = unquote(fragment.group(1)) + fragment.group(3)
+                    refuri = unquote(fragment.group(1)) + fragment.group(3)
                 file = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), uri))
+                    os.path.join(os.path.dirname(env.docname), refuri))
                 if not os.path.isfile(os.path.join(env.srcdir, file)):
                     env.app.warn('file not found: {!r}'.format(file),
                                  env.doc2path(env.docname))
@@ -1089,15 +1104,28 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 node.replace_self(xref)
 
 
-class CreateSectionLabels(docutils.transforms.Transform):
-    """Make labels for each document parsed by Sphinx, each section thereof,
-    and each Sphinx domain object.
-
-    These labels are referenced in ProcessLocalLinks.
+class CreateNotebookSectionAnchors(docutils.transforms.Transform):
+    """Create section anchors for Jupyter notebooks.
 
     Note: Sphinx lower-cases the HTML section IDs, Jupyter doesn't.
-    This transform creates labels in the Jupyter style for Jupyter
-    notebooks, but keeps the Sphinx style for all other source files.
+    This transform creates anchors in the Jupyter style.
+
+    """
+
+    default_priority = 200  # Before CreateSectionLabels (250)
+
+    def apply(self):
+        for section in self.document.traverse(docutils.nodes.section):
+            title = section.children[0].astext()
+            link_id = title.replace(' ', '-')
+            section['ids'] = [link_id]
+
+
+class CreateSectionLabels(docutils.transforms.Transform):
+    """Make labels for each document and each section thereof.
+
+    These labels are referenced in ProcessLocalLinks but can also be
+    used manually with ``:ref:``.
 
     """
 
@@ -1111,11 +1139,7 @@ class CreateSectionLabels(docutils.transforms.Transform):
             assert section.children
             assert isinstance(section.children[0], docutils.nodes.title)
             title = section.children[0].astext()
-            if file_ext.lower() == '.ipynb':
-                link_id = title.replace(' ', '-')
-                section['ids'] = [link_id]
-            else:
-                link_id = section['ids'][0]
+            link_id = section['ids'][0]
             label = '/' + env.docname + file_ext + '#' + link_id
             label = label.lower()
             env.domaindata['std']['labels'][label] = (
@@ -1132,7 +1156,15 @@ class CreateSectionLabels(docutils.transforms.Transform):
                     env.docname, '')
                 i_still_have_to_create_the_document_label = False
 
-        # Create labels for domain-specific object signatures
+
+class CreateDomainObjectLabels(docutils.transforms.Transform):
+    """Create labels for domain-specific object signatures."""
+
+    default_priority = 250  # About the same as CreateSectionLabels
+
+    def apply(self):
+        env = self.document.settings.env
+        file_ext = os.path.splitext(env.doc2path(env.docname))[1]
         for sig in self.document.traverse(sphinx.addnodes.desc_signature):
             try:
                 title = sig['ids'][0]
@@ -1420,6 +1452,8 @@ def setup(app):
     app.connect('html-collect-pages', html_collect_pages)
     app.connect('env-purge-doc', env_purge_doc)
     app.add_transform(CreateSectionLabels)
+    app.add_transform(CreateDomainObjectLabels)
+    app.add_transform(ProcessLocalLinks)
 
     # Make docutils' "code" directive (generated by markdown2rst/pandoc)
     # behave like Sphinx's "code-block",

@@ -5,21 +5,122 @@ This is a normal RST file.
 
 .. note:: Those still work!
 
-Links to Notebooks
-------------------
+Links to Notebooks (and Other Sphinx Source Files)
+--------------------------------------------------
 
-Links to notebooks can be easily created:
-:ref:`/subdir/a-notebook-in-a-subdir.ipynb`
-(the notebook title is used as link text).
-You can also use
-:ref:`an alternative text </subdir/a-notebook-in-a-subdir.ipynb>`.
+Links to Sphinx source files can be created like normal `Sphinx hyperlinks`_,
+just using a relative path to the local file: link_.
 
-The above links were created with:
+.. _Sphinx hyperlinks: http://www.sphinx-doc.org/en/stable/rest.html
+                       #external-links
+.. _link: subdir/a-notebook-in-a-subdir.ipynb
+
+.. code-block:: rst
+
+    using a relative path to the local file: link_.
+
+    .. _link: subdir/a-notebook-in-a-subdir.ipynb
+
+If the link text has a space (or some other strange character) in it, you have
+to surround it with backticks: `a notebook link`_.
+
+.. _a notebook link: subdir/a-notebook-in-a-subdir.ipynb
+
+.. code-block:: rst
+
+    surround it with backticks: `a notebook link`_.
+
+    .. _a notebook link: subdir/a-notebook-in-a-subdir.ipynb
+
+You can also use an `anonymous hyperlink target`_, like this: link__.
+If you have multiple of those, their order matters!
+
+.. _anonymous hyperlink target: http://docutils.sourceforge.net/docs/ref/rst/
+                                restructuredtext.html#anonymous-hyperlinks
+
+__ subdir/a-notebook-in-a-subdir.ipynb
+
+.. code-block:: rst
+
+    like this: link__.
+
+    __ subdir/a-notebook-in-a-subdir.ipynb
+
+Finally, you can use `Embedded URIs`_, like this
+`link <subdir/a-notebook-in-a-subdir.ipynb>`_.
+
+.. _Embedded URIs: http://docutils.sourceforge.net/docs/ref/rst/
+                   restructuredtext.html#embedded-uris-and-aliases
+
+.. code-block:: rst
+
+    like this `link <subdir/a-notebook-in-a-subdir.ipynb>`_.
+
+.. note::
+
+    These links should also work on Github and in other rendered
+    reStructuredText pages.
+
+Links to subsections are also possible by adding a hash sign (``#``) and the
+section title to any of the above-mentioned link variants.
+You have to replace spaces in the section titles by hyphens.
+For example, see this subsection_.
+
+.. _subsection: subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section
+
+.. code-block:: rst
+
+    For example, see this subsection_.
+
+    .. _subsection: subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section
+
+
+Links to Local Files (HTML only)
+--------------------------------
+
+If you use any of the above-mentioned methods to link to a local file that
+*isn't* a Sphinx source file, it will be automatically copied to the HTML output
+directory, like it would if you `link from a notebook`__.
+
+Alternatively, you can of course as always use Sphinx's download__ role.
+
+__ markdown-cells.ipynb#Links-to-Local-Files-(HTML-only)
+__ http://www.sphinx-doc.org/en/stable/markup/inline.html#role-download
+
+
+Links to Notebooks, Ye Olde Way
+-------------------------------
+
+In addition to the way shown above, you can also create links to notebooks (and
+other Sphinx source files) with
+`:ref: <http://www.sphinx-doc.org/en/stable/markup/inline.html#role-ref>`_.
+This has some disadvantages:
+
+* It is arguably a bit more clunky.
+* Because ``:ref:`` is a Sphinx feature, the links don't work on Github and
+  other rendered reStructuredText pages that use plain old ``docutils``.
+
+It also has one important advantage:
+
+* The link text can automatically be taken from the actual section title.
+
+A link with automatic title looks like this:
+:ref:`/subdir/a-notebook-in-a-subdir.ipynb`.
 
 .. code-block:: rst
 
     :ref:`/subdir/a-notebook-in-a-subdir.ipynb`
-    :ref:`an alternative text </subdir/a-notebook-in-a-subdir.ipynb>`
+
+But you can also provide
+:ref:`your own link title </subdir/a-notebook-in-a-subdir.ipynb>`.
+
+.. code-block:: rst
+
+    :ref:`your own link title </subdir/a-notebook-in-a-subdir.ipynb>`
+
+However, if you want to use your own title, you are probably better off using
+the method described above in
+`Links to Notebooks (and Other Sphinx Source Files)`_.
 
 Links to subsections are also possible, e.g.
 :ref:`/subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section`
@@ -35,9 +136,9 @@ These links were created with:
 
 .. note::
 
+    * The paths have to be relative to the top source directory and they have to
+      start with a slash (``/``).
     * Spaces in the section title have to be replaced by hyphens!
-    * Notebook paths have to be relative to the top source directory and they
-      have to start with a slash (``/``).
 
 Sphinx Directives for Info/Warning Boxes
 ----------------------------------------
