@@ -1,3 +1,7 @@
+Version 0.3.2 (2018-03-28):
+ * Links to local files are rewritten for all Sphinx source files (not only
+   Jupyter notebooks)
+
 Version 0.3.1 (2018-01-17):
  * Enable notebook translations (NB: The use of reST strings is temporary!)
 
