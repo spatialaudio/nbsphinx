@@ -1031,6 +1031,7 @@ class ProcessLocalLinks(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
+        check_links = env.config.nbsphinx_check_links
         for node in self.document.traverse(docutils.nodes.reference):
             # NB: Anonymous hyperlinks must be already resolved at this point!
             refuri = node.get('refuri')
@@ -1078,13 +1079,15 @@ class ProcessLocalLinks(docutils.transforms.Transform):
                 file = os.path.normpath(
                     os.path.join(os.path.dirname(env.docname), refuri))
                 if not os.path.isfile(os.path.join(env.srcdir, file)):
-                    env.app.warn('file not found: {!r}'.format(file),
-                                 env.doc2path(env.docname))
+                    if check_links:
+                        env.app.warn('file not found: {!r}'.format(file),
+                                     env.doc2path(env.docname))
                     continue  # Link is ignored
                 elif file.startswith('..'):
-                    env.app.warn(
-                        'link outside of source directory: {!r}'.format(file),
-                        env.doc2path(env.docname))
+                    if check_links:
+                        env.app.warn(
+                            'link outside of source directory: {!r}'.format(file),
+                            env.doc2path(env.docname))
                     continue  # Link is ignored
                 if not hasattr(env, 'nbsphinx_files'):
                     env.nbsphinx_files = {}
@@ -1436,6 +1439,7 @@ def setup(app):
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
     app.add_config_value('nbsphinx_prolog', None, rebuild='env')
     app.add_config_value('nbsphinx_epilog', None, rebuild='env')
+    app.add_config_value('nbsphinx_check_links', True, rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
