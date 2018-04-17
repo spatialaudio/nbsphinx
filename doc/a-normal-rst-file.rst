@@ -75,19 +75,6 @@ For example, see this subsection_.
     .. _subsection: subdir/a-notebook-in-a-subdir.ipynb#A-Sub-Section
 
 
-Links to Local Files (HTML only)
---------------------------------
-
-If you use any of the above-mentioned methods to link to a local file that
-*isn't* a Sphinx source file, it will be automatically copied to the HTML output
-directory, like it would if you `link from a notebook`__.
-
-Alternatively, you can of course as always use Sphinx's download__ role.
-
-__ markdown-cells.ipynb#Links-to-Local-Files-(HTML-only)
-__ http://www.sphinx-doc.org/en/stable/markup/inline.html#role-download
-
-
 Links to Notebooks, Ye Olde Way
 -------------------------------
 

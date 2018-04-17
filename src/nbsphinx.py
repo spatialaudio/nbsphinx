@@ -618,6 +618,7 @@ class NotebookParser(rst.Parser):
         return rst.Parser.get_transforms(self) + [
             CreateNotebookSectionAnchors,
             ReplaceAlertDivs,
+            CopyLinkedFiles,
         ]
 
     def parse(self, inputstring, document):
@@ -1003,11 +1004,48 @@ def _set_empty_lines(node, options):
             node.attributes[attr] = value
 
 
-class ProcessLocalLinks(docutils.transforms.Transform):
-    """Process links to local files.
+def _local_file_from_reference(node, document):
+    """Get local file path from reference and split it into components."""
+    # NB: Anonymous hyperlinks must be already resolved at this point!
+    refuri = node.get('refuri')
+    if not refuri:
+        refname = node.get('refname')
+        if refname:
+            refid = document.nameids.get(refname)
+        else:
+            # NB: This can happen for anonymous hyperlinks
+            refid = node.get('refid')
+        target = document.ids.get(refid)
+        if not target:
+            # No corresponding target, Sphinx may warn later
+            return '', '', ''
+        refuri = target.get('refuri')
+        if not refuri:
+            # Target doesn't have URI
+            return '', '', ''
+    if '://' in refuri:
+        # Not a local link
+        return '', '', ''
+    elif refuri.startswith('#') or refuri.startswith('mailto:'):
+        # Not a local link
+        return '', '', ''
 
-    Marks local files to be copied to the HTML output directory and
-    turns links to source files into ``:doc:``/``:ref:`` links.
+    # NB: We look for "fragment identifier" before unquoting
+    match = re.match(r'^([^#]+)(\.[^#]+)(#.+)$', refuri)
+    if match:
+        base = unquote(match.group(1))
+        # NB: The suffix and "fragment identifier" are not unquoted
+        suffix = match.group(2)
+        fragment = match.group(3)
+    else:
+        base, suffix = os.path.splitext(refuri)
+        base = unquote(base)
+        fragment = ''
+    return base, suffix, fragment
+
+
+class RewriteLocalLinks(docutils.transforms.Transform):
+    """Turn links to source files into ``:doc:``/``:ref:`` links.
 
     Links to subsections are possible with ``...#Subsection-Title``.
     These links use the labels created by CreateSectionLabels.
@@ -1027,69 +1065,28 @@ class ProcessLocalLinks(docutils.transforms.Transform):
 
     default_priority = 500  # After AnonymousHyperlinks (440)
 
-    _subsection_re = re.compile(r'^([^#]+)((\.[^#]+)#.+)$')
-
     def apply(self):
         env = self.document.settings.env
         for node in self.document.traverse(docutils.nodes.reference):
-            # NB: Anonymous hyperlinks must be already resolved at this point!
-            refuri = node.get('refuri')
-            if not refuri:
-                refname = node.get('refname')
-                if refname:
-                    refid = self.document.nameids.get(refname)
-                else:
-                    # NB: This can happen for anonymous hyperlinks
-                    refid = node.get('refid')
-                target = self.document.ids.get(refid)
-                if not target:
-                    continue  # No corresponding target, Sphinx may warn later
-                refuri = target.get('refuri')
-                if not refuri:
-                    continue  # Target doesn't have URI
+            base, suffix, fragment = _local_file_from_reference(node,
+                                                                self.document)
+            if not base:
+                continue
 
-            if '://' in refuri:
-                continue  # Not a local link
-            elif refuri.startswith('#') or refuri.startswith('mailto:'):
-                continue  # Nothing to be done
-
-            # NB: We look for "fragment identifier" before unquoting
-            fragment = self._subsection_re.match(refuri)
-            refuri = unquote(refuri)
-            for suffix in env.config.source_suffix:
-                if fragment:
-                    if fragment.group(3).lower() == suffix.lower():
-                        target = unquote(fragment.group(1))
-                        # NB: The "fragment identifier" is not unquoted
-                        target_ext = fragment.group(2)
+            for s in env.config.source_suffix:
+                if suffix.lower() == s.lower():
+                    target = base
+                    if fragment:
+                        target_ext = suffix + fragment
                         reftype = 'ref'
                         refdomain = 'std'
-                        break
-                else:
-                    if refuri.lower().endswith(suffix.lower()):
-                        target = refuri[:-len(suffix)]
+                    else:
                         target_ext = ''
                         reftype = 'doc'
                         refdomain = None
-                        break
+                    break
             else:
-                if fragment:
-                    refuri = unquote(fragment.group(1)) + fragment.group(3)
-                file = os.path.normpath(
-                    os.path.join(os.path.dirname(env.docname), refuri))
-                if not os.path.isfile(os.path.join(env.srcdir, file)):
-                    env.app.warn('file not found: {!r}'.format(file),
-                                 env.doc2path(env.docname))
-                    continue  # Link is ignored
-                elif file.startswith('..'):
-                    env.app.warn(
-                        'link outside of source directory: {!r}'.format(file),
-                        env.doc2path(env.docname))
-                    continue  # Link is ignored
-                if not hasattr(env, 'nbsphinx_files'):
-                    env.nbsphinx_files = {}
-                env.nbsphinx_files.setdefault(env.docname, []).append(file)
-                continue  # We're done here
+                continue  # Not a link to a potential Sphinx source file
 
             target_docname = nbconvert.filters.posix_path(os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), target)))
@@ -1124,7 +1121,7 @@ class CreateNotebookSectionAnchors(docutils.transforms.Transform):
 class CreateSectionLabels(docutils.transforms.Transform):
     """Make labels for each document and each section thereof.
 
-    These labels are referenced in ProcessLocalLinks but can also be
+    These labels are referenced in RewriteLocalLinks but can also be
     used manually with ``:ref:``.
 
     """
@@ -1233,6 +1230,35 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
                     break
                 else:
                     content.append(sibling)
+
+
+class CopyLinkedFiles(docutils.transforms.Transform):
+    """Mark linked (local) files to be copied to the HTML output."""
+
+    default_priority = 600  # After RewriteLocalLinks
+
+    def apply(self):
+        env = self.document.settings.env
+        for node in self.document.traverse(docutils.nodes.reference):
+            base, suffix, fragment = _local_file_from_reference(node,
+                                                                self.document)
+            if not base:
+                continue  # Not a local link
+            relpath = base + suffix + fragment
+            file = os.path.normpath(
+                os.path.join(os.path.dirname(env.docname), relpath))
+            if not os.path.isfile(os.path.join(env.srcdir, file)):
+                env.app.warn('file not found: {!r}'.format(file),
+                             env.doc2path(env.docname))
+                continue  # Link is ignored
+            elif file.startswith('..'):
+                env.app.warn(
+                    'link outside of source directory: {!r}'.format(file),
+                    env.doc2path(env.docname))
+                continue  # Link is ignored
+            if not hasattr(env, 'nbsphinx_files'):
+                env.nbsphinx_files = {}
+            env.nbsphinx_files.setdefault(env.docname, []).append(file)
 
 
 def builder_inited(app):
@@ -1453,7 +1479,7 @@ def setup(app):
     app.connect('env-purge-doc', env_purge_doc)
     app.add_transform(CreateSectionLabels)
     app.add_transform(CreateDomainObjectLabels)
-    app.add_transform(ProcessLocalLinks)
+    app.add_transform(RewriteLocalLinks)
 
     # Make docutils' "code" directive (generated by markdown2rst/pandoc)
     # behave like Sphinx's "code-block",
