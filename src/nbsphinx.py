@@ -476,21 +476,6 @@ CSS_STRING_READTHEDOCS = """
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -501,7 +486,7 @@ CSS_STRING_CLOUD = """
 
 /* nicer titles and more space for info and warning logos */
 
-div.admonition > .first {
+div.admonition p.admonition-title {
     background: rgba(0, 0, 0, .05);
     margin: .5em -1em;
     margin-top: -.5em !important;
@@ -1399,12 +1384,11 @@ def depart_code_latex(self, node):
 
 def visit_admonition_html(self, node):
     self.body.append(self.starttag(node, 'div'))
-    self.set_first_last(node)
-    if self.settings.env.config.html_theme in ('sphinx_rtd_theme', 'julia'):
-        if node.children:
-            classes = node.children[0]['classes']
-            if 'last' not in classes:
-                classes.extend(['fa', 'fa-exclamation-circle'])
+    if len(node.children) >= 2:
+        node[0]['classes'].append('admonition-title')
+        html_theme = self.settings.env.config.html_theme
+        if html_theme in ('sphinx_rtd_theme', 'julia'):
+            node.children[0]['classes'].extend(['fa', 'fa-exclamation-circle'])
 
 
 def depart_admonition_html(self, node):
