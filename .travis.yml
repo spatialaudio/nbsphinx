@@ -34,4 +34,5 @@ install:
 script:
   - python -m sphinx doc/ doc/_build/ -b html
   - python -m sphinx doc/ doc/_build/ -b latex
+  - python -m sphinx doc/ doc/_build/ -b epub
   - $ADDITIONAL_COMMAND
