@@ -23,7 +23,7 @@
 http://nbsphinx.rtfd.org/
 
 """
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 import copy
 import json
