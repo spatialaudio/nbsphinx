@@ -46,7 +46,6 @@ import traitlets
 
 _ipynbversion = 4
 
-
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
     'application/javascript',
@@ -522,9 +521,8 @@ class Exporter(nbconvert.RSTExporter):
 
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
                  allow_errors=False, timeout=30, codecell_lexer='none',
-                 exclude_output = False, exclude_input = False, 
-                 exclude_input_prompt = False, exclude_output_prompt = False, 
-                 exclude_markdown = False, exclude_code_cell = False):
+                 exclude_input = False, exclude_input_prompt = False,
+                 exclude_output_prompt = False):
                  
         """Initialize the Exporter."""
         self._execute = execute
@@ -534,24 +532,18 @@ class Exporter(nbconvert.RSTExporter):
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
-        self._exclude_output = exclude_output
         self._exclude_input = exclude_input
         self._exclude_input_prompt = exclude_input_prompt
         self._exclude_output_prompt = exclude_output_prompt
-        self._exclude_markdown = exclude_markdown
-        self._exclude_code_cell = exclude_code_cell 
         
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
             config=traitlets.config.Config(
                 {'HighlightMagicsPreprocessor': {'enabled': True},
                 'TemplateExporter':{
-                "exclude_output": exclude_output,
                 "exclude_input": exclude_input,
                 "exclude_input_prompt": exclude_input_prompt,
-                "exclude_output_prompt": exclude_output_prompt,
-                "exclude_markdown": exclude_markdown,
-                "exclude_code_cell": exclude_code_cell}}),
+                "exclude_output_prompt": exclude_output_prompt}}),
             filters={
                 'convert_pandoc': convert_pandoc,
                 'markdown2rst': markdown2rst,
@@ -667,12 +659,9 @@ class NotebookParser(rst.Parser):
             timeout=env.config.nbsphinx_timeout,
             codecell_lexer=env.config.nbsphinx_codecell_lexer,
             
-            exclude_output = env.config.nbsphinx_exclude_output, 
             exclude_input = env.config.nbsphinx_exclude_input, 
             exclude_input_prompt = env.config.nbsphinx_exclude_input_prompt, 
             exclude_output_prompt = env.config.nbsphinx_exclude_output_prompt, 
-            exclude_markdown = env.config.nbsphinx_exclude_markdown, 
-            exclude_code_cell = env.config.nbsphinx_exclude_code_cell
         )
 
         try:
@@ -1471,12 +1460,9 @@ def setup(app):
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
     #hide or display input, output,....
-    app.add_config_value('nbsphinx_exclude_output', False, rebuild='env')
     app.add_config_value('nbsphinx_exclude_input', False, rebuild='env')
     app.add_config_value('nbsphinx_exclude_input_prompt', False, rebuild='env')
     app.add_config_value('nbsphinx_exclude_output_prompt', False, rebuild='env')
-    app.add_config_value('nbsphinx_exclude_markdown', False, rebuild='env')
-    app.add_config_value('nbsphinx_exclude_code_cell', False, rebuild='env')
     
     # Default value is set in builder_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
