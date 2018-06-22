@@ -20,7 +20,7 @@
 
 """Jupyter Notebook Tools for Sphinx.
 
-http://nbsphinx.rtfd.org/
+http://nbsphinx.readthedocs.io/
 
 """
 __version__ = '0.3.3'
