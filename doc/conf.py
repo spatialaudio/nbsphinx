@@ -91,14 +91,17 @@ copyright = '2018, ' + author
 
 linkcheck_ignore = [r'http://localhost:\d+/']
 
-# -- Get version information from Git -------------------------------------
+# -- Get version information and date from Git ----------------------------
 
 try:
     from subprocess import check_output
     release = check_output(['git', 'describe', '--tags', '--always'])
     release = release.decode().strip()
+    today = check_output(['git', 'show', '-s', '--format=%ad', '--date=short'])
+    today = today.decode().strip()
 except Exception:
     release = '<unknown>'
+    today = '<unknown date>'
 
 # -- Options for HTML output ----------------------------------------------
 
