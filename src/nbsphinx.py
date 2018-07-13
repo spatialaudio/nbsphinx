@@ -849,19 +849,29 @@ def markdown2rst(text):
     except that it uses a pandoc filter to convert raw LaTeX blocks to
     "math" directives (instead of "raw:: latex" directives).
 
+    NB: At some point, pandoc changed its behavior!  In former times,
+    it converted LaTeX math environments to RawBlock ("latex"), at some
+    later point this was changed to RawInline ("tex").
+    Either way, we convert it to Math/DisplayMath.
+
     """
+
+    def displaymath(text):
+        return {
+            't': 'Math',
+            'c': [
+                {'t': 'DisplayMath', 'c': []},
+                # Special marker characters are removed below:
+                '\x0e:nowrap:\x0f\n\n' + text,
+            ]
+        }
 
     def rawlatex2math_hook(obj):
         if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
             obj['t'] = 'Para'
-            obj['c'] = [{
-                't': 'Math',
-                'c': [
-                    {'t': 'DisplayMath', 'c': []},
-                    # Special marker characters are removed below:
-                    '\x0e:nowrap:\x0f\n\n' + obj['c'][1],
-                ]
-            }]
+            obj['c'] = [displaymath(obj['c'][1])]
+        elif obj.get('t') == 'RawInline' and obj['c'][0] == 'tex':
+            obj = displaymath(obj['c'][1])
         return obj
 
     def rawlatex2math(text):
