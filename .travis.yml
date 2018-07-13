@@ -13,9 +13,9 @@ matrix:
   - env: SPHINX="==1.4.9 docutils<0.13.1"
   - env: SPHINX="==1.5.0 docutils<0.13.1"
   - env: SPHINX="==1.5.1"
-  - env: SPHINX="==1.5.3"
   - env: SPHINX="==1.5.6"
-  - env: SPHINX="==1.6.6"
+  - env: SPHINX="==1.6.7"
+  - env: SPHINX="==1.7.5"
 
   # a few Python versions using latest Sphinx release
   - python: "3.4"
