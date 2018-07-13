@@ -1475,4 +1475,8 @@ def setup(app):
     # see https://github.com/sphinx-doc/sphinx/issues/2155:
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
 
-    return {'version': __version__, 'parallel_read_safe': True}
+    return {
+        'version': __version__,
+        'parallel_read_safe': True,
+        'env_version': 1,
+    }
