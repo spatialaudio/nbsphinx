@@ -1080,8 +1080,9 @@ class RewriteLocalLinks(docutils.transforms.Transform):
             target_docname = nbconvert.filters.posix_path(os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), target)))
             if target_docname in env.found_docs:
-                reftarget = target_docname + target_ext
-                reftarget = '/' + reftarget.lower()
+                reftarget = '/' + target_docname + target_ext
+                if reftype == 'ref':
+                    reftarget = reftarget.lower()
                 linktext = node.astext()
                 xref = sphinx.addnodes.pending_xref(
                     reftype=reftype, reftarget=reftarget, refdomain=refdomain,
