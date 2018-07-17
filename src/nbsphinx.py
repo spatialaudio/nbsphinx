@@ -596,7 +596,7 @@ class NotebookParser(rst.Parser):
 
     """
 
-    supported = ()
+    supported = 'jupyter_notebook',
 
     def get_transforms(self):
         """List of transforms for documents parsed by this parser."""
@@ -1448,7 +1448,12 @@ def _add_notebook_parser(app):
 
 def setup(app):
     """Initialize Sphinx extension."""
-    _add_notebook_parser(app)
+    try:
+        # Available since Sphinx 1.8:
+        app.add_source_suffix('.ipynb', 'jupyter_notebook')
+        app.add_source_parser(NotebookParser)
+    except AttributeError:
+        _add_notebook_parser(app)
 
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
