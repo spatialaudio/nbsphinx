@@ -1,3 +1,6 @@
+Version 0.3.4 (2018-07-28):
+ * Fix issue #196 and other minor changes
+
 Version 0.3.3 (2018-04-25):
  * Locally linked files are only copied for Jupyter notebooks (and not anymore
    for other Sphinx source files)
