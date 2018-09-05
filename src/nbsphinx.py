@@ -131,7 +131,7 @@ RST_TEMPLATE = """
 {%- if datatype == 'text/plain' -%}
 {{ insert_empty_lines(output.data[datatype]) }}
 
-{{ output.data[datatype].strip(\n) | indent }}
+{{ output.data[datatype].strip('\n') | indent }}
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
     .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
