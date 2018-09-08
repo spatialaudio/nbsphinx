@@ -111,6 +111,7 @@ RST_TEMPLATE = """
 
 {{ cell.source.strip('\n') | indent }}
 {%- endif %}
+..{# Empty comment to make sure the directive is closed #}
 {% endblock input %}
 
 
@@ -187,6 +188,7 @@ RST_TEMPLATE = """
 
     .. nbwarning:: Data type cannot be displayed: {{ datatype }}
 {%- endif %}
+..{# Empty comment to make sure the directive is closed #}
 {% endmacro %}
 
 
