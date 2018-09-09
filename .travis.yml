@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.6"
+  - "3.7"
 matrix:
   include:
 
@@ -16,6 +16,7 @@ matrix:
   # a few Python versions using latest Sphinx release
   - python: "3.4"
   - python: "3.5"
+  - python: "3.6"
   - python: "nightly"
   - python: "pypy3"
 
