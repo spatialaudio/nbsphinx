@@ -1,3 +1,7 @@
+Version 0.3.5 (2018-09-10):
+ * Disable ``nbconvert`` version 5.4 to avoid
+   `issue #878 <https://github.com/jupyter/nbconvert/issues/878>`__
+
 Version 0.3.4 (2018-07-28):
  * Fix issue #196 and other minor changes
 
