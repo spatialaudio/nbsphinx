@@ -573,10 +573,12 @@ class Exporter(nbconvert.RSTExporter):
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
-            pp = nbconvert.preprocessors.ExecutePreprocessor(
-                kernel_name=self._kernel_name,
-                extra_arguments=self._execute_arguments,
-                allow_errors=allow_errors, timeout=timeout)
+            preprocess_args = {"extra_arguments":self._execute_arguments,
+                               "allow_errors": allow_errors,
+                               "timeout": timeout}
+            if self._kernel_name != "":
+                preprocess_args['kernel_name'] = self._kernel_name
+            pp = nbconvert.preprocessors.ExecutePreprocessor(**preprocess_args)
             nb, resources = pp.preprocess(nb, resources)
 
         # Call into RSTExporter
