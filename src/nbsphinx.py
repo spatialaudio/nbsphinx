@@ -1342,6 +1342,18 @@ def depart_codecell_html(self, node):
 def visit_codecell_latex(self, node):
     if node['has_text_content']:
         self.pushbody([])  # See popbody() below
+    elif 'prompt' in node:
+        self.body.append(r"""
+\newbox\nbsphinxpromptbox
+\savebox{\nbsphinxpromptbox}{\textcolor{nbsphinxout}{\Verb|%s |}}
+\newskip\nbsphinxoutputareawidth
+\nbsphinxoutputareawidth=\textwidth
+\advance\nbsphinxoutputareawidth by -\wd\nbsphinxpromptbox
+\vspace{-1.5ex}\begin{minipage}[t]{\wd\nbsphinxpromptbox}\vspace{0pt}
+\usebox{\nbsphinxpromptbox}
+\end{minipage}%%
+\begin{minipage}[t]{\nbsphinxoutputareawidth}\vspace{0pt}
+""" % node.get('prompt'))
 
 
 def depart_codecell_latex(self, node):
@@ -1353,6 +1365,9 @@ def depart_codecell_latex(self, node):
 
     """
     if not node['has_text_content']:
+        if 'prompt' in node:
+            self.body.append(r'\end{minipage}')
+        self.body.append(r'\par')  # Force new paragraph
         return
     lines = ''.join(self.popbody()).split('\n')
     out = []
