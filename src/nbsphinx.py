@@ -696,73 +696,70 @@ class NotebookError(sphinx.errors.SphinxError):
     category = 'Notebook error'
 
 
-class CodecellNode(docutils.nodes.Element):
-    """A custom node for Jupyter code cells."""
+class CodeAreaNode(docutils.nodes.Element):
+    """Input area or output area of a Jupyter notebook code cell."""
 
-    def __init__(self, dummy_text='', directive=None, **attributes):
-        """Create a node for an input or output cell.
 
-        The constructor is also used when Sphinx de-serializes nodes,
-        Therefore the first positional argument and *attributes* have
-        to be forwarded to the parent ctor.
+class FancyOutputNode(docutils.nodes.Element):
+    """A custom node for non-code output of code cells."""
 
-        """
-        docutils.nodes.Element.__init__(self, dummy_text, **attributes)
-        if directive is None:
-            return  # Constructor was used by Sphinx, we are done here
 
-        has_text_content = True
-        language = 'none'
-        execution_count = directive.options.get('execution-count')
-        if isinstance(directive, NbInput):
-            outer_classes = ['nbinput']
-            if 'no-output' in directive.options:
-                outer_classes.append('nblast')
-            inner_classes = ['input_area']
-            if directive.arguments:
-                language = directive.arguments[0]
-            prompt_template = 'In [%s]:'
-            if not execution_count:
-                execution_count = ' '
-        elif isinstance(directive, NbOutput):
-            outer_classes = ['nboutput']
-            if 'more-to-come' not in directive.options:
-                outer_classes.append('nblast')
-            inner_classes = ['output_area']
-            # 'class' can be 'stderr'
-            inner_classes.append(directive.options.get('class', ''))
-            prompt_template = 'Out[%s]:'
-            if directive.arguments and directive.arguments[0] == 'rst':
-                has_text_content = False
-        else:
-            assert False
+def _create_code_nodes(directive):
+    """Create nodes for an input or output code cell."""
+    fancy_output = False
+    language = 'none'
+    execution_count = directive.options.get('execution-count')
+    if isinstance(directive, NbInput):
+        outer_classes = ['nbinput']
+        if 'no-output' in directive.options:
+            outer_classes.append('nblast')
+        inner_classes = ['input_area']
+        if directive.arguments:
+            language = directive.arguments[0]
+        prompt_template = 'In [%s]:'
+        if not execution_count:
+            execution_count = ' '
+    elif isinstance(directive, NbOutput):
+        outer_classes = ['nboutput']
+        if 'more-to-come' not in directive.options:
+            outer_classes.append('nblast')
+        inner_classes = ['output_area']
+        # 'class' can be 'stderr'
+        inner_classes.append(directive.options.get('class', ''))
+        prompt_template = 'Out[%s]:'
+        if directive.arguments and directive.arguments[0] == 'rst':
+            fancy_output = True
+    else:
+        assert False
 
-        container = docutils.nodes.container(classes=outer_classes)
-        if execution_count:
-            prompt = prompt_template % (execution_count,)
-            prompt_node = docutils.nodes.literal_block(
-                prompt, prompt, language='none', classes=['prompt'])
-            self['prompt'] = prompt
-        else:
-            prompt_node = docutils.nodes.container(classes=['prompt', 'empty'])
-        # Not needed for LaTeX output:
-        container += sphinx.addnodes.only('', prompt_node, expr='html')
-        if has_text_content:
-            # See http://stackoverflow.com/q/34050044/.
-            for attr in 'empty-lines-before', 'empty-lines-after':
-                value = directive.options.get(attr, 0)
-                if value:
-                    self[attr] = value
-            text = '\n'.join(directive.content.data)
-            inner_node = docutils.nodes.literal_block(
-                text, text, language=language, classes=inner_classes)
-        else:
-            inner_node = docutils.nodes.container(classes=inner_classes)
-            sphinx.util.nodes.nested_parse_with_titles(
-                directive.state, directive.content, inner_node)
-        container += inner_node
-        self += container
-        self['has_text_content'] = has_text_content
+    outer_node = docutils.nodes.container(classes=outer_classes)
+    if execution_count:
+        prompt = prompt_template % (execution_count,)
+        prompt_node = docutils.nodes.literal_block(
+            prompt, prompt, language='none', classes=['prompt'])
+    else:
+        prompt = ''
+        prompt_node = docutils.nodes.container(classes=['prompt', 'empty'])
+    # NB: Prompts are added manually in LaTeX output
+    outer_node += sphinx.addnodes.only('', prompt_node, expr='html')
+
+    if fancy_output:
+        inner_node = docutils.nodes.container(classes=inner_classes)
+        sphinx.util.nodes.nested_parse_with_titles(
+            directive.state, directive.content, inner_node)
+        outer_node += FancyOutputNode('', inner_node, prompt=prompt)
+    else:
+        text = '\n'.join(directive.content.data)
+        inner_node = docutils.nodes.literal_block(
+            text, text, language=language, classes=inner_classes)
+        codearea_node = CodeAreaNode('', inner_node, prompt=prompt)
+        # See http://stackoverflow.com/q/34050044/.
+        for attr in 'empty-lines-before', 'empty-lines-after':
+            value = directive.options.get(attr, 0)
+            if value:
+                codearea_node[attr] = value
+        outer_node += codearea_node
+    return [outer_node]
 
 
 class AdmonitionNode(docutils.nodes.Element):
@@ -788,7 +785,7 @@ class NbInput(rst.Directive):
     def run(self):
         """This is called by the reST parser."""
         self.state.document['nbsphinx_include_css'] = True
-        return [CodecellNode(directive=self)]
+        return _create_code_nodes(self)
 
 
 class NbOutput(rst.Directive):
@@ -809,7 +806,7 @@ class NbOutput(rst.Directive):
     def run(self):
         """This is called by the reST parser."""
         self.state.document['nbsphinx_include_css'] = True
-        return [CodecellNode(directive=self)]
+        return _create_code_nodes(self)
 
 
 class _NbAdmonition(rst.Directive):
@@ -1327,36 +1324,21 @@ def env_purge_doc(app, env, docname):
         pass
 
 
-def depart_codecell_html(self, node):
+def depart_codearea_html(self, node):
     """Add empty lines before and after the code."""
-    if not node['has_text_content']:
-        return
-    text = self.body[-2]
+    text = self.body[-1]
     text = text.replace('<pre>',
                         '<pre>\n' + '\n' * node.get('empty-lines-before', 0))
     text = text.replace('</pre>',
                         '\n' * node.get('empty-lines-after', 0) + '</pre>')
-    self.body[-2] = text
+    self.body[-1] = text
 
 
-def visit_codecell_latex(self, node):
-    if node['has_text_content']:
-        self.pushbody([])  # See popbody() below
-    elif 'prompt' in node:
-        self.body.append(r"""
-\newbox\nbsphinxpromptbox
-\savebox{\nbsphinxpromptbox}{\textcolor{nbsphinxout}{\Verb|%s |}}
-\newskip\nbsphinxoutputareawidth
-\nbsphinxoutputareawidth=\textwidth
-\advance\nbsphinxoutputareawidth by -\wd\nbsphinxpromptbox
-\vspace{-1.5ex}\begin{minipage}[t]{\wd\nbsphinxpromptbox}\vspace{0pt}
-\usebox{\nbsphinxpromptbox}
-\end{minipage}%%
-\begin{minipage}[t]{\nbsphinxoutputareawidth}\vspace{0pt}
-""" % node.get('prompt'))
+def visit_codearea_latex(self, node):
+    self.pushbody([])  # See popbody() below
 
 
-def depart_codecell_latex(self, node):
+def depart_codearea_latex(self, node):
     """Some changes to code blocks.
 
     * Remove the frame (by changing Verbatim -> OriginalVerbatim)
@@ -1364,13 +1346,8 @@ def depart_codecell_latex(self, node):
     * Add prompt to the first line, empty space to the following lines
 
     """
-    if not node['has_text_content']:
-        if 'prompt' in node:
-            self.body.append(r'\end{minipage}')
-        self.body.append(r'\par')  # Force new paragraph
-        return
-    lines = ''.join(self.popbody()).split('\n')
     out = []
+    lines = ''.join(self.popbody()).split('\n')
     assert lines[0] == ''
     out.append(lines[0])
     if lines[1].startswith(r'\fvset{'):  # Sphinx >= 1.6.6
@@ -1387,8 +1364,8 @@ def depart_codecell_latex(self, node):
         lines[2:-2] +
         [''] * node.get('empty-lines-after', 0)
     )
-    prompt = node.get('prompt', '')
-    if 'nbinput' in node[0]['classes']:
+    prompt = node['prompt']
+    if 'nbinput' in node.parent['classes']:
         color = 'nbsphinxin'
     else:
         color = 'nbsphinxout'
@@ -1407,6 +1384,30 @@ def depart_codecell_latex(self, node):
     assert lines[-1] == ''
     out.append(lines[-1])
     self.body.append('\n'.join(out))
+
+
+def visit_fancyoutput_latex(self, node):
+    prompt = node['prompt']
+    if prompt:
+        self.body.append(r"""
+\newbox\nbsphinxpromptbox
+\savebox{\nbsphinxpromptbox}{\textcolor{nbsphinxout}{\Verb|%s |}}
+\newskip\nbsphinxcodeareawidth
+\nbsphinxcodeareawidth=\textwidth
+\advance\nbsphinxcodeareawidth by -\wd\nbsphinxpromptbox
+\vspace{-1.5ex}\begin{minipage}[t]{\wd\nbsphinxpromptbox}\vspace{0pt}
+\usebox{\nbsphinxpromptbox}
+\end{minipage}%%
+\begin{minipage}[t]{\nbsphinxcodeareawidth}\vspace{0pt}
+""" % (prompt,))
+    else:
+        self.body.append('\n')
+
+
+def depart_fancyoutput_latex(self, node):
+    if node['prompt']:
+        self.body.append('\n' + r'\end{minipage}')
+    self.body.append('\n')
 
 
 def visit_admonition_html(self, node):
@@ -1483,9 +1484,12 @@ def setup(app):
     app.add_directive('nboutput', NbOutput)
     app.add_directive('nbinfo', NbInfo)
     app.add_directive('nbwarning', NbWarning)
-    app.add_node(CodecellNode,
-                 html=(do_nothing, depart_codecell_html),
-                 latex=(visit_codecell_latex, depart_codecell_latex))
+    app.add_node(CodeAreaNode,
+                 html=(do_nothing, depart_codearea_html),
+                 latex=(visit_codearea_latex, depart_codearea_latex))
+    app.add_node(FancyOutputNode,
+                 html=(do_nothing, do_nothing),
+                 latex=(visit_fancyoutput_latex, depart_fancyoutput_latex))
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
                  latex=(visit_admonition_latex, depart_admonition_latex))
