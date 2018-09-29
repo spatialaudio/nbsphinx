@@ -129,3 +129,4 @@ latex_documents = [
 ]
 
 latex_show_urls = 'footnote'
+latex_show_pagerefs = True
