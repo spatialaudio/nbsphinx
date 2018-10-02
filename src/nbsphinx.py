@@ -111,7 +111,6 @@ RST_TEMPLATE = """
 
 {{ cell.source.strip('\n') | indent }}
 {%- endif %}
-..{# Empty comment to make sure the directive is closed #}
 {% endblock input %}
 
 
@@ -188,7 +187,6 @@ RST_TEMPLATE = """
 
     .. nbwarning:: Data type cannot be displayed: {{ datatype }}
 {%- endif %}
-..{# Empty comment to make sure the directive is closed #}
 {% endmacro %}
 
 
@@ -241,8 +239,10 @@ RST_TEMPLATE = """
 
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
+..{# Empty comment to make sure the preceding directive (if any) is closed #}
 {{ cell.source | markdown2rst }}
 {%- elif raw_mimetype == 'text/restructuredtext' %}
+..{# Empty comment to make sure the preceding directive (if any) is closed #}
 {{ cell.source }}
 {% endif %}
 {% endblock rawcell %}
