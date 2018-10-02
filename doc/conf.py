@@ -81,6 +81,16 @@ nbsphinx_epilog = r"""
     \vfil\penalty-1\vfilneg
 """
 
+# Work-around until https://github.com/sphinx-doc/sphinx/pull/5504 is done:
+mathjax_config = {
+    'tex2jax': {
+        'inlineMath': [['$', '$'], ['\\(', '\\)']],
+        'processEscapes': True,
+        'ignoreClass': '.*',
+        'processClass': 'math',
+    }
+}
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'
