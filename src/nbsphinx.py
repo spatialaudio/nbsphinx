@@ -911,7 +911,10 @@ def markdown2rst(text):
         json_data = json.loads(text, object_hook=rawlatex2math_hook)
         return json.dumps(json_data)
 
-    rststring = pandoc(text, 'markdown', 'rst', filter_func=rawlatex2math)
+    input_format = 'markdown'
+    input_format += '-implicit_figures'
+
+    rststring = pandoc(text, input_format, 'rst', filter_func=rawlatex2math)
     return re.sub(r'^\n( *)\x0e:nowrap:\x0f$',
                   r'\1:nowrap:',
                   rststring,
