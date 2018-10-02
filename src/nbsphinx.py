@@ -217,7 +217,7 @@ RST_TEMPLATE = """
 {%- if 'nbsphinx-toctree' in cell.metadata %}
 {{ cell | extract_toctree }}
 {%- else %}
-{{ super() }}
+{{ cell | save_attachments or super() | replace_attachments }}
 {% endif %}
 {% endblock markdowncell %}
 
@@ -524,6 +524,31 @@ class Exporter(nbconvert.RSTExporter):
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
                  allow_errors=False, timeout=30, codecell_lexer='none'):
         """Initialize the Exporter."""
+
+        # NB: The following stateful Jinja filters are a hack until
+        # template-based processing is dropped
+        # (https://github.com/spatialaudio/nbsphinx/issues/36) or someone
+        # comes up with a better idea.
+
+        # NB: This instance-local state makes the methods non-reentrant!
+        attachment_storage = []
+
+        def save_attachments(cell):
+            for filename, bundle in cell.get('attachments', {}).items():
+                attachment_storage.append((filename, bundle))
+
+        def replace_attachments(text):
+            for filename, bundle in attachment_storage:
+                # For now, this works only if there is a single MIME bundle
+                (mime_type, data), = bundle.items()
+                text = re.sub(
+                    r'^(\s*\.\. (\|[^|]*\| image|figure)::) attachment:{0}$'
+                        .format(filename),
+                    r'\1 data:{0};base64,{1}'.format(mime_type, data),
+                    text, flags=re.MULTILINE)
+            attachment_storage.clear()
+            return text
+
         self._execute = execute
         self._kernel_name = kernel_name
         self._execute_arguments = execute_arguments
@@ -543,6 +568,8 @@ class Exporter(nbconvert.RSTExporter):
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_toctree': _extract_toctree,
+                'save_attachments': save_attachments,
+                'replace_attachments': replace_attachments,
                 'get_output_type': _get_output_type,
                 'json_dumps': json.dumps,
             })
