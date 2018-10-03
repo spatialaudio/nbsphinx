@@ -736,6 +736,7 @@ def _create_code_nodes(directive):
     fancy_output = False
     language = 'none'
     execution_count = directive.options.get('execution-count')
+    config = directive.state.document.settings.env.config
     if isinstance(directive, NbInput):
         outer_classes = ['nbinput']
         if 'no-output' in directive.options:
@@ -743,7 +744,7 @@ def _create_code_nodes(directive):
         inner_classes = ['input_area']
         if directive.arguments:
             language = directive.arguments[0]
-        prompt_template = 'In [%s]:'
+        prompt_template = config.nbsphinx_input_prompt
         if not execution_count:
             execution_count = ' '
     elif isinstance(directive, NbOutput):
@@ -753,7 +754,7 @@ def _create_code_nodes(directive):
         inner_classes = ['output_area']
         # 'class' can be 'stderr'
         inner_classes.append(directive.options.get('class', ''))
-        prompt_template = 'Out[%s]:'
+        prompt_template = config.nbsphinx_output_prompt
         if directive.arguments and directive.arguments[0] == 'rst':
             fancy_output = True
     else:
@@ -1296,21 +1297,21 @@ def builder_inited(app):
     # Set default value for CSS prompt width
     if app.config.nbsphinx_prompt_width is None:
         app.config.nbsphinx_prompt_width = {
-            'agogo': '7ex',
-            'alabaster': '8ex',
-            'better': '8ex',
-            'classic': '7ex',
-            'cloud': '8ex',
-            'dotted': '8ex',
-            'haiku': '7ex',
-            'julia': '7ex',
-            'nature': '8ex',
-            'pyramid': '8ex',
-            'redcloud': '8ex',
-            'sphinx_py3doc_enhanced_theme': '8ex',
-            'sphinx_rtd_theme': '8ex',
-            'traditional': '6ex',
-        }.get(app.config.html_theme, '9ex')
+            'agogo': '4ex',
+            'alabaster': '5ex',
+            'better': '5ex',
+            'classic': '4ex',
+            'cloud': '5ex',
+            'dotted': '5ex',
+            'haiku': '4ex',
+            'julia': '5ex',
+            'nature': '5ex',
+            'pyramid': '5ex',
+            'redcloud': '5ex',
+            'sphinx_py3doc_enhanced_theme': '6ex',
+            'sphinx_rtd_theme': '5ex',
+            'traditional': '4ex',
+        }.get(app.config.html_theme, '7ex')
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
@@ -1509,6 +1510,8 @@ def setup(app):
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
     app.add_config_value('nbsphinx_prolog', None, rebuild='env')
     app.add_config_value('nbsphinx_epilog', None, rebuild='env')
+    app.add_config_value('nbsphinx_input_prompt', '[%s]:', rebuild='env')
+    app.add_config_value('nbsphinx_output_prompt', '[%s]:', rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
