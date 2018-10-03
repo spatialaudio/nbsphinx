@@ -117,6 +117,7 @@ RST_TEMPLATE = """
 {% macro insert_nboutput(datatype, output, cell) -%}
 .. nboutput::
 {%- if datatype == 'text/plain' %}{# nothing #}
+{%- elif datatype == 'ansi' %} ansi
 {%- else %} rst
 {%- endif %}
 {%- if output.output_type == 'execute_result' and cell.execution_count %}
@@ -176,9 +177,18 @@ RST_TEMPLATE = """
     .. raw:: latex
 
         %
-        \\begin{OriginalVerbatim}[commandchars=\\\\\\{\\}]
+        {
+        \\kern-\\sphinxverbatimsmallskipamount\\kern-\\baselineskip
+        \\kern+\\FrameHeightAdjust\\kern-\\fboxrule
+        \\vspace{\\nbsphinxcodecellspacing}
+        \\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
+    {%- if output.name == 'stderr' %}
+        \\sphinxsetup{VerbatimColor={named}{nbsphinx-stderr}}
+    {%- endif %}
+        \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
-        \\end{OriginalVerbatim}
+        \\end{sphinxVerbatim}
+        }
         % The following \\relax is needed to avoid problems with adjacent ANSI
         % cells and some other stuff (e.g. bullet lists) following ANSI cells.
         % See https://github.com/sphinx-doc/sphinx/issues/3594
@@ -264,9 +274,12 @@ RST_TEMPLATE = """
 
 
 LATEX_PREAMBLE = r"""
-% Jupyter Notebook prompt colors
-\definecolor{nbsphinxin}{HTML}{303F9F}
-\definecolor{nbsphinxout}{HTML}{D84315}
+% Jupyter Notebook code cell colors
+\definecolor{nbsphinxin}{HTML}{307FC1}
+\definecolor{nbsphinxout}{HTML}{BF5B3D}
+\definecolor{nbsphinx-code-bg}{HTML}{F5F5F5}
+\definecolor{nbsphinx-code-border}{HTML}{E0E0E0}
+\definecolor{nbsphinx-stderr}{HTML}{FFDDDD}
 % ANSI colors for output streams and traceback highlighting
 \definecolor{ansi-black}{HTML}{3E424D}
 \definecolor{ansi-black-intense}{HTML}{282C36}
@@ -295,6 +308,27 @@ LATEX_PREAMBLE = r"""
 \newenvironment{notice}{\begin{sphinxadmonition}}{\end{sphinxadmonition}}%
 }{}
 \makeatother
+
+% Define an environment for non-plain-text code cell outputs (e.g. images)
+\makeatletter
+\newenvironment{nbsphinxfancyoutput}{%
+\def\nbsphinxfcolorbox{\spx@fcolorbox{nbsphinx-code-border}{white}}%
+\def\FrameCommand{\nbsphinxfcolorbox\nbsphinxfancyaddprompt\@empty}%
+\def\FirstFrameCommand{\nbsphinxfcolorbox\nbsphinxfancyaddprompt\sphinxVerbatim@Continues}%
+\def\MidFrameCommand{\nbsphinxfcolorbox\sphinxVerbatim@Continued\sphinxVerbatim@Continues}%
+\def\LastFrameCommand{\nbsphinxfcolorbox\sphinxVerbatim@Continued\@empty}%
+\MakeFramed{\advance\hsize-\width\@totalleftmargin\z@\linewidth\hsize\@setminipage}%
+}{\par\unskip\@minipagefalse\endMakeFramed}
+\makeatother
+\newbox\nbsphinxpromptbox
+\def\nbsphinxfancyaddprompt{\ifvoid\nbsphinxpromptbox\else
+    \kern\fboxrule\kern\fboxsep
+    \copy\nbsphinxpromptbox
+    \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
+    \kern-\fboxsep\kern-\fboxrule\nointerlineskip
+    \fi}
+\newlength\nbsphinxcodecellspacing
+\setlength{\nbsphinxcodecellspacing}{0pt}
 """
 
 
@@ -755,7 +789,7 @@ def _create_code_nodes(directive):
         # 'class' can be 'stderr'
         inner_classes.append(directive.options.get('class', ''))
         prompt_template = config.nbsphinx_output_prompt
-        if directive.arguments and directive.arguments[0] == 'rst':
+        if directive.arguments and directive.arguments[0] in ['rst', 'ansi']:
             fancy_output = True
     else:
         assert False
@@ -775,7 +809,12 @@ def _create_code_nodes(directive):
         inner_node = docutils.nodes.container(classes=inner_classes)
         sphinx.util.nodes.nested_parse_with_titles(
             directive.state, directive.content, inner_node)
-        outer_node += FancyOutputNode('', inner_node, prompt=prompt)
+        if directive.arguments[0] == 'rst':
+            outer_node += FancyOutputNode('', inner_node, prompt=prompt)
+        elif directive.arguments[0] == 'ansi':
+            outer_node += inner_node
+        else:
+            assert False
     else:
         text = '\n'.join(directive.content.data)
         inner_node = docutils.nodes.literal_block(
@@ -1372,73 +1411,78 @@ def visit_codearea_latex(self, node):
 def depart_codearea_latex(self, node):
     """Some changes to code blocks.
 
-    * Remove the frame (by changing Verbatim -> OriginalVerbatim)
+    * Change frame color and background color
     * Add empty lines before and after the code
-    * Add prompt to the first line, empty space to the following lines
+    * Add prompt
 
     """
     out = []
     lines = ''.join(self.popbody()).split('\n')
     assert lines[0] == ''
     out.append(lines[0])
+    out.append('{')  # Start a scope for colors
+    prompt = node['prompt']
+    if 'nbinput' in node.parent['classes']:
+        promptcolor = 'nbsphinxin'
+        out.append(r'\sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}')
+    else:
+        out.append(r"""
+\kern-\sphinxverbatimsmallskipamount\kern-\baselineskip
+\kern+\FrameHeightAdjust\kern-\fboxrule
+\vspace{\nbsphinxcodecellspacing}
+""")
+        promptcolor = 'nbsphinxout'
+
+    out.append(
+        r'\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}')
     if lines[1].startswith(r'\fvset{'):  # Sphinx >= 1.6.6
         out.append(lines[1])
         del lines[1]
-    if lines[1].startswith(r'\begin{sphinxVerbatim}'):  # Sphinx >= 1.5
-        out.append(lines[1].replace('sphinxVerbatim', 'Verbatim'))
-    elif lines[1].startswith(r'\begin{Verbatim}'):  # Sphinx < 1.5
-        out.append(lines[1].replace('Verbatim', 'OriginalVerbatim'))
-    else:
-        assert False
+    assert 'Verbatim' in lines[1]
+    out.append(lines[1])
     code_lines = (
         [''] * node.get('empty-lines-before', 0) +
         lines[2:-2] +
         [''] * node.get('empty-lines-after', 0)
     )
-    prompt = node['prompt']
-    if 'nbinput' in node.parent['classes']:
-        color = 'nbsphinxin'
-    else:
-        color = 'nbsphinxout'
-    prefix = r'\textcolor{' + color + '}{' + prompt + '}' if prompt else ''
-    for line in code_lines[:1]:
-        out.append(' '.join([prefix, line]))
-    prefix = ' ' * len(prompt)
-    for line in code_lines[1:]:
-        out.append(' '.join([prefix, line]))
-    if lines[-2].startswith(r'\end{sphinxVerbatim}'):  # Sphinx >= 1.5
-        out.append(lines[-2].replace('sphinxVerbatim', 'Verbatim'))
-    elif lines[-2].startswith(r'\end{Verbatim}'):  # Sphinx < 1.5
-        out.append(lines[-2].replace('Verbatim', 'OriginalVerbatim'))
-    else:
-        assert False
+    if prompt:
+        prompt = nbconvert.filters.latex.escape_latex(prompt)
+        prefix = r'\llap{\color{' + promptcolor + '}' + prompt + \
+            r'\,\hspace{\fboxrule}\hspace{\fboxsep}}'
+        assert code_lines
+        code_lines[0] = prefix + code_lines[0]
+    out.extend(code_lines)
+    assert 'Verbatim' in lines[-2]
+    out.append(lines[-2])
+    out.append('}')  # End of scope for colors
     assert lines[-1] == ''
     out.append(lines[-1])
     self.body.append('\n'.join(out))
 
 
 def visit_fancyoutput_latex(self, node):
+    out = r"""
+\hrule height -\fboxrule\relax
+\vspace{\nbsphinxcodecellspacing}
+"""
     prompt = node['prompt']
     if prompt:
-        self.body.append(r"""
-\newbox\nbsphinxpromptbox
-\savebox{\nbsphinxpromptbox}{\textcolor{nbsphinxout}{\Verb|%s |}}
-\newskip\nbsphinxcodeareawidth
-\nbsphinxcodeareawidth=\textwidth
-\advance\nbsphinxcodeareawidth by -\wd\nbsphinxpromptbox
-\vspace{-1.5ex}\begin{minipage}[t]{\wd\nbsphinxpromptbox}\vspace{0pt}
-\usebox{\nbsphinxpromptbox}
-\end{minipage}%%
-\begin{minipage}[t]{\nbsphinxcodeareawidth}\vspace{0pt}
-""" % (prompt,))
+        prompt = nbconvert.filters.latex.escape_latex(prompt)
+        out += r"""
+\savebox\nbsphinxpromptbox[0pt][r]{\color{nbsphinxout}\Verb|\strut{%s}\,|}
+""" % (prompt,)
     else:
-        self.body.append('\n')
+        out += r"""
+\makeatletter\setbox\nbsphinxpromptbox\box\voidb@x\makeatother
+"""
+    out += r"""
+\begin{nbsphinxfancyoutput}
+"""
+    self.body.append(out)
 
 
 def depart_fancyoutput_latex(self, node):
-    if node['prompt']:
-        self.body.append('\n' + r'\end{minipage}')
-    self.body.append('\n')
+    self.body.append('\n\\end{nbsphinxfancyoutput}\n')
 
 
 def visit_admonition_html(self, node):
@@ -1455,7 +1499,7 @@ def depart_admonition_html(self, node):
 
 
 def visit_admonition_latex(self, node):
-    # See http://tex.stackexchange.com/q/305898/13684:
+    # See http://tex.stackexchange.com/q/305898/:
     self.body.append('\n\\begin{notice}{' + node['classes'][1] + '}{}\\unskip')
 
 
