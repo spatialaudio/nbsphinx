@@ -739,16 +739,14 @@ class NotebookParser(rst.Parser):
         if resources.get('nbsphinx_orphan', False):
             rst.Parser.parse(self, ':orphan:', document)
         if env.config.nbsphinx_prolog:
-            rst.Parser.parse(
-                self,
-                jinja2.Template(env.config.nbsphinx_prolog).render(env=env),
-                document)
+            prolog = exporter.environment.from_string(
+                env.config.nbsphinx_prolog).render(env=env)
+            rst.Parser.parse(self, prolog, document)
         rst.Parser.parse(self, rststring, document)
         if env.config.nbsphinx_epilog:
-            rst.Parser.parse(
-                self,
-                jinja2.Template(env.config.nbsphinx_epilog).render(env=env),
-                document)
+            epilog = exporter.environment.from_string(
+                env.config.nbsphinx_epilog).render(env=env)
+            rst.Parser.parse(self, epilog, document)
 
 
 class NotebookError(sphinx.errors.SphinxError):
