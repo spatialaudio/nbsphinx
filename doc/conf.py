@@ -4,7 +4,7 @@
 # Use sphinx-quickstart to create your own conf.py file!
 # After that, you have to edit a few things.  See below.
 
-# Select nbsphinx and, if needed, add a math extension (mathjax or pngmath):
+# Select nbsphinx and, if needed, add a math extension (mathjax or imgmath):
 extensions = [
     'nbsphinx',
     'sphinx.ext.mathjax',
