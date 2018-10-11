@@ -81,6 +81,7 @@ nbsphinx_epilog = r"""
 .. raw:: latex
 
     \makeatletter\@minipagefalse\makeatother
+    \nopagebreak[4]
     \par\nointerlineskip
     \nopagebreak[4]
     \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
