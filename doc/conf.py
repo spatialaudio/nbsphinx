@@ -4,7 +4,7 @@
 # Use sphinx-quickstart to create your own conf.py file!
 # After that, you have to edit a few things.  See below.
 
-# Select nbsphinx and, if needed, add a math extension (mathjax or pngmath):
+# Select nbsphinx and, if needed, add a math extension (mathjax or imgmath):
 extensions = [
     'nbsphinx',
     'sphinx.ext.mathjax',
@@ -63,22 +63,36 @@ nbsphinx_prolog = r"""
 
 .. raw:: latex
 
-    \vfil\penalty-1\vfilneg
-    \vspace{\baselineskip}
-    \textcolor{gray}{The following section was generated from
-    \texttt{\strut{}{{ docname }}}\\[-0.5\baselineskip]
-    \noindent\rule{\textwidth}{0.4pt}}
-    \vspace{-2\baselineskip}
+    \par
+    \smallskip
+    \noindent\textcolor{gray}{\scriptsize
+    The following section was generated from
+    \sphinxcode{\sphinxupquote{\strut{}{{ docname | escape_latex }}}}.}
+    \par\nointerlineskip\kern-1ex
+    \nopagebreak[4]
+    \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
+    \par\unskip\kern-1ex
+    \nopagebreak[4]
+    \makeatletter\@setminipage\makeatother
 """
 
 # This is processed by Jinja2 and inserted after each notebook
 nbsphinx_epilog = r"""
 .. raw:: latex
 
-    \textcolor{gray}{\noindent\rule{\textwidth}{0.4pt}\\
-    \hbox{}\hfill End of
-    \texttt{\strut{}{{ env.doc2path(env.docname, base='doc') }}}}
-    \vfil\penalty-1\vfilneg
+    \nopagebreak[4]
+    \makeatletter\@minipagefalse\makeatother
+    \nopagebreak[4]
+    \par\nointerlineskip
+    \nopagebreak[4]
+    \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
+    \par\nointerlineskip\kern-1ex
+    \nopagebreak[4]
+    \noindent\textcolor{gray}{\scriptsize\hfill
+    End of \sphinxcode{\sphinxupquote{\strut
+    {{ env.doc2path(env.docname, base='doc') | escape_latex }}}}.}
+    \par
+    \smallskip
 """
 
 # Input prompt for code cells. "%s" is replaced by the execution count.
