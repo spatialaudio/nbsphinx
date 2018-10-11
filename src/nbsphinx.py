@@ -329,6 +329,56 @@ LATEX_PREAMBLE = r"""
     \fi}
 \newlength\nbsphinxcodecellspacing
 \setlength{\nbsphinxcodecellspacing}{0pt}
+
+% Define support macros for attaching opening and closing lines to notebooks
+\newsavebox\nbsphinxbox
+\makeatletter
+\newcommand{\nbsphinxstartnotebook}[1]{%
+    \par
+    % measure needed space
+    \setbox\nbsphinxbox\vtop{{#1\par}}
+    % reserve some space at bottom of page, else start new page
+    \needspace{\dimexpr2.5\baselineskip+\ht\nbsphinxbox+\dp\nbsphinxbox}
+    % mimick vertical spacing from \section command
+      \addpenalty\@secpenalty
+      \@tempskipa 3.5ex \@plus 1ex \@minus .2ex\relax
+      \addvspace\@tempskipa
+      {\Large\@tempskipa\baselineskip
+             \advance\@tempskipa-\prevdepth
+             \advance\@tempskipa-\ht\nbsphinxbox
+             \ifdim\@tempskipa>\z@
+               \vskip \@tempskipa
+             \fi}
+    \unvbox\nbsphinxbox
+    % if notebook starts with a \section, prevent it from adding extra space
+    \@nobreaktrue\everypar{\@nobreakfalse\everypar{}}%
+    % compensate the parskip which will get inserted by next paragraph
+    \nobreak\vskip-\parskip
+    % do not break here
+    \nobreak
+}% end of \nbsphinxstartnotebook
+
+\newcommand{\nbsphinxstopnotebook}[1]{%
+    \par
+    % measure needed space
+    \setbox\nbsphinxbox\vbox{{#1\par}}
+    \nobreak % it updates page totals
+    \dimen@\pagegoal
+    \advance\dimen@-\pagetotal \advance\dimen@-\pagedepth
+    \advance\dimen@-\ht\nbsphinxbox \advance\dimen@-\dp\nbsphinxbox
+    \ifdim\dimen@<\z@
+      % little space left
+      \unvbox\nbsphinxbox
+      \kern-.8\baselineskip
+      \nobreak\vskip\z@\@plus1fil
+      \penalty100
+      \vskip\z@\@plus-1fil
+      \kern.8\baselineskip
+    \else
+      \unvbox\nbsphinxbox
+    \fi
+}% end of \nbsphinxstopnotebook
+\makeatother
 """
 
 

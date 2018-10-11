@@ -63,32 +63,20 @@ nbsphinx_prolog = r"""
 
 .. raw:: latex
 
-    \vfil\penalty-1\vfilneg
-    \par
-    \smallskip
-    \noindent\textcolor{gray}{\scriptsize
-    The following section was generated from
-    \sphinxcode{\sphinxupquote{\strut{}{{ docname | escape_latex }}}}.}
-    \par\nointerlineskip\kern-1ex
-    \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
-    \par\unskip\kern-1ex
-    \makeatletter\@setminipage\makeatother
+    \nbsphinxstartnotebook{\scriptsize\strut
+    \textcolor{gray}{The following section was generated from
+       {\sphinxcode{\sphinxupquote{\strut{}{{ docname | escape_latex }}}}}\relax
+        \dotfill }}
 """
 
 # This is processed by Jinja2 and inserted after each notebook
 nbsphinx_epilog = r"""
 .. raw:: latex
 
-    \makeatletter\@minipagefalse\makeatother
-    \par\nointerlineskip
-    \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
-    \par\nointerlineskip\kern-1ex
-    \noindent\textcolor{gray}{\scriptsize\hfill
-    End of \sphinxcode{\sphinxupquote{\strut
-    {{ env.doc2path(env.docname, base='doc') | escape_latex }}}}.}
-    \par
-    \smallskip
-    \vfil\penalty-1\vfilneg
+    \nbsphinxstopnotebook{\scriptsize
+    \noindent\strut\textcolor{gray}{\dotfill\sphinxcode{\sphinxupquote{\relax
+    {{ env.doc2path(env.docname, base='doc') | escape_latex }}}}
+    ends here.}}
 """
 
 # Input prompt for code cells. "%s" is replaced by the execution count.
