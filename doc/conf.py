@@ -63,15 +63,16 @@ nbsphinx_prolog = r"""
 
 .. raw:: latex
 
-    \vfil\penalty-1\vfilneg
     \par
     \smallskip
     \noindent\textcolor{gray}{\scriptsize
     The following section was generated from
     \sphinxcode{\sphinxupquote{\strut{}{{ docname | escape_latex }}}}.}
     \par\nointerlineskip\kern-1ex
+    \nopagebreak[4]
     \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
     \par\unskip\kern-1ex
+    \nopagebreak[4]
     \makeatletter\@setminipage\makeatother
 """
 
@@ -81,14 +82,15 @@ nbsphinx_epilog = r"""
 
     \makeatletter\@minipagefalse\makeatother
     \par\nointerlineskip
+    \nopagebreak[4]
     \noindent\textcolor{gray}{\rule{\textwidth}{0.4pt}}
     \par\nointerlineskip\kern-1ex
+    \nopagebreak[4]
     \noindent\textcolor{gray}{\scriptsize\hfill
     End of \sphinxcode{\sphinxupquote{\strut
     {{ env.doc2path(env.docname, base='doc') | escape_latex }}}}.}
     \par
     \smallskip
-    \vfil\penalty-1\vfilneg
 """
 
 # Input prompt for code cells. "%s" is replaced by the execution count.
