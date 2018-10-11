@@ -80,6 +80,7 @@ nbsphinx_prolog = r"""
 nbsphinx_epilog = r"""
 .. raw:: latex
 
+    \nopagebreak[4]
     \makeatletter\@minipagefalse\makeatother
     \nopagebreak[4]
     \par\nointerlineskip
