@@ -8,8 +8,7 @@ matrix:
   - env: ADDITIONAL_COMMAND="python -m sphinx doc/ doc/_build/ -b linkcheck"
 
   # a few older Sphinx releases using default Python version
-  - env: SPHINX="==1.3.2 docutils<0.13.1"
-  - env: SPHINX="==1.3.6 docutils<0.13.1"
+  - env: SPHINX="==1.4.0 docutils<0.13.1"
   - env: SPHINX="==1.4.9 docutils<0.13.1"
   - env: SPHINX="==1.5.0 docutils<0.13.1"
   - env: SPHINX="==1.5.1"
