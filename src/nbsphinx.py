@@ -720,6 +720,7 @@ class NotebookParser(rst.Parser):
             CreateNotebookSectionAnchors,
             ReplaceAlertDivs,
             CopyLinkedFiles,
+            GetSizeFromImages,
         ]
 
     def parse(self, inputstring, document):
@@ -1371,6 +1372,23 @@ class CopyLinkedFiles(docutils.transforms.Transform):
             if not hasattr(env, 'nbsphinx_files'):
                 env.nbsphinx_files = {}
             env.nbsphinx_files.setdefault(env.docname, []).append(file)
+
+
+class GetSizeFromImages(docutils.transforms.Transform):
+    """Get size from images and store it as node attributes."""
+
+    default_priority = 500  # Doesn't really matter?
+
+    def apply(self):
+        env = self.document.settings.env
+        for node in self.document.traverse(docutils.nodes.image):
+            if 'width' not in node and 'height' not in node:
+                uri = node['uri']
+                srcdir = os.path.dirname(env.doc2path(env.docname))
+                size = sphinx.util.images.get_image_size(
+                        os.path.join(srcdir, uri))
+                if size is not None:
+                    node['width'], node['height'] = map(str, size)
 
 
 def builder_inited(app):
