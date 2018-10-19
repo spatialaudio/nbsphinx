@@ -6,3 +6,4 @@ dependencies:
   - pandoc
   - nbconvert!=5.4
   - ipykernel
+  - matplotlib
