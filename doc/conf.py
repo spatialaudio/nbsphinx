@@ -63,7 +63,6 @@ nbsphinx_prolog = r"""
 
 .. raw:: latex
 
-    \par\bigskip
     \nbsphinxstartnotebook{\scriptsize\strut
     \textcolor{gray}{The following section was generated from
        {\sphinxcode{\sphinxupquote{\strut{}{{ docname | escape_latex }}}}}\relax

@@ -341,8 +341,9 @@ LATEX_PREAMBLE = r"""
     \needspace{\dimexpr2.5\baselineskip+\ht\nbsphinxbox+\dp\nbsphinxbox}
     % mimick vertical spacing from \section command
       \addpenalty\@secpenalty
-      \@tempskipa 2.3ex \@plus .2ex\relax
+      \@tempskipa 3.5ex \@plus 1ex \@minus .2ex\relax
       \addvspace\@tempskipa
+      \vskip 5.59pt
     \unvbox\nbsphinxbox
     % if notebook starts with a \section, prevent it from adding extra space
     \@nobreaktrue\everypar{\@nobreakfalse\everypar{}}%
