@@ -336,14 +336,19 @@ LATEX_PREAMBLE = r"""
 \newcommand{\nbsphinxstartnotebook}[1]{%
     \par
     % measure needed space
-    \setbox\nbsphinxbox\vbox{{#1\par}}
+    \setbox\nbsphinxbox\vtop{{#1\par}}
     % reserve some space at bottom of page, else start new page
     \needspace{\dimexpr2.5\baselineskip+\ht\nbsphinxbox+\dp\nbsphinxbox}
     % mimick vertical spacing from \section command
       \addpenalty\@secpenalty
       \@tempskipa 3.5ex \@plus 1ex \@minus .2ex\relax
       \addvspace\@tempskipa
-      \vskip 5.59pt
+      {\Large\@tempskipa\baselineskip
+             \advance\@tempskipa-\prevdepth
+             \advance\@tempskipa-\ht\nbsphinxbox
+             \ifdim\@tempskipa>\z@
+               \vskip \@tempskipa
+             \fi}
     \unvbox\nbsphinxbox
     % if notebook starts with a \section, prevent it from adding extra space
     \@nobreaktrue\everypar{\@nobreakfalse\everypar{}}%
