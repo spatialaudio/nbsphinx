@@ -63,20 +63,18 @@ nbsphinx_prolog = r"""
 
 .. raw:: latex
 
-    \nbsphinxstartnotebook{\scriptsize\strut
+    \nbsphinxstartnotebook{\scriptsize\noindent\strut
     \textcolor{gray}{The following section was generated from
-       {\sphinxcode{\sphinxupquote{\strut{}{{ docname | escape_latex }}}}}\relax
-        \dotfill }}
+    \sphinxcode{\sphinxupquote{\strut {{ docname | escape_latex }}}} \dotfill}}
 """
 
 # This is processed by Jinja2 and inserted after each notebook
 nbsphinx_epilog = r"""
 .. raw:: latex
 
-    \nbsphinxstopnotebook{\scriptsize
-    \noindent\strut\textcolor{gray}{\dotfill\sphinxcode{\sphinxupquote{\relax
-    {{ env.doc2path(env.docname, base='doc') | escape_latex }}}}
-    ends here.}}
+    \nbsphinxstopnotebook{\scriptsize\noindent\strut
+    \textcolor{gray}{\dotfill\ \sphinxcode{\sphinxupquote{\strut
+    {{ env.doc2path(env.docname, base='doc') | escape_latex }}}} ends here.}}
 """
 
 # Input prompt for code cells. "%s" is replaced by the execution count.
