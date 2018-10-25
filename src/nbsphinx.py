@@ -783,14 +783,27 @@ class NotebookParser(rst.Parser):
         that, the translated strings will most likely be parsed as
         CommonMark.
 
+        If the configuration value "nbsphinx_contents_manager" is
+        specified, the translation mechansim will not work!
+
         """
-        try:
-            nb = nbformat.reads(inputstring, as_version=_ipynbversion)
-        except Exception:
-            # NB: The use of the RST parser is temporary!
-            rst.Parser.parse(self, inputstring, document)
-            return
         env = document.settings.env
+        cm = env.config.nbsphinx_contents_manager
+        if cm is None:
+            try:
+                nb = nbformat.reads(inputstring, as_version=_ipynbversion)
+            except Exception:
+                # NB: The use of the RST parser is temporary!
+                rst.Parser.parse(self, inputstring, document)
+                return
+        else:
+            relative_doc = env.doc2path(
+                env.docname, base=os.path.relpath(env.srcdir, os.getcwd()))
+            if isinstance(cm, str):
+                cm = sphinx.util.import_object(cm)()
+            model = cm.get(relative_doc)
+            assert model['type'] == 'notebook'
+            nb = model['content']
         srcdir = os.path.dirname(env.doc2path(env.docname))
         auxdir = os.path.join(env.doctreedir, 'nbsphinx')
         sphinx.util.ensuredir(auxdir)
@@ -1670,6 +1683,7 @@ def setup(app):
     app.add_config_value('nbsphinx_epilog', None, rebuild='env')
     app.add_config_value('nbsphinx_input_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_output_prompt', '[%s]:', rebuild='env')
+    app.add_config_value('nbsphinx_contents_manager', None, rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)

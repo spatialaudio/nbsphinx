@@ -86,6 +86,12 @@ nbsphinx_epilog = r"""
 # Output prompt for code cells. "%s" is replaced by the execution count.
 #nbsphinx_output_prompt = 'Out[%s]:'
 
+#nbsphinx_contents_manager = 'jupytext.TextFileContentsManager'
+#source_suffix = {
+#    '.Rmd': 'jupyter_notebook',
+#    '.rst': 'restructuredtext',
+#}
+
 # Work-around until https://github.com/sphinx-doc/sphinx/pull/5504 is done:
 mathjax_config = {
     'tex2jax': {
