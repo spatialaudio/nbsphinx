@@ -136,6 +136,16 @@ RST_TEMPLATE = """
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
     .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
+{%- if datatype in output.metadata %}
+{%- set width = output.metadata[datatype].width %}
+{%- if width %}
+        :width: {{ width }}
+{%- endif %}
+{%- set height = output.metadata[datatype].height %}
+{%- if height %}
+        :height: {{ height }}
+{% endif %}
+{% endif %}
 {%- elif datatype in ['text/markdown'] %}
 
 {{ output.data['text/markdown'] | markdown2rst | indent }}
