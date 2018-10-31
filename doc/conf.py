@@ -19,6 +19,9 @@ highlight_language = 'none'
 # Don't add .txt suffix to source files (available for Sphinx >= 1.5):
 html_sourcelink_suffix = ''
 
+# Work-around until https://github.com/sphinx-doc/sphinx/issues/4229 is solved:
+html_scaled_image_link = False
+
 # Execute notebooks before conversion: 'always', 'never', 'auto' (default)
 #nbsphinx_execute = 'never'
 
