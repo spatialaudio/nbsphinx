@@ -1012,6 +1012,9 @@ def markdown2rst(text):
 
     input_format = 'markdown'
     input_format += '-implicit_figures'
+    v = nbconvert.utils.pandoc.get_pandoc_version()
+    if nbconvert.utils.version.check_version(v, '1.13'):
+        input_format += '-native_divs+raw_html'
 
     rststring = pandoc(text, input_format, 'rst', filter_func=rawlatex2math)
     return re.sub(r'^\n( *)\x0e:nowrap:\x0f$',
