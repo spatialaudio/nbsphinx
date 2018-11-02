@@ -559,7 +559,7 @@ div.nboutput div.output_area.stderr {
 .ansi-underline { text-decoration: underline; }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
-.rendered_html table {
+div.rendered_html table {
   border: none;
   border-collapse: collapse;
   border-spacing: 0;
@@ -567,13 +567,13 @@ div.nboutput div.output_area.stderr {
   font-size: 12px;
   table-layout: fixed;
 }
-.rendered_html thead {
+div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
-.rendered_html tr,
-.rendered_html th,
-.rendered_html td {
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
   text-align: right;
   vertical-align: middle;
   padding: 0.5em 0.5em;
@@ -582,13 +582,13 @@ div.nboutput div.output_area.stderr {
   max-width: none;
   border: none;
 }
-.rendered_html th {
+div.rendered_html th {
   font-weight: bold;
 }
-.rendered_html tbody tr:nth-child(odd) {
+div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
-.rendered_html tbody tr:hover {
+div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 """
