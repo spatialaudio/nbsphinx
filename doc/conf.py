@@ -86,10 +86,10 @@ nbsphinx_epilog = r"""
 # Output prompt for code cells. "%s" is replaced by the execution count.
 #nbsphinx_output_prompt = 'Out[%s]:'
 
-#nbsphinx_contents_manager = 'jupytext.TextFileContentsManager'
-#source_suffix = {
-#    '.Rmd': 'jupyter_notebook',
-#    '.rst': 'restructuredtext',
+# Specify conversion functions for custom notebook formats:
+#import jupytext
+#nbsphinx_custom_formats = {
+#    '.Rmd': lambda s: jupytext.reads(s, '.Rmd'),
 #}
 
 # -- The settings below this line are not specific to nbsphinx ------------

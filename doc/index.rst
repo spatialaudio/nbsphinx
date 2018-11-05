@@ -15,7 +15,7 @@ was generated from Jupyter notebooks.
     hidden-cells.ipynb
     executing-notebooks.ipynb
     prolog-and-epilog.ipynb
-    contents-manager.ipynb
+    custom-formats.ipynb
     subdir/*
     a-normal-rst-file.rst
     links.ipynb

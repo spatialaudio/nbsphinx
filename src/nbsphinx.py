@@ -783,27 +783,29 @@ class NotebookParser(rst.Parser):
         that, the translated strings will most likely be parsed as
         CommonMark.
 
-        If the configuration value "nbsphinx_contents_manager" is
-        specified, the translation mechansim will not work!
+        If the configuration value "nbsphinx_custom_formats" is
+        specified, the input string is converted to the Jupyter notebook
+        format with the given conversion function.
 
         """
         env = document.settings.env
-        cm = env.config.nbsphinx_contents_manager
-        if cm is None:
-            try:
-                nb = nbformat.reads(inputstring, as_version=_ipynbversion)
-            except Exception:
-                # NB: The use of the RST parser is temporary!
-                rst.Parser.parse(self, inputstring, document)
-                return
-        else:
-            relative_doc = env.doc2path(
-                env.docname, base=os.path.relpath(env.srcdir, os.getcwd()))
-            if isinstance(cm, str):
-                cm = sphinx.util.import_object(cm)()
-            model = cm.get(relative_doc)
-            assert model['type'] == 'notebook'
-            nb = model['content']
+        formats = env.config.nbsphinx_custom_formats
+        formats.setdefault(
+            '.ipynb', lambda s: nbformat.reads(s, as_version=_ipynbversion))
+        suffix = os.path.splitext(env.doc2path(env.docname))[1]
+        try:
+            converter = formats[suffix]
+        except KeyError:
+            raise NotebookError('No converter for suffix {!r}'.format(suffix))
+        if isinstance(converter, str):
+            converter = sphinx.util.import_object(converter)
+        try:
+            nb = converter(inputstring)
+        except Exception:
+            # NB: The use of the RST parser is temporary!
+            rst.Parser.parse(self, inputstring, document)
+            return
+
         srcdir = os.path.dirname(env.doc2path(env.docname))
         auxdir = os.path.join(env.doctreedir, 'nbsphinx')
         sphinx.util.ensuredir(auxdir)
@@ -1479,6 +1481,9 @@ def builder_inited(app):
             'traditional': '4ex',
         }.get(app.config.html_theme, '7ex')
 
+    for suffix in app.config.nbsphinx_custom_formats:
+        app.add_source_suffix(suffix, 'jupyter_notebook')
+
 
 def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
@@ -1683,7 +1688,7 @@ def setup(app):
     app.add_config_value('nbsphinx_epilog', None, rebuild='env')
     app.add_config_value('nbsphinx_input_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_output_prompt', '[%s]:', rebuild='env')
-    app.add_config_value('nbsphinx_contents_manager', None, rebuild='env')
+    app.add_config_value('nbsphinx_custom_formats', {}, rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
