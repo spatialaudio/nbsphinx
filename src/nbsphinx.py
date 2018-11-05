@@ -1711,6 +1711,16 @@ def setup(app):
     # see https://github.com/sphinx-doc/sphinx/issues/2155:
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
 
+    # Work-around until https://github.com/sphinx-doc/sphinx/pull/5504 is done:
+    app.config._raw_config.setdefault('mathjax_config', {
+        'tex2jax': {
+            'inlineMath': [['$', '$'], ['\\(', '\\)']],
+            'processEscapes': True,
+            'ignoreClass': '.*',
+            'processClass': 'math',
+        }
+    })
+
     return {
         'version': __version__,
         'parallel_read_safe': True,
