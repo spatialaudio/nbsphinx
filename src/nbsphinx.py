@@ -1442,13 +1442,6 @@ class GetSizeFromImages(docutils.transforms.Transform):
 
 
 def builder_inited(app):
-    # Add LaTeX definitions to preamble
-    latex_elements = app.builder.config.latex_elements
-    latex_elements['preamble'] = '\n'.join([
-        LATEX_PREAMBLE,
-        latex_elements.get('preamble', ''),
-    ])
-
     # Set default value for CSS prompt width
     if app.config.nbsphinx_prompt_width is None:
         app.config.nbsphinx_prompt_width = {
@@ -1711,6 +1704,13 @@ def setup(app):
             'processClass': 'math',
         }
     })
+
+    # Add LaTeX definitions to preamble
+    latex_elements = app.config._raw_config['latex_elements']
+    latex_elements['preamble'] = '\n'.join([
+        LATEX_PREAMBLE,
+        latex_elements.get('preamble', ''),
+    ])
 
     return {
         'version': __version__,
