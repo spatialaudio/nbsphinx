@@ -1,0 +1,7 @@
+This directory holds configuration files for https://mybinder.org/.
+
+The notebooks that comprise the documentation can be accessed with this link:
+https://mybinder.org/v2/gh/spatialaudio/nbsphinx/master?filepath=doc
+
+To check out a different version, just replace "master" with the desired
+branch/tag name or commit hash.
