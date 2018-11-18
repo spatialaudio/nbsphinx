@@ -29,7 +29,10 @@ html_scaled_image_link = False
 #nbsphinx_kernel_name = 'python3'
 
 # List of arguments to be passed to the kernel that executes the notebooks:
-nbsphinx_execute_arguments = ['--InlineBackend.figure_formats={"svg", "pdf"}']
+nbsphinx_execute_arguments = [
+    "--InlineBackend.figure_formats={'svg', 'pdf'}",
+    "--InlineBackend.rc={'figure.dpi': 96}",
+]
 
 # If True, the build process is continued even if an exception occurs:
 #nbsphinx_allow_errors = True
