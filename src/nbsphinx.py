@@ -1243,15 +1243,9 @@ class RewriteLocalLinks(docutils.transforms.Transform):
                     if fragment:
                         target_ext = suffix + fragment
                         reftype = 'ref'
-                        refdomain = 'std'
                     else:
                         target_ext = ''
                         reftype = 'doc'
-                        if hasattr(sphinx.util, 'status_iterator'):
-                            # Sphinx >= 1.6
-                            refdomain = 'std'
-                        else:
-                            refdomain = None
                     break
             else:
                 continue  # Not a link to a potential Sphinx source file
@@ -1264,7 +1258,7 @@ class RewriteLocalLinks(docutils.transforms.Transform):
                     reftarget = reftarget.lower()
                 linktext = node.astext()
                 xref = sphinx.addnodes.pending_xref(
-                    reftype=reftype, reftarget=reftarget, refdomain=refdomain,
+                    reftype=reftype, reftarget=reftarget, refdomain='std',
                     refwarn=True, refexplicit=True, refdoc=env.docname)
                 xref += docutils.nodes.Text(linktext, linktext)
                 node.replace_self(xref)
