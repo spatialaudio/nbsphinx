@@ -313,15 +313,6 @@ LATEX_PREAMBLE = r"""
 \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
 \definecolor{ansi-default-inverse-bg}{HTML}{000000}
 
-% Define "notice" environment, which was removed in Sphinx 1.7.
-% At some point, "notice" should be replaced by "sphinxadmonition",
-% which is available since Sphinx 1.5.
-\makeatletter
-\@ifundefined{notice}{%
-\newenvironment{notice}{\begin{sphinxadmonition}}{\end{sphinxadmonition}}%
-}{}
-\makeatother
-
 % Define an environment for non-plain-text code cell outputs (e.g. images)
 \makeatletter
 \newenvironment{nbsphinxfancyoutput}{%
@@ -1635,11 +1626,12 @@ def depart_admonition_html(self, node):
 
 def visit_admonition_latex(self, node):
     # See http://tex.stackexchange.com/q/305898/:
-    self.body.append('\n\\begin{notice}{' + node['classes'][1] + '}{}\\unskip')
+    self.body.append(
+        '\n\\begin{sphinxadmonition}{' + node['classes'][1] + '}{}\\unskip')
 
 
 def depart_admonition_latex(self, node):
-    self.body.append('\\end{notice}\n')
+    self.body.append('\\end{sphinxadmonition}\n')
 
 
 def do_nothing(self, node):
