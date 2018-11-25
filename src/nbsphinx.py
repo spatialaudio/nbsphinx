@@ -1426,13 +1426,13 @@ class CopyLinkedFiles(docutils.transforms.Transform):
             file = os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), relpath))
             if not os.path.isfile(os.path.join(env.srcdir, file)):
-                env.app.warn('file not found: {!r}'.format(file),
-                             env.doc2path(env.docname))
+                logger = sphinx.util.logging.getLogger(__name__)
+                logger.warning('File not found: %r', file, location=node)
                 continue  # Link is ignored
             elif file.startswith('..'):
-                env.app.warn(
-                    'link outside of source directory: {!r}'.format(file),
-                    env.doc2path(env.docname))
+                logger = sphinx.util.logging.getLogger(__name__)
+                logger.warning('Link outside source directory: %r', file,
+                               location=node)
                 continue  # Link is ignored
             if not hasattr(env, 'nbsphinx_files'):
                 env.nbsphinx_files = {}
@@ -1516,7 +1516,8 @@ def html_collect_pages(app):
         try:
             sphinx.util.copyfile(os.path.join(app.env.srcdir, file), target)
         except OSError as err:
-            app.warn('cannot copy local file {!r}: {}'.format(file, err))
+            logger = sphinx.util.logging.getLogger(__name__)
+            logger.warning('Cannot copy local file %r: %s', file, err)
     return []  # No new HTML pages are created
 
 
