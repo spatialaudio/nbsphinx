@@ -260,10 +260,12 @@ RST_TEMPLATE = """
 
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
-..{# Empty comment to make sure the preceding directive (if any) is closed #}
+..
+{# Empty comment to make sure the preceding directive (if any) is closed #}
 {{ cell.source | markdown2rst }}
 {%- elif raw_mimetype == 'text/restructuredtext' %}
-..{# Empty comment to make sure the preceding directive (if any) is closed #}
+..
+{# Empty comment to make sure the preceding directive (if any) is closed #}
 {{ cell.source }}
 {% endif %}
 {% endblock rawcell %}
