@@ -1093,7 +1093,8 @@ def pandoc(source, fmt, to, filter_func=None):
         # see issue #155
         cmd += ['--eol', 'lf']
     cmd1 = cmd + ['--from', fmt, '--to', 'json']
-    cmd2 = cmd + ['--from', 'json', '--to', to]
+    to = to + '+grid_tables'
+    cmd2 = cmd + ['--from', 'json', '--to', to,'--columns=500']
 
     p = subprocess.Popen(cmd1, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     json_data, _ = p.communicate(encode(source))
