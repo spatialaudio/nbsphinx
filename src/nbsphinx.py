@@ -782,9 +782,9 @@ class NotebookParser(rst.Parser):
 
         """
         env = document.settings.env
-        formats = env.config.nbsphinx_custom_formats
-        formats.setdefault(
-            '.ipynb', lambda s: nbformat.reads(s, as_version=_ipynbversion))
+        formats = {
+            '.ipynb': lambda s: nbformat.reads(s, as_version=_ipynbversion)}
+        formats.update(env.config.nbsphinx_custom_formats)
         suffix = os.path.splitext(env.doc2path(env.docname))[1]
         try:
             converter = formats[suffix]
