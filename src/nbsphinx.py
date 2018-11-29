@@ -1696,14 +1696,16 @@ def setup(app):
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
 
     # Work-around until https://github.com/sphinx-doc/sphinx/pull/5504 is done:
-    app.config._raw_config.setdefault('mathjax_config', {
-        'tex2jax': {
+    mathjax_config = app.config._raw_config.setdefault('mathjax_config', {})
+    mathjax_config.setdefault(
+        'tex2jax',
+        {
             'inlineMath': [['$', '$'], ['\\(', '\\)']],
             'processEscapes': True,
             'ignoreClass': '.*',
             'processClass': 'math',
         }
-    })
+    )
 
     # Add LaTeX definitions to preamble
     latex_elements = app.config._raw_config['latex_elements']
