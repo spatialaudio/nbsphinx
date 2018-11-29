@@ -95,6 +95,10 @@ nbsphinx_epilog = r"""
 #    '.Rmd': lambda s: jupytext.reads(s, '.Rmd'),
 #}
 
+mathjax_config = {
+    'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
+}
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'
