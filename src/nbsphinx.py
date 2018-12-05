@@ -32,8 +32,10 @@ import re
 import subprocess
 try:
     from urllib.parse import unquote  # Python 3.x
+    from html.parser import HTMLParser
 except ImportError:
     from urllib2 import unquote  # Python 2.x
+    from HTMLParser import HTMLParser
 
 import docutils
 from docutils.parsers import rst
@@ -1017,6 +1019,32 @@ def convert_pandoc(text, from_format, to_format):
     return markdown2rst(text)
 
 
+class CitationParser(HTMLParser):
+
+    def handle_starttag(self, tag, attrs):
+        if self._check_cite(attrs):
+            self.starttag = tag
+
+    def handle_endtag(self, tag):
+        self.endtag = tag
+
+    def handle_startendtag(self, tag, attrs):
+        self._check_cite(attrs)
+
+    def _check_cite(self, attrs):
+        for name, value in attrs:
+            if name == 'data-cite':
+                self.cite = ':cite:`' + value + '`'
+                return True
+        return False
+
+    def reset(self):
+        HTMLParser.reset(self)
+        self.starttag = ''
+        self.endtag = ''
+        self.cite = ''
+
+
 def markdown2rst(text):
     """Convert a Markdown string to reST via pandoc.
 
@@ -1041,16 +1069,38 @@ def markdown2rst(text):
             ]
         }
 
-    def rawlatex2math_hook(obj):
+    def parse_html(obj):
+        p = CitationParser()
+        p.feed(obj['c'][1])
+        p.close()
+        return p
+
+    open_cite_tag = ''
+
+    def object_hook(obj):
+        nonlocal open_cite_tag
+        if open_cite_tag:
+            if obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
+                p = parse_html(obj)
+                if p.endtag == open_cite_tag:
+                    open_cite_tag = ''
+            return {'t': 'Str', 'c': ''}  # Object is replaced by empty string
+
         if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
             obj['t'] = 'Para'
             obj['c'] = [displaymath(obj['c'][1])]
         elif obj.get('t') == 'RawInline' and obj['c'][0] == 'tex':
             obj = displaymath(obj['c'][1])
+        elif obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
+            p = parse_html(obj)
+            if p.starttag:
+                open_cite_tag = p.starttag
+            if p.cite:
+                obj = {'t': 'RawInline', 'c': ['rst', p.cite]}
         return obj
 
-    def rawlatex2math(text):
-        json_data = json.loads(text, object_hook=rawlatex2math_hook)
+    def filter_func(text):
+        json_data = json.loads(text, object_hook=object_hook)
         return json.dumps(json_data)
 
     input_format = 'markdown'
@@ -1059,7 +1109,7 @@ def markdown2rst(text):
     if nbconvert.utils.version.check_version(v, '1.13'):
         input_format += '-native_divs+raw_html'
 
-    rststring = pandoc(text, input_format, 'rst', filter_func=rawlatex2math)
+    rststring = pandoc(text, input_format, 'rst', filter_func=filter_func)
     return re.sub(r'^\n( *)\x0e:nowrap:\x0f$',
                   r'\1:nowrap:',
                   rststring,

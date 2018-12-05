@@ -163,3 +163,55 @@ Domain Objects
     :ref:`this section </markdown-cells.ipynb#Links-to-Domain-Objects>`.
 
     :param str foo: Example string parameter
+
+Citations
+---------
+
+You could use `standard Sphinx citations`_, but it might be more practical to
+use the sphinxcontrib.bibtex_ extension.
+
+If you install and enable this extension,
+you can create citations like :cite:`perez2011python`:
+
+.. code-block:: rst
+
+    :cite:`perez2011python`
+
+You can create similar citations in Jupyter notebooks with a special HTML
+syntax, see the section about `citations in Markdown cells`_.
+
+.. _standard Sphinx Citations: https://www.sphinx-doc.org/en/master/usage/
+    restructuredtext/basics.html#citations
+.. _sphinxcontrib.bibtex: https://sphinxcontrib-bibtex.readthedocs.io/
+.. _citations in Markdown cells: markdown-cells.ipynb#Citations
+
+For those citations to work, you also need to specify a BibTeX file,
+as explained in the next section.
+
+
+References
+----------
+
+After installing and enabling the sphinxcontrib.bibtex_ extension,
+you can create a list of references from a BibTeX file like this:
+
+.. code-block:: rst
+
+    .. bibliography:: references.bib
+
+Have a look at the documentation for all the available options.
+
+The list of references may look something like this:
+
+.. bibliography:: references.bib
+    :all:
+    :style: alpha
+
+However, in the LaTeX/PDF output the list of references will not appear here,
+but at the end of the document.
+For a possible work-around,
+see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
+
+There is an alternative Sphinx extension for creating bibliographies:
+https://bitbucket.org/wnielson/sphinx-natbib/.
+However, this project seems to be abandoned (last commit in 2011).

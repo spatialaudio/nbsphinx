@@ -100,7 +100,7 @@ mathjax_config = {
     'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
 }
 
-# TODO: explain!
+# Additional files needed for generating LaTeX/PDF output:
 latex_additional_files = ['references.bib']
 
 # -- The settings below this line are not specific to nbsphinx ------------
