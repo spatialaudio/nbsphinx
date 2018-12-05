@@ -4,10 +4,11 @@
 # Use sphinx-quickstart to create your own conf.py file!
 # After that, you have to edit a few things.  See below.
 
-# Select nbsphinx and, if needed, add a math extension (mathjax or imgmath):
+# Select nbsphinx and, if needed, other Sphinx extensions:
 extensions = [
     'nbsphinx',
     'sphinx.ext.mathjax',
+    'sphinxcontrib.bibtex',
 ]
 
 # Exclude build directory and Jupyter backup files:
@@ -98,6 +99,9 @@ nbsphinx_epilog = r"""
 mathjax_config = {
     'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
 }
+
+# TODO: explain!
+latex_additional_files = ['references.bib']
 
 # -- The settings below this line are not specific to nbsphinx ------------
 

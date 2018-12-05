@@ -28,6 +28,7 @@ install:
   - pip install .
   - pip install ipykernel
   - pip install matplotlib
+  - pip install sphinxcontrib-bibtex
 script:
   - python -m sphinx doc/ doc/_build/ -b html
   - python -m sphinx doc/ doc/_build/ -b latex

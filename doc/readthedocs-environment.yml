@@ -7,3 +7,4 @@ dependencies:
   - nbconvert!=5.4
   - ipykernel
   - matplotlib
+  - sphinxcontrib-bibtex
