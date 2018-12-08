@@ -6,5 +6,7 @@ dependencies:
   - pandoc
   - nbconvert!=5.4
   - ipykernel
+  - numpy
   - matplotlib
+  - pandas
   - sphinxcontrib-bibtex

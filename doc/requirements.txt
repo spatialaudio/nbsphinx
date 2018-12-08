@@ -1,5 +1,7 @@
 sphinx>=1.6
 nbconvert!=5.4
 ipykernel
+numpy
 matplotlib
+pandas
 sphinxcontrib-bibtex

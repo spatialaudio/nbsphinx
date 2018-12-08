@@ -143,6 +143,7 @@ latex_elements = {
 }{
     \renewcommand{\ttdefault}{lmtt}  % typewriter font from lmodern
 }
+\usepackage{booktabs}  % for Pandas dataframes
 """,
 }
 
