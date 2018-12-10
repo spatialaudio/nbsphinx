@@ -1136,7 +1136,6 @@ def pandoc(source, fmt, to, filter_func=None):
         # see issue #155
         cmd += ['--eol', 'lf']
     cmd1 = cmd + ['--from', fmt, '--to', 'json']
-    
     cmd2 = cmd + ['--from', 'json', '--to', to]
     cmd2 += ['--columns=500']  # Avoid breaks in tables, see issue #240
 
@@ -1754,8 +1753,8 @@ def setup(app):
         {
             'inlineMath': [['$', '$'], ['\\(', '\\)']],
             'processEscapes': True,
-            'ignoreClass': '.*',
-            'processClass': 'math',
+            'ignoreClass': 'document',
+            'processClass': 'math|output_area',
         }
     )
 
