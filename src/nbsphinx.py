@@ -835,6 +835,15 @@ class NotebookParser(rst.Parser):
                                 env.doc2path(env.docname, base=None) + ':\n' +
                                 str(e))
 
+        rststring = """
+.. role:: nbsphinx-math(raw)
+    :format: latex + html
+    :class: math
+
+..
+
+""" + rststring
+
         # Create additional output files (figures etc.),
         # see nbconvert.writers.FilesWriter.write()
         for filename, data in resources.get('outputs', {}).items():
@@ -1059,16 +1068,6 @@ def markdown2rst(text):
 
     """
 
-    def displaymath(text):
-        return {
-            't': 'Math',
-            'c': [
-                {'t': 'DisplayMath', 'c': []},
-                # Special marker characters are removed below:
-                '\x0e:nowrap:\x0f\n\n' + text,
-            ]
-        }
-
     def parse_html(obj):
         p = CitationParser()
         p.feed(obj['c'][1])
@@ -1088,9 +1087,17 @@ def markdown2rst(text):
 
         if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
             obj['t'] = 'Para'
-            obj['c'] = [displaymath(obj['c'][1])]
+            obj['c'] = [{
+                't': 'Math',
+                'c': [
+                    {'t': 'DisplayMath'},
+                    # Special marker characters are removed below:
+                    '\x0e:nowrap:\x0f\n\n' + obj['c'][1],
+                ]
+            }]
         elif obj.get('t') == 'RawInline' and obj['c'][0] == 'tex':
-            obj = displaymath(obj['c'][1])
+            obj = {'t': 'RawInline',
+                   'c': ['rst', ':nbsphinx-math:`{}`'.format(obj['c'][1])]}
         elif obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
             p = parse_html(obj)
             if p.starttag:
