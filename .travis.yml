@@ -17,7 +17,8 @@ matrix:
   - python: "3.4"
   - python: "3.5"
   - python: "nightly"
-  - python: "pypy3"
+  # Pandas only works in PyPy >= 5.9, which isn't yet available on Travis-CI
+  #- python: "pypy3"
 
 addons:
   apt:
