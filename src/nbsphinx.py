@@ -197,6 +197,8 @@ RST_TEMPLATE = """
         \\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
     {%- if output.name == 'stderr' %}
         \\sphinxsetup{VerbatimColor={named}{nbsphinx-stderr}}
+    {%- else %}
+        \\sphinxsetup{VerbatimColor={named}{white}}
     {%- endif %}
         \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
@@ -1598,6 +1600,7 @@ def depart_codearea_latex(self, node):
 \kern-\sphinxverbatimsmallskipamount\kern-\baselineskip
 \kern+\FrameHeightAdjust\kern-\fboxrule
 \vspace{\nbsphinxcodecellspacing}
+\sphinxsetup{VerbatimColor={named}{white}}
 """)
         promptcolor = 'nbsphinxout'
 
