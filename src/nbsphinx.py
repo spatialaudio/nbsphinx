@@ -50,9 +50,9 @@ _ipynbversion = 4
 
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
-    'application/javascript',
-    'application/vnd.jupyter.widget-view+json',
     'application/vnd.jupyter.widget-state+json',
+    'application/vnd.jupyter.widget-view+json',
+    'application/javascript',
     'text/html',
     'text/markdown',
     'image/svg+xml',
