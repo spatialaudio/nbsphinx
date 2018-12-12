@@ -1,3 +1,11 @@
+Version 0.4.0 (2018-12-14):
+ * Support for "data-cite" HTML tags in Markdown cells
+ * Add option ``nbsphinx_custom_formats``
+ * LaTeX macros ``\nbsphinxstartnotebook`` and ``\nbsphinxstopnotebook``
+ * Support for cell attachments
+ * Add options ``nbsphinx_input_prompt`` and ``nbsphinx_output_prompt``
+ * Re-design LaTeX output of code cells, fix image sizes
+
 Version 0.3.5 (2018-09-10):
  * Disable ``nbconvert`` version 5.4 to avoid
    `issue #878 <https://github.com/jupyter/nbconvert/issues/878>`__

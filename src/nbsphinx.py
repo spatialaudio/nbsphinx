@@ -23,7 +23,7 @@
 http://nbsphinx.readthedocs.io/
 
 """
-__version__ = '0.3.5'
+__version__ = '0.4.0'
 
 import copy
 import json
