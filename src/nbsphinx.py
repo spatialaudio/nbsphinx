@@ -44,6 +44,7 @@ import nbconvert
 import nbformat
 import sphinx
 import sphinx.errors
+import sphinx.transforms.post_transforms.images
 import traitlets
 
 _ipynbversion = 4
