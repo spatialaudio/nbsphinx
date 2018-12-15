@@ -1781,7 +1781,7 @@ def setup(app):
     )
 
     # Add LaTeX definitions to preamble
-    latex_elements = app.config._raw_config['latex_elements']
+    latex_elements = app.config._raw_config.setdefault('latex_elements', {})
     latex_elements['preamble'] = '\n'.join([
         LATEX_PREAMBLE,
         latex_elements.get('preamble', ''),
