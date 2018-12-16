@@ -1,3 +1,6 @@
+Version 0.4.1 (2018-12-16):
+ * Fix issue #266
+
 Version 0.4.0 (2018-12-14):
  * Support for "data-cite" HTML tags in Markdown cells
  * Add option ``nbsphinx_custom_formats``
