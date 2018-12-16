@@ -201,6 +201,7 @@ RST_TEMPLATE = """
     {%- else %}
         \\sphinxsetup{VerbatimColor={named}{white}}
     {%- endif %}
+        \\fvset{hllines={, ,}}%
         \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
         \\end{sphinxVerbatim}
