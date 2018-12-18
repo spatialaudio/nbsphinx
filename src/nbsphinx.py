@@ -1363,9 +1363,14 @@ class CreateNotebookSectionAnchors(docutils.transforms.Transform):
     default_priority = 200  # Before CreateSectionLabels (250)
 
     def apply(self):
+        all_ids = set()
         for section in self.document.traverse(docutils.nodes.section):
             title = section.children[0].astext()
             link_id = title.replace(' ', '-')
+            if link_id in all_ids:
+                # Avoid duplicated anchors on the same page
+                continue
+            all_ids.add(link_id)
             section['ids'] = [link_id]
 
 
