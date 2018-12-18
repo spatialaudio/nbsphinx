@@ -1651,7 +1651,7 @@ def depart_codearea_latex(self, node):
 
     out.append(
         r'\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}')
-    if lines[1].startswith(r'\fvset{'):  # Sphinx >= 1.6.6
+    if lines[1].startswith(r'\fvset{'):  # Sphinx >= 1.6.6 and < 1.8.3
         out.append(lines[1])
         del lines[1]
     assert 'Verbatim' in lines[1]
