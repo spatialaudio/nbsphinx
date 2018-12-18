@@ -1098,7 +1098,7 @@ def markdown2rst(text):
             obj['c'] = [{
                 't': 'Math',
                 'c': [
-                    {'t': 'DisplayMath'},
+                    {'t': 'DisplayMath', 'c': []},
                     # Special marker characters are removed below:
                     '\x0e:nowrap:\x0f\n\n' + obj['c'][1],
                 ]
