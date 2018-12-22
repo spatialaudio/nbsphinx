@@ -7,18 +7,18 @@ was generated from Jupyter notebooks.
     :maxdepth: 3
     :glob:
 
-    installation.ipynb
-    usage.ipynb
-    markdown-cells.ipynb
-    code-cells.ipynb
-    raw-cells.ipynb
-    hidden-cells.ipynb
-    executing-notebooks.ipynb
-    prolog-and-epilog.ipynb
-    custom-formats.ipynb
+    installation
+    usage
+    markdown-cells
+    code-cells
+    raw-cells
+    hidden-cells
+    executing-notebooks
+    prolog-and-epilog
+    custom-formats
     subdir/*
-    a-normal-rst-file.rst
-    links.ipynb
+    a-normal-rst-file
+    links
 
 .. only:: html
 
