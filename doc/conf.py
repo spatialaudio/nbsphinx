@@ -7,8 +7,9 @@
 # Select nbsphinx and, if needed, other Sphinx extensions:
 extensions = [
     'nbsphinx',
-    'sphinx.ext.mathjax',
-    'sphinxcontrib.bibtex',
+    'sphinx.ext.mathjax',  # for math equation
+    'sphinxcontrib.bibtex',  # for bibliographic references
+    'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
 ]
 
 # Exclude build directory and Jupyter backup files:
@@ -166,3 +167,12 @@ latex_documents = [
 
 latex_show_urls = 'footnote'
 latex_show_pagerefs = True
+
+# -- Work-around to support sphinxcontrib.rsvgconverter on Sphinx < 1.8 ---
+
+# See https://github.com/missinglinkelectronics/sphinxcontrib-svg2pdfconverter/issues/2
+
+import sphinx.locale
+
+if not hasattr(sphinx.locale, '__'):
+    sphinx.locale.__ = lambda x: x
