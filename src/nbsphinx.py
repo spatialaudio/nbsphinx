@@ -1082,15 +1082,14 @@ def markdown2rst(text):
         p.close()
         return p
 
-    open_cite_tag = ''
+    open_cite_tag = ['']
 
     def object_hook(obj):
-        nonlocal open_cite_tag
-        if open_cite_tag:
+        if open_cite_tag[0]:
             if obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
                 p = parse_html(obj)
-                if p.endtag == open_cite_tag:
-                    open_cite_tag = ''
+                if p.endtag == open_cite_tag[0]:
+                    open_cite_tag[0] = ''
             return {'t': 'Str', 'c': ''}  # Object is replaced by empty string
 
         if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
@@ -1109,7 +1108,7 @@ def markdown2rst(text):
         elif obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
             p = parse_html(obj)
             if p.starttag:
-                open_cite_tag = p.starttag
+                open_cite_tag[0] = p.starttag
             if p.cite:
                 obj = {'t': 'RawInline', 'c': ['rst', p.cite]}
         return obj
