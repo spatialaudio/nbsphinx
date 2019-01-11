@@ -388,6 +388,33 @@ LATEX_PREAMBLE = r"""
       \unvbox\nbsphinxbox
     \fi
 }% end of \nbsphinxstopnotebook
+
+% Avoid fatal error with framed.sty if graphics too long to fit on one page
+\newdimen\nbsphinx@image@maxheight
+\AtBeginDocument{%
+  \nbsphinx@image@maxheight\textheight
+  % -20pt was found insufficient in testing
+  \advance\nbsphinx@image@maxheight -2.5\baselineskip
+}
+\renewcommand*{\sphinxincludegraphics}[2][]{%
+    \gdef\spx@includegraphics@options{#1}%
+    \setbox\spx@image@box\hbox{\includegraphics[#1,draft]{#2}}%
+    \in@false
+    \ifdim \wd\spx@image@box>\linewidth
+      \g@addto@macro\spx@includegraphics@options{,width=\linewidth}%
+      \in@true
+    \fi
+    % no rotation, no need to worry about depth
+    \ifdim \ht\spx@image@box>\nbsphinx@image@maxheight
+      \g@addto@macro\spx@includegraphics@options{,height=\nbsphinx@image@maxheight}%
+      \in@true
+    \fi
+    \ifin@
+      \g@addto@macro\spx@includegraphics@options{,keepaspectratio}%
+    \fi
+    \setbox\spx@image@box\box\voidb@x % clear memory
+    \expandafter\includegraphics\expandafter[\spx@includegraphics@options]{#2}%
+}% end of redefined \sphinxincludegraphics
 \makeatother
 """
 
