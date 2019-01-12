@@ -322,6 +322,12 @@ LATEX_PREAMBLE = r"""
 % Define an environment for non-plain-text code cell outputs (e.g. images)
 \makeatletter
 \newenvironment{nbsphinxfancyoutput}{%
+    % Avoid fatal error with framed.sty if graphics too long to fit on one page
+    \let\sphinxincludegraphics\nbsphinxincludegraphics
+    \nbsphinx@image@maxheight\textheight
+    \advance\nbsphinx@image@maxheight -2\fboxsep   % default \fboxsep 3pt
+    \advance\nbsphinx@image@maxheight -2\fboxrule  % default \fboxrule 0.4pt
+    \advance\nbsphinx@image@maxheight -\baselineskip
 \def\nbsphinxfcolorbox{\spx@fcolorbox{nbsphinx-code-border}{white}}%
 \def\FrameCommand{\nbsphinxfcolorbox\nbsphinxfancyaddprompt\@empty}%
 \def\FirstFrameCommand{\nbsphinxfcolorbox\nbsphinxfancyaddprompt\sphinxVerbatim@Continues}%
@@ -389,14 +395,9 @@ LATEX_PREAMBLE = r"""
     \fi
 }% end of \nbsphinxstopnotebook
 
-% Avoid fatal error with framed.sty if graphics too long to fit on one page
-\newdimen\nbsphinx@image@maxheight
-\AtBeginDocument{%
-  \nbsphinx@image@maxheight\textheight
-  % -20pt was found insufficient in testing
-  \advance\nbsphinx@image@maxheight -2.5\baselineskip
-}
-\renewcommand*{\sphinxincludegraphics}[2][]{%
+% Ensure height of an included graphics fits in nbsphinxfancyoutput frame
+\newdimen\nbsphinx@image@maxheight % set in nbsphinxfancyoutput environment
+\newcommand*{\nbsphinxincludegraphics}[2][]{%
     \gdef\spx@includegraphics@options{#1}%
     \setbox\spx@image@box\hbox{\includegraphics[#1,draft]{#2}}%
     \in@false
@@ -414,7 +415,7 @@ LATEX_PREAMBLE = r"""
     \fi
     \setbox\spx@image@box\box\voidb@x % clear memory
     \expandafter\includegraphics\expandafter[\spx@includegraphics@options]{#2}%
-}% end of redefined \sphinxincludegraphics
+}% end of "\MakeFrame"-safe variant of \sphinxincludegraphics
 \makeatother
 """
 
