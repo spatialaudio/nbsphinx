@@ -1,3 +1,6 @@
+Version 0.4.2 (2019-01-15):
+ * Re-establish Python 2 compatibility (but the clock is ticking ...)
+
 Version 0.4.1 (2018-12-16):
  * Fix issue #266
 
