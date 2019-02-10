@@ -11,7 +11,7 @@ Links to Notebooks (and Other Sphinx Source Files)
 Links to Sphinx source files can be created like normal `Sphinx hyperlinks`_,
 just using a relative path to the local file: link_.
 
-.. _Sphinx hyperlinks: http://www.sphinx-doc.org/en/master/usage/
+.. _Sphinx hyperlinks: https://www.sphinx-doc.org/en/master/usage/
                        restructuredtext/basics.html#external-links
 .. _link: subdir/a-notebook-in-a-subdir.ipynb
 
@@ -80,7 +80,7 @@ Links to Notebooks, Ye Olde Way
 
 In addition to the way shown above, you can also create links to notebooks (and
 other Sphinx source files) with
-`:ref: <http://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#role-ref>`_.
+`:ref: <https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#role-ref>`_.
 This has some disadvantages:
 
 * It is arguably a bit more clunky.

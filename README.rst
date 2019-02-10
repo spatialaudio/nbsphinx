@@ -27,5 +27,5 @@ Source code repository (and issue tracker):
 License:
     MIT -- see the file ``LICENSE`` for details.
 
-.. _Sphinx: http://sphinx-doc.org/
-.. _Jupyter Notebook: http://jupyter.org/
+.. _Sphinx: https://www.sphinx-doc.org/
+.. _Jupyter Notebook: https://jupyter.org/
