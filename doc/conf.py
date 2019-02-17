@@ -97,7 +97,10 @@ nbsphinx_epilog = r"""
 #}
 
 mathjax_config = {
-    'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
+    'TeX': {
+        'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True},
+        'extensions': ['newcommand.js', 'begingroup.js'],
+    },
 }
 
 # Additional files needed for generating LaTeX/PDF output:
