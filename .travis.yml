@@ -5,7 +5,8 @@ matrix:
   include:
 
   # default Python + latest Sphinx + check for broken links
-  - env: ADDITIONAL_COMMAND="python -m sphinx doc/ doc/_build/ -b linkcheck"
+  - script:
+    - python -m sphinx doc/ doc/_build/ -b linkcheck
 
   # a few older Sphinx releases using default Python version
   - env: SPHINX="==1.6.2"
@@ -37,4 +38,3 @@ script:
   - python -m sphinx doc/ doc/_build/ -b html
   - python -m sphinx doc/ doc/_build/ -b latex
   - python -m sphinx doc/ doc/_build/ -b epub
-  - $ADDITIONAL_COMMAND
