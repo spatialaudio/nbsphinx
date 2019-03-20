@@ -4,7 +4,10 @@ python:
 matrix:
   include:
 
-  # default Python + latest Sphinx + check for broken links
+  # default Python + latest Sphinx
+  -
+
+  # check for broken links
   - script:
     - python -m sphinx doc/ doc/_build/ -b linkcheck
 
