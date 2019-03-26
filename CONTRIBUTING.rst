@@ -11,7 +11,7 @@ newest development version (a.k.a. "master") from Github_::
 
    git clone https://github.com/spatialaudio/nbsphinx.git
    cd nbsphinx
-   python3 setup.py develop --user
+   python3 -m pip install -e . --user
 
 This way, your installation always stays up-to-date, even if you pull new
 changes from the Github repository.  If you have only Python 3 installed, you
@@ -43,5 +43,5 @@ Again, you'll probably have to use ``python`` instead of ``python3``.
 The generated files will be available in the directories ``build/sphinx/html/``
 and ``build/sphinx/latex/``, respectively.
 
-.. _PyPI: https://pypi.python.org/pypi/nbsphinx/
-.. _Github: http://github.com/spatialaudio/nbsphinx/
+.. _PyPI: https://pypi.org/project/nbsphinx/
+.. _Github: https://github.com/spatialaudio/nbsphinx/
