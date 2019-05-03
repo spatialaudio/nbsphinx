@@ -30,6 +30,7 @@ install:
   - pip install ipykernel
   - pip install numpy
   - pip install matplotlib
+  - pip install plotly
   - pip install pandas
   - pip install sphinxcontrib-bibtex
 script:
