@@ -1754,7 +1754,6 @@ def setup(app):
     except AttributeError:
         _add_notebook_parser(app)
 
-    # require.js for plotly rendering
     app.add_javascript(
         "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js")
     
