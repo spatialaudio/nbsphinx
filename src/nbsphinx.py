@@ -76,6 +76,12 @@ DISPLAY_DATA_PRIORITY_LATEX = (
 RST_TEMPLATE = """
 {% extends 'rst.tpl' %}
 
+{% block header %}
+.. raw:: html
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+{% endblock header %}
 
 {% macro insert_empty_lines(text) %}
 {%- set before, after = text | get_empty_lines %}
@@ -1754,8 +1760,8 @@ def setup(app):
     except AttributeError:
         _add_notebook_parser(app)
 
-    app.add_javascript(
-        "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js")
+    # app.add_javascript(
+    #     "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js")
     
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
