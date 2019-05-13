@@ -1760,9 +1760,6 @@ def setup(app):
     except AttributeError:
         _add_notebook_parser(app)
 
-    # app.add_javascript(
-    #     "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js")
-    
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
     app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
