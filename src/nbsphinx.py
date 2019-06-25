@@ -76,6 +76,12 @@ DISPLAY_DATA_PRIORITY_LATEX = (
 RST_TEMPLATE = """
 {% extends 'rst.tpl' %}
 
+{% block header %}
+.. raw:: html
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+{% endblock header %}
 
 {% macro insert_empty_lines(text) %}
 {%- set before, after = text | get_empty_lines %}
