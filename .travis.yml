@@ -27,11 +27,7 @@ addons:
 install:
   - pip install Sphinx$SPHINX
   - pip install .
-  - pip install ipykernel
-  - pip install numpy
-  - pip install matplotlib
-  - pip install pandas
-  - pip install sphinxcontrib-bibtex
+  - pip install -r doc/requirements.txt
 script:
   - python -m nbsphinx
   - python -m sphinx doc/ doc/_build/ -b html
