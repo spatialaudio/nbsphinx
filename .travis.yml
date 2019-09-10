@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.6"
+  - "3.7"
 matrix:
   include:
 
@@ -8,16 +8,21 @@ matrix:
   - env: ADDITIONAL_COMMAND="python -m sphinx doc/ doc/_build/ -b linkcheck"
 
   # a few older Sphinx releases using default Python version
-  - env: SPHINX="==1.6.2"
+  - env: SPHINX="==1.6.1"
   - env: SPHINX="==1.6.7"
-  - env: SPHINX="==1.7.5"
-  - env: SPHINX="==1.8.2"
+  - env: SPHINX="==1.7.0"
+  - env: SPHINX="==1.7.9"
+  - env: SPHINX="==1.8.0"
+  - env: SPHINX="==1.8.5"
+  - env: SPHINX="==2.0.0"
+  - env: SPHINX="==2.1.0"
+  - env: SPHINX="==2.1.2"
 
   # a few Python versions using latest Sphinx release
   - python: "3.4"
   - python: "3.5"
+  - python: "3.6"
   - python: "nightly"
-  # Pandas only works in PyPy >= 5.9, which isn't yet available on Travis-CI
   #- python: "pypy3"
 
 addons:
