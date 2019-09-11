@@ -167,12 +167,3 @@ latex_documents = [
 
 latex_show_urls = 'footnote'
 latex_show_pagerefs = True
-
-# -- Work-around to support sphinxcontrib.rsvgconverter on Sphinx < 1.8 ---
-
-# See https://github.com/missinglinkelectronics/sphinxcontrib-svg2pdfconverter/issues/2
-
-import sphinx.locale
-
-if not hasattr(sphinx.locale, '__'):
-    sphinx.locale.__ = lambda x: x
