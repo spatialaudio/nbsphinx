@@ -32,7 +32,7 @@ matrix:
     script: &py2-script
       - python2 -m nbsphinx
       # We don't execute, because the example notebooks use Python 3
-      - python2 -m sphinx doc/ doc/_build/ -b html -D nbsphinx_execute=never
+      - python2 -m sphinx doc/ doc/_build/ -W -b html -D nbsphinx_execute=never
 
   - name: default Python + latest Sphinx
     os: osx
@@ -65,6 +65,6 @@ install:
   - python3 -m pip install sphinxcontrib-bibtex$BIBTEX
 script:
   - python3 -m nbsphinx
-  - python3 -m sphinx doc/ doc/_build/ -b html
-  - python3 -m sphinx doc/ doc/_build/ -b latex
-  - python3 -m sphinx doc/ doc/_build/ -b epub
+  - python3 -m sphinx doc/ doc/_build/ -W -b html
+  - python3 -m sphinx doc/ doc/_build/ -W -b latex
+  - python3 -m sphinx doc/ doc/_build/ -W -b epub
