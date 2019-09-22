@@ -2,5 +2,5 @@ ipykernel
 numpy
 matplotlib
 pandas
-sphinxcontrib-bibtex
+git+https://github.com/mgeier/sphinxcontrib-bibtex.git@allow-older-sphinx
 sphinxcontrib-svg2pdfconverter
