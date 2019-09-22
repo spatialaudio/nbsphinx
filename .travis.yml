@@ -30,6 +30,7 @@ addons:
   apt:
     packages:
       - pandoc
+      - librsvg2-bin
 install:
   - pip install Sphinx$SPHINX
   - pip install .
