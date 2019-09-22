@@ -98,6 +98,12 @@ nbsphinx_epilog = r"""
 #    '.Rmd': lambda s: jupytext.reads(s, '.Rmd'),
 #}
 
+# Link or path to require.js, set to empty string to disable
+#nbsphinx_requirejs_path = ''
+
+# Options for loading require.js
+#nbsphinx_requirejs_options = {'async': 'async'}
+
 mathjax_config = {
     'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
 }

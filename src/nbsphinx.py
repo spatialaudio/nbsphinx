@@ -76,13 +76,6 @@ DISPLAY_DATA_PRIORITY_LATEX = (
 RST_TEMPLATE = """
 {% extends 'rst.tpl' %}
 
-{% block header %}
-.. raw:: html
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
-
-{% endblock header %}
-
 {% macro insert_empty_lines(text) %}
 {%- set before, after = text | get_empty_lines %}
 {%- if before %}
@@ -1569,6 +1562,12 @@ def builder_inited(app):
     for suffix in app.config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
+    if app.config.nbsphinx_requirejs_path:
+        # TODO: Add only on pages created from notebooks?
+        app.add_js_file(
+            app.config.nbsphinx_requirejs_path,
+            **app.config.nbsphinx_requirejs_options)
+
 
 def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
@@ -1774,6 +1773,16 @@ def setup(app):
     app.add_config_value('nbsphinx_input_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_output_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_custom_formats', {}, rebuild='env')
+    app.add_config_value(
+        'nbsphinx_requirejs_path',
+        'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
+        rebuild='html')
+    app.add_config_value(
+        'nbsphinx_requirejs_options',
+        {
+            'integrity': 'sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=',
+            'crossorigin': 'anonymous',
+        }, rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
