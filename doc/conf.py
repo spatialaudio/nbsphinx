@@ -53,7 +53,7 @@ nbsphinx_execute_arguments = [
 
 # This is processed by Jinja2 and inserted before each notebook
 nbsphinx_prolog = r"""
-{% set docname = env.doc2path(env.docname, base='doc') %}
+{% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
 
 .. only:: html
 
@@ -78,11 +78,12 @@ nbsphinx_prolog = r"""
 
 # This is processed by Jinja2 and inserted after each notebook
 nbsphinx_epilog = r"""
+{% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
 .. raw:: latex
 
     \nbsphinxstopnotebook{\scriptsize\noindent\strut
     \textcolor{gray}{\dotfill\ \sphinxcode{\sphinxupquote{\strut
-    {{ env.doc2path(env.docname, base='doc') | escape_latex }}}} ends here.}}
+    {{ docname | escape_latex }}}} ends here.}}
 """
 
 # Input prompt for code cells. "%s" is replaced by the execution count.
