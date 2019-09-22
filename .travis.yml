@@ -30,7 +30,16 @@ addons:
 install:
   - pip install Sphinx$SPHINX
   - pip install .
-  - pip install -r doc/requirements.txt
+  #- pip install -r doc/requirements.txt
+  # Install manually until
+  # https://github.com/mcmtroffaes/sphinxcontrib-bibtex/pull/178 is solved:
+  - pip install ipykernel
+  - pip install numpy
+  - pip install matplotlib
+  - pip install pandas
+  - pip install sphinxcontrib-svg2pdfconverter
+  - pip install git+https://github.com/mgeier/sphinxcontrib-bibtex.git@allow-older-sphinx
+
 script:
   - python -m nbsphinx
   - python -m sphinx doc/ doc/_build/ -b html
