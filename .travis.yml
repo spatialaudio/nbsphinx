@@ -8,18 +8,19 @@ matrix:
   - env: ADDITIONAL_COMMAND="python -m sphinx doc/ doc/_build/ -b linkcheck"
 
   # a few older Sphinx releases using default Python version
-  - env: SPHINX="==1.6.3"
-  - env: SPHINX="==1.6.7"
-  - env: SPHINX="==1.7.0"
-  - env: SPHINX="==1.7.9"
-  - env: SPHINX="==1.8.0"
-  - env: SPHINX="==1.8.5"
+  - env: SPHINX="==1.6.3" BIBTEX="==0.4.2"
+  - env: SPHINX="==1.6.7" BIBTEX="==0.4.2"
+  - env: SPHINX="==1.7.0" BIBTEX="==0.4.2"
+  - env: SPHINX="==1.7.9" BIBTEX="==0.4.2"
+  - env: SPHINX="==1.8.0" BIBTEX="==0.4.2"
+  - env: SPHINX="==1.8.5" BIBTEX="==0.4.2"
   - env: SPHINX="==2.0.0"
   - env: SPHINX="==2.1.0"
   - env: SPHINX="==2.1.2"
 
   # a few Python versions using latest Sphinx release
   - python: "3.4"
+    env: BIBTEX="==0.4.2"
   - python: "3.5"
   - python: "3.6"
   - python: "nightly"
@@ -32,7 +33,8 @@ addons:
 install:
   - pip install Sphinx$SPHINX
   - pip install .
-  - pip install -r doc/requirements.txt
+  - pip install $(grep -iv bibtex doc/requirements.txt)
+  - pip install sphinxcontrib-bibtex$BIBTEX
 script:
   - python -m nbsphinx
   - python -m sphinx doc/ doc/_build/ -b html
