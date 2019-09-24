@@ -1563,10 +1563,14 @@ def builder_inited(app):
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
     if app.config.nbsphinx_requirejs_path:
-        # TODO: Add only on pages created from notebooks?
-        app.add_js_file(
-            app.config.nbsphinx_requirejs_path,
-            **app.config.nbsphinx_requirejs_options)
+        try:
+            # TODO: Add only on pages created from notebooks?
+            app.add_js_file(
+                app.config.nbsphinx_requirejs_path,
+                **app.config.nbsphinx_requirejs_options)
+        except AttributeError:
+            # For Sphinx < 1.8 (nbsphinx_requirejs_options are ignored):
+            app.add_javascript(app.config.nbsphinx_requirejs_path)
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
