@@ -1,3 +1,6 @@
+Version 0.4.3 (2019-09-30):
+ * Add option ``nbsphinx_requirejs_path`` (and ``nbsphinx_requirejs_options``)
+
 Version 0.4.2 (2019-01-15):
  * Re-establish Python 2 compatibility (but the clock is ticking ...)
 
