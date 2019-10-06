@@ -6,3 +6,5 @@ include doc/*.rst
 include doc/*.ipynb
 include doc/subdir/*.ipynb
 include doc/images/*
+include doc/references.bib
+include doc/ipython_kernel_config.py
