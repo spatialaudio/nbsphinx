@@ -5,3 +5,6 @@ https://mybinder.org/v2/gh/spatialaudio/nbsphinx/master?filepath=doc
 
 To check out a different version, just replace "master" with the desired
 branch/tag name or commit hash.
+
+To use JupyterLab, use:
+https://mybinder.org/v2/gh/spatialaudio/nbsphinx/master?urlpath=lab/tree/doc

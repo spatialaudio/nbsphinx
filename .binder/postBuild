@@ -1,3 +1,5 @@
 #!/bin/sh
 
 set -e
+
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
