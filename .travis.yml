@@ -25,9 +25,27 @@ matrix:
     script:
       - python3 -m sphinx doc/ doc/_build/ -b linkcheck
 
-  # default Python + latest Sphinx on macOS
-  - os: osx
+  - name: Python 2.7 + latest Sphinx
+    python: "2.7"
+    install: &py2-install
+      - python2 -m pip install .
+      - python2 -m pip install sphinxcontrib-bibtex==0.4.2
+      - python2 -m pip install sphinxcontrib-svg2pdfconverter
+      - python2 -m pip install ipywidgets
+    script: &py2-script
+      - python2 -m nbsphinx
+      # We don't execute, because the example notebooks use Python 3
+      - python2 -m sphinx doc/ doc/_build/ -b html -D nbsphinx_execute=never
+
+  - name: default Python + latest Sphinx
+    os: osx
     language: generic
+
+  - name: Python 2.7 + latest Sphinx
+    os: osx
+    language: generic
+    install: *py2-install
+    script: *py2-script
 
 addons:
   apt:
