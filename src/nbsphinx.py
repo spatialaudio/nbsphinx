@@ -1563,14 +1563,10 @@ def builder_inited(app):
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
     if app.config.nbsphinx_requirejs_path:
-        try:
-            # TODO: Add only on pages created from notebooks?
-            app.add_js_file(
-                app.config.nbsphinx_requirejs_path,
-                **app.config.nbsphinx_requirejs_options)
-        except AttributeError:
-            # For Sphinx < 1.8 (nbsphinx_requirejs_options are ignored):
-            app.add_javascript(app.config.nbsphinx_requirejs_path)
+        # TODO: Add only on pages created from notebooks?
+        app.add_js_file(
+            app.config.nbsphinx_requirejs_path,
+            **app.config.nbsphinx_requirejs_options)
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
@@ -1731,37 +1727,10 @@ def do_nothing(self, node):
     pass
 
 
-def _add_notebook_parser(app):
-    """Ugly hack to modify source_suffix and source_parsers.
-
-    Once https://github.com/sphinx-doc/sphinx/pull/2209 is merged (and
-    some additional time has passed), this should be replaced by ::
-
-        app.add_source_parser('.ipynb', NotebookParser)
-
-    See also https://github.com/sphinx-doc/sphinx/issues/2162.
-
-    """
-    source_suffix = app.config._raw_config.get('source_suffix', ['.rst'])
-    if isinstance(source_suffix, sphinx.config.string_types):
-        source_suffix = [source_suffix]
-    if '.ipynb' not in source_suffix:
-        source_suffix.append('.ipynb')
-        app.config._raw_config['source_suffix'] = source_suffix
-    source_parsers = app.config._raw_config.get('source_parsers', {})
-    if '.ipynb' not in source_parsers and 'ipynb' not in source_parsers:
-        source_parsers['.ipynb'] = NotebookParser
-        app.config._raw_config['source_parsers'] = source_parsers
-
-
 def setup(app):
     """Initialize Sphinx extension."""
-    try:
-        # Available since Sphinx 1.8:
-        app.add_source_suffix('.ipynb', 'jupyter_notebook')
-        app.add_source_parser(NotebookParser)
-    except AttributeError:
-        _add_notebook_parser(app)
+    app.add_source_suffix('.ipynb', 'jupyter_notebook')
+    app.add_source_parser(NotebookParser)
 
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
