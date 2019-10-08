@@ -4,8 +4,7 @@ python:
 matrix:
   include:
 
-  # default Python + latest Sphinx + check for broken links
-  - env: ADDITIONAL_COMMAND="python -m sphinx doc/ doc/_build/ -b linkcheck"
+  - name: default Python + latest Sphinx
 
   # a few older Sphinx releases using default Python version
   - env: SPHINX="==1.8.0" BIBTEX="==0.4.2"
@@ -22,6 +21,10 @@ matrix:
   - python: "nightly"
   #- python: "pypy3"
 
+  - name: check for broken links
+    script:
+      - python3 -m sphinx doc/ doc/_build/ -b linkcheck
+
 addons:
   apt:
     packages:
@@ -37,4 +40,3 @@ script:
   - python -m sphinx doc/ doc/_build/ -b html
   - python -m sphinx doc/ doc/_build/ -b latex
   - python -m sphinx doc/ doc/_build/ -b epub
-  - $ADDITIONAL_COMMAND
