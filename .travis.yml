@@ -28,6 +28,7 @@ matrix:
   - name: Python 2.7 + latest Sphinx
     python: "2.7"
     install: &py2-install
+      - python2 --version
       - python2 -m pip install .
       - python2 -m pip install sphinxcontrib-bibtex==0.4.2
       - python2 -m pip install sphinxcontrib-svg2pdfconverter
@@ -40,10 +41,12 @@ matrix:
   - name: default Python + latest Sphinx
     os: osx
     language: generic
+    python: ""
 
   - name: Python 2.7 + latest Sphinx
     os: osx
     language: generic
+    python: ""
     install: *py2-install
     script: *py2-script
 
@@ -59,6 +62,7 @@ addons:
       - librsvg
       - python3
 install:
+  - python3 --version
   - python3 -m pip install Sphinx$SPHINX
   - python3 -m pip install .
   - python3 -m pip install $(grep -iv bibtex doc/requirements.txt)
