@@ -1539,10 +1539,10 @@ class GetSizeFromImages(
                 node['width'], node['height'] = map(str, size)
 
 
-def builder_inited(app):
+def config_inited(app, config):
     # Set default value for CSS prompt width
-    if app.config.nbsphinx_prompt_width is None:
-        app.config.nbsphinx_prompt_width = {
+    if config.nbsphinx_prompt_width is None:
+        config.nbsphinx_prompt_width = {
             'agogo': '4ex',
             'alabaster': '5ex',
             'better': '5ex',
@@ -1557,16 +1557,16 @@ def builder_inited(app):
             'sphinx_py3doc_enhanced_theme': '6ex',
             'sphinx_rtd_theme': '5ex',
             'traditional': '4ex',
-        }.get(app.config.html_theme, '7ex')
+        }.get(config.html_theme, '7ex')
 
-    for suffix in app.config.nbsphinx_custom_formats:
+    for suffix in config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
-    if app.config.nbsphinx_requirejs_path:
+    if config.nbsphinx_requirejs_path:
         # TODO: Add only on pages created from notebooks?
         app.add_js_file(
-            app.config.nbsphinx_requirejs_path,
-            **app.config.nbsphinx_requirejs_options)
+            config.nbsphinx_requirejs_path,
+            **config.nbsphinx_requirejs_options)
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
@@ -1738,7 +1738,7 @@ def setup(app):
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', 30, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
-    # Default value is set in builder_inited():
+    # Default value is set in config_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
     app.add_config_value('nbsphinx_prolog', None, rebuild='env')
@@ -1770,7 +1770,7 @@ def setup(app):
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
                  latex=(visit_admonition_latex, depart_admonition_latex))
-    app.connect('builder-inited', builder_inited)
+    app.connect('config-inited', config_inited)
     app.connect('html-page-context', html_page_context)
     app.connect('html-collect-pages', html_collect_pages)
     app.connect('env-purge-doc', env_purge_doc)
