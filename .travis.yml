@@ -25,11 +25,21 @@ matrix:
     script:
       - python3 -m sphinx doc/ doc/_build/ -b linkcheck
 
+  # default Python + latest Sphinx on macOS
+  - os: osx
+    language: generic
+
 addons:
   apt:
     packages:
       - pandoc
       - librsvg2-bin
+  homebrew:
+    update: true
+    packages:
+      - pandoc
+      - librsvg
+      - python3
 install:
   - python3 -m pip install Sphinx$SPHINX
   - python3 -m pip install .
