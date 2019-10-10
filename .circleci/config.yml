@@ -71,6 +71,11 @@ jobs:
           path: build/sphinx/latex/nbsphinx.pdf
           destination: nbsphinx.pdf
 
+      - store_artifacts:
+          name: Uploading overview page
+          path: .circleci/artifacts.html
+          destination: artifacts.html
+
 workflows:
   version: 2
   build-me-my-docs:
