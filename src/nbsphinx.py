@@ -333,6 +333,7 @@ LATEX_PREAMBLE = r"""
 \def\MidFrameCommand{\nbsphinxfcolorbox\sphinxVerbatim@Continued\sphinxVerbatim@Continues}%
 \def\LastFrameCommand{\nbsphinxfcolorbox\sphinxVerbatim@Continued\@empty}%
 \MakeFramed{\advance\hsize-\width\@totalleftmargin\z@\linewidth\hsize\@setminipage}%
+\lineskip=1ex\lineskiplimit=1ex\raggedright%
 }{\par\unskip\@minipagefalse\endMakeFramed}
 \makeatother
 \newbox\nbsphinxpromptbox
