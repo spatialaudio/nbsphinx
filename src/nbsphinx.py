@@ -430,8 +430,8 @@ div.nbinput div.input_area,
 div.nbinput div[class*=highlight],
 div.nbinput div[class*=highlight] pre,
 div.nboutput,
-div.nbinput div.prompt,
-div.nbinput div.output_area,
+div.nboutput div.prompt,
+div.nboutput div.output_area,
 div.nboutput div[class*=highlight],
 div.nboutput div[class*=highlight] pre {
     background: none;
