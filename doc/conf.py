@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Use sphinx-quickstart to create your own conf.py file!
 # After that, you have to edit a few things.  See below.
@@ -7,7 +6,7 @@
 # Select nbsphinx and, if needed, other Sphinx extensions:
 extensions = [
     'nbsphinx',
-    'sphinx.ext.mathjax',  # for math equation
+    'sphinx.ext.mathjax',  # for math equations
     'sphinxcontrib.bibtex',  # for bibliographic references
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
 ]
@@ -15,41 +14,20 @@ extensions = [
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
-# Default language for syntax highlighting in reST and Markdown cells
+# Default language for syntax highlighting in reST and Markdown cells:
 highlight_language = 'none'
 
-# Don't add .txt suffix to source files (available for Sphinx >= 1.5):
+# Don't add .txt suffix to source files:
 html_sourcelink_suffix = ''
 
 # Work-around until https://github.com/sphinx-doc/sphinx/issues/4229 is solved:
 html_scaled_image_link = False
-
-# Execute notebooks before conversion: 'always', 'never', 'auto' (default)
-#nbsphinx_execute = 'never'
-
-# Use this kernel instead of the one stored in the notebook metadata:
-#nbsphinx_kernel_name = 'python3'
 
 # List of arguments to be passed to the kernel that executes the notebooks:
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'pdf'}",
     "--InlineBackend.rc={'figure.dpi': 96}",
 ]
-
-# If True, the build process is continued even if an exception occurs:
-#nbsphinx_allow_errors = True
-
-# Controls when a cell will time out (defaults to 30; use -1 for no timeout):
-#nbsphinx_timeout = 60
-
-# Default Pygments lexer for syntax highlighting in code cells:
-#nbsphinx_codecell_lexer = 'ipython3'
-
-# Width of input/output prompts used in CSS:
-#nbsphinx_prompt_width = '8ex'
-
-# If window is narrower than this, input/output prompts are on separate lines:
-#nbsphinx_responsive_width = '700px'
 
 # This is processed by Jinja2 and inserted before each notebook
 nbsphinx_prolog = r"""
@@ -85,30 +63,6 @@ nbsphinx_epilog = r"""
     \textcolor{gray}{\dotfill\ \sphinxcode{\sphinxupquote{\strut
     {{ docname | escape_latex }}}} ends here.}}
 """
-
-# Input prompt for code cells. "%s" is replaced by the execution count.
-#nbsphinx_input_prompt = 'In [%s]:'
-
-# Output prompt for code cells. "%s" is replaced by the execution count.
-#nbsphinx_output_prompt = 'Out[%s]:'
-
-# Specify conversion functions for custom notebook formats:
-#import jupytext
-#nbsphinx_custom_formats = {
-#    '.Rmd': lambda s: jupytext.reads(s, '.Rmd'),
-#}
-
-# Link or path to require.js, set to empty string to disable
-#nbsphinx_requirejs_path = ''
-
-# Options for loading require.js
-#nbsphinx_requirejs_options = {'async': 'async'}
-
-# Link or path to Jupyter widgets resources, set to empty string to disable
-#nbsphinx_widgets_path = ''
-
-# Options for loading Jupyter widgets resources
-#nbsphinx_widgets_options = {'async': 'async'}
 
 mathjax_config = {
     'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},

@@ -192,7 +192,7 @@ as explained in the next section.
 References
 ----------
 
-After installing and enabling the sphinxcontrib.bibtex_ extension,
+After installing and enabling_ the sphinxcontrib.bibtex_ extension,
 you can create a list of references from a BibTeX file like this:
 
 .. code-block:: rst
@@ -201,7 +201,9 @@ you can create a list of references from a BibTeX file like this:
 
 Have a look at the documentation for all the available options.
 
-The list of references may look something like this:
+.. _enabling: usage.ipynb#extensions
+
+The list of references may look something like this (in HTML output):
 
 .. bibliography:: references.bib
     :all:
