@@ -6,10 +6,6 @@ matrix:
 
   - name: default Python + latest Sphinx
 
-  - name: check for broken links
-    script:
-      - python3 -m sphinx doc/ doc/_build/ -b linkcheck
-
   # a few older Sphinx releases using default Python version
   - env: SPHINX="==1.8.0" BIBTEX="==0.4.2"
   - env: SPHINX="==1.8.5" BIBTEX="==0.4.2"

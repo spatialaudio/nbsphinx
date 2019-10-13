@@ -76,6 +76,11 @@ jobs:
           path: .circleci/artifacts.html
           destination: artifacts.html
 
+      - run:
+          name: Checking for Outdated Links
+          command: |
+            python3 setup.py build_sphinx -b linkcheck
+
 workflows:
   version: 2
   build-me-my-docs:
