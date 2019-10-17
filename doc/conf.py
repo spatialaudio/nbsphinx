@@ -137,6 +137,13 @@ except Exception:
 
 html_favicon = 'favicon.svg'
 html_title = project + ' version ' + release
+html_theme = 'pytorch_sphinx_theme'
+html_theme_options = {
+    'pytorch_project': 'tutorials',
+    'collapse_navigation': True,
+    'navigation_depth': 3,
+    'display_version': False,
+}
 
 # -- Options for LaTeX output ---------------------------------------------
 
