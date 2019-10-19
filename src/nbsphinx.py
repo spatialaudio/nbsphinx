@@ -1541,7 +1541,7 @@ class GetSizeFromImages(
 
 
 def config_inited(app, config):
-    # Set default value for CSS prompt width
+    # Set default value for CSS prompt width (optimized for two-digit numbers)
     if config.nbsphinx_prompt_width is None:
         config.nbsphinx_prompt_width = {
             'agogo': '4ex',
@@ -1550,13 +1550,19 @@ def config_inited(app, config):
             'classic': '4ex',
             'cloud': '5ex',
             'dotted': '5ex',
+            'guzzle_sphinx_theme': '6ex',
             'haiku': '4ex',
             'julia': '5ex',
+            'maisie_sphinx_theme': '6ex',
             'nature': '5ex',
+            'pangeo': '5ex',
             'pyramid': '5ex',
             'redcloud': '5ex',
+            'sizzle': '5.5ex',
             'sphinx_py3doc_enhanced_theme': '6ex',
+            'sphinx_pyviz_theme': '5.5ex',
             'sphinx_rtd_theme': '5ex',
+            'sphinx_typlog_theme': '5.5ex',
             'traditional': '4ex',
         }.get(config.html_theme, '7ex')
 
