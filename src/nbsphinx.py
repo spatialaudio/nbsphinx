@@ -1580,6 +1580,13 @@ def config_inited(app, config):
     for suffix in config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
+    if config.nbsphinx_requirejs_path is None:
+        config.nbsphinx_requirejs_path = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js'
+    if config.nbsphinx_requirejs_options is None:
+        config.nbsphinx_requirejs_options = {
+            'integrity': 'sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=',
+            'crossorigin': 'anonymous',
+        }
     if config.nbsphinx_requirejs_path:
         # TODO: Add only on pages created from notebooks?
         app.add_js_file(
@@ -1788,16 +1795,10 @@ def setup(app):
     app.add_config_value('nbsphinx_input_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_output_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_custom_formats', {}, rebuild='env')
-    app.add_config_value(
-        'nbsphinx_requirejs_path',
-        'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
-        rebuild='html')
-    app.add_config_value(
-        'nbsphinx_requirejs_options',
-        {
-            'integrity': 'sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=',
-            'crossorigin': 'anonymous',
-        }, rebuild='html')
+    # Default value is set in config_inited():
+    app.add_config_value('nbsphinx_requirejs_path', None, rebuild='html')
+    # Default value is set in config_inited():
+    app.add_config_value('nbsphinx_requirejs_options', None, rebuild='html')
     # This will be updated in env_updated():
     app.add_config_value('nbsphinx_widgets_path', None, rebuild='html')
     app.add_config_value('nbsphinx_widgets_options', {}, rebuild='html')
