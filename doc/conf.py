@@ -104,21 +104,18 @@ nbsphinx_epilog = r"""
 # Options for loading require.js
 #nbsphinx_requirejs_options = {'async': 'async'}
 
+# Link or path to Jupyter widgets resources, set to empty string to disable
+#nbsphinx_widgets_path = ''
+
+# Options for loading Jupyter widgets resources
+#nbsphinx_widgets_options = {'async': 'async'}
+
 mathjax_config = {
     'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
 }
 
 # Additional files needed for generating LaTeX/PDF output:
 latex_additional_files = ['references.bib']
-
-# -- Settings for Jupyter Interactive Widgets -----------------------------
-
-from ipywidgets.embed import DEFAULT_EMBED_REQUIREJS_URL
-
-# require.js is also needed, which is configured with nbsphinx_requirejs_path
-html_js_files = [
-    DEFAULT_EMBED_REQUIREJS_URL,
-]
 
 # -- The settings below this line are not specific to nbsphinx ------------
 

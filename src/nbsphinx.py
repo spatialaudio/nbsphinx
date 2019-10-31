@@ -779,6 +779,10 @@ class Exporter(nbconvert.RSTExporter):
         elif orphan is not False:
             raise ValueError('invalid orphan option: {!r}'.format(orphan))
 
+        if 'application/vnd.jupyter.widget-state+json' in nb.metadata.get(
+                'widgets', {}):
+            resources['nbsphinx_widgets'] = True
+
         return rststr, resources
 
 
@@ -900,6 +904,11 @@ class NotebookParser(rst.Parser):
             epilog = exporter.environment.from_string(
                 env.config.nbsphinx_epilog).render(env=env)
             rst.Parser.parse(self, epilog, document)
+
+        if resources.get('nbsphinx_widgets', False):
+            if not hasattr(env, 'nbsphinx_widgets'):
+                env.nbsphinx_widgets = set()
+            env.nbsphinx_widgets.add(env.docname)
 
 
 class NotebookError(sphinx.errors.SphinxError):
@@ -1615,6 +1624,30 @@ def env_purge_doc(app, env, docname):
         del env.nbsphinx_files[docname]
     except (AttributeError, KeyError):
         pass
+    try:
+        env.nbsphinx_widgets.discard(docname)
+    except AttributeError:
+        pass
+
+
+def env_updated(app, env):
+    widgets_path = app.config.nbsphinx_widgets_path
+    if widgets_path is None:
+        if getattr(env, 'nbsphinx_widgets', set()):
+            try:
+                from ipywidgets.embed import DEFAULT_EMBED_REQUIREJS_URL
+            except ImportError:
+                logger = sphinx.util.logging.getLogger(__name__)
+                logger.warning(
+                    'nbsphinx_widgets_path not given '
+                    'and ipywidgets module unavailable')
+            else:
+                widgets_path = DEFAULT_EMBED_REQUIREJS_URL
+        else:
+            widgets_path = ''
+
+    if widgets_path:
+        app.add_js_file(widgets_path, **app.config.nbsphinx_widgets_options)
 
 
 def depart_codearea_html(self, node):
@@ -1765,6 +1798,9 @@ def setup(app):
             'integrity': 'sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=',
             'crossorigin': 'anonymous',
         }, rebuild='html')
+    # This will be updated in env_updated():
+    app.add_config_value('nbsphinx_widgets_path', None, rebuild='html')
+    app.add_config_value('nbsphinx_widgets_options', {}, rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
@@ -1783,6 +1819,7 @@ def setup(app):
     app.connect('html-page-context', html_page_context)
     app.connect('html-collect-pages', html_collect_pages)
     app.connect('env-purge-doc', env_purge_doc)
+    app.connect('env-updated', env_updated)
     app.add_transform(CreateSectionLabels)
     app.add_transform(CreateDomainObjectLabels)
     app.add_transform(RewriteLocalLinks)
