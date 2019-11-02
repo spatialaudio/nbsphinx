@@ -74,7 +74,7 @@ DISPLAY_DATA_PRIORITY_LATEX = (
 )
 
 RST_TEMPLATE = """
-{% extends 'rst.tpl' %}
+{% extends 'index.rst.j2' %}
 
 {% macro insert_empty_lines(text) %}
 {%- set before, after = text | get_empty_lines %}
