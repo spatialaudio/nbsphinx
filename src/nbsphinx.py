@@ -73,8 +73,10 @@ DISPLAY_DATA_PRIORITY_LATEX = (
     'text/plain',
 )
 
+# The default rst template name is changing in nbconvert 6, so we substitute
+# it in to the *extends* directive.
 RST_TEMPLATE = """
-{% extends 'rst.tpl' %}
+{% extends '__RST_DEFAULT_TEMPLATE__' %}
 
 {% macro insert_empty_lines(text) %}
 {%- set before, after = text | get_empty_lines %}
@@ -288,7 +290,7 @@ RST_TEMPLATE = """
 {% endif %}
 {{ super() }}
 {% endblock footer %}
-"""
+""".replace('__RST_DEFAULT_TEMPLATE__', nbconvert.RSTExporter().template_file)
 
 
 LATEX_PREAMBLE = r"""
