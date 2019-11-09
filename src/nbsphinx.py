@@ -111,19 +111,13 @@ RST_TEMPLATE = """
 {%- if not cell.outputs %}
     :no-output:
 {%- endif %}
-{%- if cell.source.strip() %}
 
 {{ cell.source.strip('\n') | indent }}
-{%- endif %}
 {% endblock input %}
 
 
 {% macro insert_nboutput(datatype, output, cell) -%}
 .. nboutput::
-{%- if datatype == 'text/plain' %}{# nothing #}
-{%- elif datatype == 'ansi' %} ansi
-{%- else %} rst
-{%- endif %}
 {%- if output.output_type == 'execute_result' and cell.execution_count %}
     :execution-count: {{ cell.execution_count }}
 {%- endif %}
@@ -133,10 +127,25 @@ RST_TEMPLATE = """
 {%- if output.name == 'stderr' %}
     :class: stderr
 {%- endif %}
-{%- if datatype == 'text/plain' -%}
-{{ insert_empty_lines(output.data[datatype]) }}
+{%- if datatype != 'text/plain' %}
+    :fancy:
+{%- endif %}
+{%- if datatype == 'text/plain' %}
 
-{{ output.data[datatype].strip('\n') | indent }}
+    .. rst-class:: highlight
+
+    .. raw:: html
+
+        <pre>
+{{ output.data[datatype] | ansi2html | indent | indent }}
+        </pre>
+
+    .. raw:: latex
+
+        \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
+{{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
+        \\end{sphinxVerbatim}
+
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
     .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
@@ -179,38 +188,6 @@ RST_TEMPLATE = """
     .. raw:: html
 
         <script type="{{ datatype }}">{{ output.data[datatype] | json_dumps }}</script>
-{%- elif datatype == 'ansi' %}
-
-    .. rst-class:: highlight
-
-    .. raw:: html
-
-        <pre>
-{{ output.data[datatype] | ansi2html | indent | indent }}
-        </pre>
-
-    .. raw:: latex
-
-        %
-        {
-        \\kern-\\sphinxverbatimsmallskipamount\\kern-\\baselineskip
-        \\kern+\\FrameHeightAdjust\\kern-\\fboxrule
-        \\vspace{\\nbsphinxcodecellspacing}
-        \\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
-    {%- if output.name == 'stderr' %}
-        \\sphinxsetup{VerbatimColor={named}{nbsphinx-stderr}}
-    {%- else %}
-        \\sphinxsetup{VerbatimColor={named}{white}}
-    {%- endif %}
-        \\fvset{hllines={, ,}}%
-        \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
-{{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
-        \\end{sphinxVerbatim}
-        }
-        % The following \\relax is needed to avoid problems with adjacent ANSI
-        % cells and some other stuff (e.g. bullet lists) following ANSI cells.
-        % See https://github.com/sphinx-doc/sphinx/issues/3594
-        \\relax
 {% else %}
 
     .. nbwarning:: Data type cannot be displayed: {{ datatype }}
@@ -418,6 +395,20 @@ LATEX_PREAMBLE = r"""
     \setbox\spx@image@box\box\voidb@x % clear memory
     \expandafter\includegraphics\expandafter[\spx@includegraphics@options]{#2}%
 }% end of "\MakeFrame"-safe variant of \sphinxincludegraphics
+\makeatother
+
+\makeatletter
+\renewcommand*\sphinx@verbatim@nolig@list{\do\'\do\`}
+\begingroup
+\catcode`'=\active
+\let\nbsphinx@noligs\@noligs
+\g@addto@macro\nbsphinx@noligs{\let'\PYGZsq}
+\endgroup
+\makeatother
+\renewcommand*\sphinxbreaksbeforeactivelist{\do\<\do\"\do\'}
+\renewcommand*\sphinxbreaksafteractivelist{\do\.\do\,\do\:\do\;\do\?\do\!\do\/\do\>\do\-}
+\makeatletter
+\fvset{codes*=\sphinxbreaksattexescapedchars\do\^\^\let\@noligs\nbsphinx@noligs}
 \makeatother
 """
 
@@ -918,17 +909,16 @@ class NotebookError(sphinx.errors.SphinxError):
 
 
 class CodeAreaNode(docutils.nodes.Element):
-    """Input area or output area of a Jupyter notebook code cell."""
+    """Input area or plain-text output area of a Jupyter notebook code cell."""
 
 
 class FancyOutputNode(docutils.nodes.Element):
-    """A custom node for non-code output of code cells."""
+    """A custom node for non-plain-text output of code cells."""
 
 
 def _create_code_nodes(directive):
     """Create nodes for an input or output code cell."""
-    fancy_output = False
-    language = 'none'
+    directive.state.document['nbsphinx_include_css'] = True
     execution_count = directive.options.get('execution-count')
     config = directive.state.document.settings.env.config
     if isinstance(directive, NbInput):
@@ -936,8 +926,6 @@ def _create_code_nodes(directive):
         if 'no-output' in directive.options:
             outer_classes.append('nblast')
         inner_classes = ['input_area']
-        if directive.arguments:
-            language = directive.arguments[0]
         prompt_template = config.nbsphinx_input_prompt
         if not execution_count:
             execution_count = ' '
@@ -946,11 +934,8 @@ def _create_code_nodes(directive):
         if 'more-to-come' not in directive.options:
             outer_classes.append('nblast')
         inner_classes = ['output_area']
-        # 'class' can be 'stderr'
         inner_classes.append(directive.options.get('class', ''))
         prompt_template = config.nbsphinx_output_prompt
-        if directive.arguments and directive.arguments[0] in ['rst', 'ansi']:
-            fancy_output = True
     else:
         assert False
 
@@ -965,21 +950,24 @@ def _create_code_nodes(directive):
     # NB: Prompts are added manually in LaTeX output
     outer_node += sphinx.addnodes.only('', prompt_node, expr='html')
 
-    if fancy_output:
+    if isinstance(directive, NbInput):
+        text = '\n'.join(directive.content.data)
+        if directive.arguments:
+            language = directive.arguments[0]
+        else:
+            language = 'none'
+        inner_node = docutils.nodes.literal_block(
+            text, text, language=language, classes=inner_classes)
+    else:
         inner_node = docutils.nodes.container(classes=inner_classes)
         sphinx.util.nodes.nested_parse_with_titles(
             directive.state, directive.content, inner_node)
-        if directive.arguments[0] == 'rst':
-            outer_node += FancyOutputNode('', inner_node, prompt=prompt)
-        elif directive.arguments[0] == 'ansi':
-            outer_node += inner_node
-        else:
-            assert False
+
+    if 'fancy' in directive.options:
+        outer_node += FancyOutputNode('', inner_node, prompt=prompt)
     else:
-        text = '\n'.join(directive.content.data)
-        inner_node = docutils.nodes.literal_block(
-            text, text, language=language, classes=inner_classes)
-        codearea_node = CodeAreaNode('', inner_node, prompt=prompt)
+        codearea_node = CodeAreaNode(
+            '', inner_node, prompt=prompt, stderr='stderr' in inner_classes)
         # See http://stackoverflow.com/q/34050044/.
         for attr in 'empty-lines-before', 'empty-lines-after':
             value = directive.options.get(attr, 0)
@@ -1011,7 +999,6 @@ class NbInput(rst.Directive):
 
     def run(self):
         """This is called by the reST parser."""
-        self.state.document['nbsphinx_include_css'] = True
         return _create_code_nodes(self)
 
 
@@ -1019,20 +1006,17 @@ class NbOutput(rst.Directive):
     """A notebook output cell with optional prompt."""
 
     required_arguments = 0
-    optional_arguments = 1  # 'rst' or nothing (which means literal text)
     final_argument_whitespace = False
     option_spec = {
         'execution-count': rst.directives.positive_int,
         'more-to-come': rst.directives.flag,
-        'empty-lines-before': rst.directives.nonnegative_int,
-        'empty-lines-after': rst.directives.nonnegative_int,
+        'fancy': rst.directives.flag,
         'class': rst.directives.unchanged,
     }
     has_content = True
 
     def run(self):
         """This is called by the reST parser."""
-        self.state.document['nbsphinx_include_css'] = True
         return _create_code_nodes(self)
 
 
@@ -1250,12 +1234,12 @@ def _get_empty_lines(text):
 def _get_output_type(output):
     """Choose appropriate output data types for HTML and LaTeX."""
     if output.output_type == 'stream':
-        html_datatype = latex_datatype = 'ansi'
+        html_datatype = latex_datatype = 'text/plain'
         text = output.text
-        output.data = {'ansi': text[:-1] if text.endswith('\n') else text}
+        output.data = {'text/plain': text[:-1] if text.endswith('\n') else text}
     elif output.output_type == 'error':
-        html_datatype = latex_datatype = 'ansi'
-        output.data = {'ansi': '\n'.join(output.traceback)}
+        html_datatype = latex_datatype = 'text/plain'
+        output.data = {'text/plain': '\n'.join(output.traceback)}
     else:
         for datatype in DISPLAY_DATA_PRIORITY_HTML:
             if datatype in output.data:
@@ -1679,12 +1663,10 @@ def depart_codearea_latex(self, node):
     * Add prompt
 
     """
+    lines = ''.join(self.popbody()).strip('\n').split('\n')
     out = []
-    lines = ''.join(self.popbody()).split('\n')
-    assert lines[0] == ''
-    out.append(lines[0])
+    out.append('')
     out.append('{')  # Start a scope for colors
-    prompt = node['prompt']
     if 'nbinput' in node.parent['classes']:
         promptcolor = 'nbsphinxin'
         out.append(r'\sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}')
@@ -1693,22 +1675,26 @@ def depart_codearea_latex(self, node):
 \kern-\sphinxverbatimsmallskipamount\kern-\baselineskip
 \kern+\FrameHeightAdjust\kern-\fboxrule
 \vspace{\nbsphinxcodecellspacing}
-\sphinxsetup{VerbatimColor={named}{white}}
 """)
         promptcolor = 'nbsphinxout'
+        if node['stderr']:
+            out.append(r'\sphinxsetup{VerbatimColor={named}{nbsphinx-stderr}}')
+        else:
+            out.append(r'\sphinxsetup{VerbatimColor={named}{white}}')
 
     out.append(
         r'\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}')
-    if lines[1].startswith(r'\fvset{'):  # Sphinx >= 1.6.6 and < 1.8.3
-        out.append(lines[1])
-        del lines[1]
-    assert 'Verbatim' in lines[1]
-    out.append(lines[1])
+    if lines[0].startswith(r'\fvset{'):  # Sphinx >= 1.6.6 and < 1.8.3
+        out.append(lines[0])
+        del lines[0]
+    assert 'Verbatim' in lines[0]
+    out.append(lines[0])
     code_lines = (
         [''] * node.get('empty-lines-before', 0) +
-        lines[2:-2] +
+        lines[1:-1] +
         [''] * node.get('empty-lines-after', 0)
     )
+    prompt = node['prompt']
     if prompt:
         prompt = nbconvert.filters.latex.escape_latex(prompt)
         prefix = r'\llap{\color{' + promptcolor + '}' + prompt + \
@@ -1716,11 +1702,10 @@ def depart_codearea_latex(self, node):
         assert code_lines
         code_lines[0] = prefix + code_lines[0]
     out.extend(code_lines)
-    assert 'Verbatim' in lines[-2]
-    out.append(lines[-2])
-    out.append('}')  # End of scope for colors
-    assert lines[-1] == ''
+    assert 'Verbatim' in lines[-1]
     out.append(lines[-1])
+    out.append('}')  # End of scope for colors
+    out.append('')
     self.body.append('\n'.join(out))
 
 
