@@ -139,17 +139,11 @@ RST_TEMPLATE = """
 
     .. raw:: latex
 
-        \\kern-\\FrameHeightAdjust
-        \\sphinxsetup{verbatimwithframe=false}
-    {%- if output.name == 'stderr' %}
-        \\sphinxsetup{VerbatimColor={named}{nbsphinx-stderr}}
-    {%- else %}
-        \\sphinxsetup{VerbatimColor={named}{white}}
-    {%- endif %}
-        \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
-{{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
-        \\end{sphinxVerbatim}
         \\kern-\\sphinxverbatimsmallskipamount
+        \\kern+\\FrameHeightAdjust\\kern-\\fboxrule
+        \\begin{Verbatim}[commandchars=\\\\\\{\\}]
+{{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
+        \\end{Verbatim}
 
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
