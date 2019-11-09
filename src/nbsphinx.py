@@ -504,7 +504,6 @@ div.nboutput.container div.prompt pre {
 /* input/output area */
 div.nbinput.container div.input_area,
 div.nboutput.container div.output_area {
-    padding: 0.4em;
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
@@ -611,6 +610,28 @@ div.rendered_html tbody tr:nth-child(odd) {
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
+
+/* set the padding for the pre so copybtn icon won't cause an overflow */
+div.nbinput.container div.input_area div[class*=highlight] pre,
+div.nboutput.container div.output_area div[class*=highlight] pre,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area div.widget-subarea,
+div.nboutput.container div.output_area div.math,
+div.nboutput.container div.output_area > img{
+    padding: 0.4em;
+}
+
+/* fix positioning of copybtn icon */
+a.copybtn {
+    padding: 0;
+    top: 0.1em;
+}
+
+/* hide copybtn icon on prompts */
+.prompt.highlight-none.notranslate a.copybtn {
+    display: none;
+}
+
 """
 
 CSS_STRING_READTHEDOCS = """
