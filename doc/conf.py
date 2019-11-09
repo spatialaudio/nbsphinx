@@ -6,7 +6,8 @@
 # Select nbsphinx and, if needed, other Sphinx extensions:
 extensions = [
     'nbsphinx',
-    'sphinx.ext.mathjax',  # for math equations
+    'sphinx_copybutton',
+    'sphinx.ext.mathjax',  # for math equation
     'sphinxcontrib.bibtex',  # for bibliographic references
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
 ]
