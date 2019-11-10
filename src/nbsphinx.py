@@ -139,8 +139,7 @@ RST_TEMPLATE = """
 
     .. raw:: latex
 
-        \\kern-\\sphinxverbatimsmallskipamount
-        \\kern+\\FrameHeightAdjust\\kern-\\fboxrule
+        \\lineskip0pt\\relax
         \\begin{Verbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
         \\end{Verbatim}
