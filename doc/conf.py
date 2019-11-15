@@ -134,3 +134,9 @@ latex_documents = [
 
 latex_show_urls = 'footnote'
 latex_show_pagerefs = True
+
+# -- Options for EPUB output ----------------------------------------------
+
+# These are just defined to avoid Sphinx warnings related to EPUB:
+version = release
+suppress_warnings = ['epub.unknown_project_files']
