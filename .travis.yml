@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.7"
+  - "3.8"
 matrix:
   include:
 
@@ -11,13 +11,14 @@ matrix:
   - env: SPHINX="==1.8.5" BIBTEX="==0.4.2"
   - env: SPHINX="==2.0.0"
   - env: SPHINX="==2.1.0"
-  - env: SPHINX="==2.1.2"
+  - env: SPHINX="==2.2.0"
 
   # a few Python versions using latest Sphinx release
   - python: "3.4"
     env: BIBTEX="==0.4.2"
   - python: "3.5"
   - python: "3.6"
+  - python: "3.7"
   - python: "nightly"
   #- python: "pypy3"
 
