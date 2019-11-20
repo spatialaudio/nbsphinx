@@ -1,3 +1,7 @@
+Version 0.5.0 (2019-11-20):
+ * Automatic support for Jupyter widgets, customizable with
+   ``nbsphinx_widgets_path`` (and ``nbsphinx_widgets_options``)
+
 Version 0.4.3 (2019-09-30):
  * Add option ``nbsphinx_requirejs_path`` (and ``nbsphinx_requirejs_options``)
 
