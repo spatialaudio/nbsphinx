@@ -26,8 +26,9 @@ setup(
     long_description=open('README.rst').read(),
     license='MIT',
     keywords='Sphinx Jupyter notebook'.split(),
+    url='https://nbsphinx.readthedocs.io/',
     project_urls={
-        'Documentation': 'http://nbsphinx.readthedocs.io/',
+        'Documentation': 'https://nbsphinx.readthedocs.io/',
         'Source Code': 'https://github.com/spatialaudio/nbsphinx/',
         'Bug Tracker': 'https://github.com/spatialaudio/nbsphinx/issues/',
     },
