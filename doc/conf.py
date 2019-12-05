@@ -103,6 +103,29 @@ except Exception:
 
 html_title = project + ' version ' + release
 
+import sphinx_material
+html_context = sphinx_material.get_html_context()
+html_theme_path = sphinx_material.html_theme_path()
+html_theme = 'sphinx_material'
+html_theme_options = {
+    'nav_title': 'nbsphinx',
+    #'color_primary': 'blue',
+    #'color_accent': 'light-blue',
+    'repo_url': 'https://github.com/spatialaudio/nbsphinx',
+    'repo_name': 'nbsphinx on Github',
+    'repo_type': 'github',
+    'globaltoc_depth': 3,
+    'globaltoc_collapse': True,
+    'master_doc': True,
+}
+html_show_sourcelink = True
+html_sidebars = {
+    '**': [
+        'globaltoc.html',
+        #'localtoc.html',
+    ]
+}
+
 # -- Options for LaTeX output ---------------------------------------------
 
 # See https://www.sphinx-doc.org/en/master/latex.html
