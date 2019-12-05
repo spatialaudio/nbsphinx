@@ -1554,6 +1554,7 @@ def config_inited(app, config):
             'pyramid': '5ex',
             'redcloud': '5ex',
             'sizzle': '5.5ex',
+            'sphinx_material': '5.5ex',
             'sphinx_py3doc_enhanced_theme': '6ex',
             'sphinx_pyviz_theme': '5.5ex',
             'sphinx_rtd_theme': '5ex',
