@@ -612,12 +612,12 @@ div.rendered_html tbody tr:hover {
 }
 
 /* set the padding for the pre so copybtn icon won't cause an overflow */
-div.nbinput.container div.input_area div[class*=highlight] pre,
-div.nboutput.container div.output_area div[class*=highlight] pre,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area div.widget-subarea,
-div.nboutput.container div.output_area div.math,
-div.nboutput.container div.output_area > img{
+div.nbinput.container > div.input_area > div[class*=highlight] > pre,
+div.nboutput.container > div.output_area > div[class*=highlight] > pre,
+div.nboutput.container > div.output_area.rendered_html,
+div.nboutput.container > div.output_area > div.widget-subarea,
+div.nboutput.container > div.output_area > div.math,
+div.nboutput.container > div.output_area > img{
     padding: 0.4em;
 }
 
