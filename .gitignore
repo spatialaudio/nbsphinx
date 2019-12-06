@@ -5,3 +5,5 @@ dist/
 nbsphinx.egg-info/
 .ipynb_checkpoints/
 .python-version
+.vscode
+doc/_build
