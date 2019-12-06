@@ -30,7 +30,7 @@ matrix:
       - python2 -m pip install sphinxcontrib-bibtex==0.4.2
       - python2 -m pip install sphinxcontrib-svg2pdfconverter
       - python2 -m pip install ipywidgets
-      - python2 -m pip install sphinx-copybutton
+      - python2 -m pip install 'sphinx-copybutton<0.2.6'
     script: &py2-script
       - python2 -m nbsphinx
       # We don't execute, because the example notebooks use Python 3
