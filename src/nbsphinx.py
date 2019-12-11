@@ -886,15 +886,15 @@ class NotebookParser(rst.Parser):
 
         if resources.get('nbsphinx_orphan', False):
             rst.Parser.parse(self, ':orphan:', document)
-        if env.config.nbsphinx_prolog:
-            prolog = exporter.environment.from_string(
-                env.config.nbsphinx_prolog).render(env=env)
-            rst.Parser.parse(self, prolog, document)
+        if env.config.nbsphinx_prologue:
+            prologue = exporter.environment.from_string(
+                env.config.nbsphinx_prologue).render(env=env)
+            rst.Parser.parse(self, prologue, document)
         rst.Parser.parse(self, rststring, document)
-        if env.config.nbsphinx_epilog:
-            epilog = exporter.environment.from_string(
-                env.config.nbsphinx_epilog).render(env=env)
-            rst.Parser.parse(self, epilog, document)
+        if env.config.nbsphinx_epilogue:
+            epilogue = exporter.environment.from_string(
+                env.config.nbsphinx_epilogue).render(env=env)
+            rst.Parser.parse(self, epilogue, document)
 
         if resources.get('nbsphinx_widgets', False):
             if not hasattr(env, 'nbsphinx_widgets'):
@@ -1776,8 +1776,8 @@ def setup(app):
     # Default value is set in config_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
-    app.add_config_value('nbsphinx_prolog', None, rebuild='env')
-    app.add_config_value('nbsphinx_epilog', None, rebuild='env')
+    app.add_config_value('nbsphinx_prologue', None, rebuild='env')
+    app.add_config_value('nbsphinx_epilogue', None, rebuild='env')
     app.add_config_value('nbsphinx_input_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_output_prompt', '[%s]:', rebuild='env')
     app.add_config_value('nbsphinx_custom_formats', {}, rebuild='env')

@@ -30,7 +30,7 @@ nbsphinx_execute_arguments = [
 ]
 
 # This is processed by Jinja2 and inserted before each notebook
-nbsphinx_prolog = r"""
+nbsphinx_prologue = r"""
 {% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
 
 .. only:: html
@@ -55,7 +55,7 @@ nbsphinx_prolog = r"""
 """
 
 # This is processed by Jinja2 and inserted after each notebook
-nbsphinx_epilog = r"""
+nbsphinx_epilogue = r"""
 {% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
 .. raw:: latex
 
