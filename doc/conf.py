@@ -30,8 +30,9 @@ nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'pdf'}",
     "--InlineBackend.rc={'figure.dpi': 96}",
 ]
-# environment variables to be passed to the kernel
-os.environ["MY_DUMMY_VARIABLE"] = "Hello from conf.py!"
+
+# Environment variables to be passed to the kernel:
+os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
 
 # This is processed by Jinja2 and inserted before each notebook
 nbsphinx_prolog = r"""
