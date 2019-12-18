@@ -617,7 +617,7 @@ div.nboutput.container > div.output_area > div[class*=highlight].math,
 div.nboutput.container > div.output_area.rendered_html,
 div.nboutput.container > div.output_area > div,
 div.nboutput.container > div.output_area > img{
-    padding: 0.4em;
+    padding: 0.4rem;
 }
 
 div.nboutput.container > div.output_area > div[class*=highlight]{
