@@ -611,7 +611,6 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 
-/* set the padding for the pre so copybtn icon won't cause an overflow */
 div.nbinput.container > div.input_area > div[class*=highlight] > pre,
 div.nboutput.container > div.output_area > div[class*=highlight] > pre,
 div.nboutput.container > div.output_area > div[class*=highlight].math,
