@@ -178,7 +178,7 @@ RST_TEMPLATE = """
 
     .. raw:: html
 
-        <div class="js-render-output"></div>
+        <div class="output_javascript"></div>
         <script type="text/javascript">
         var element = document.currentScript.previousSibling.previousSibling;
 {{ output.data['application/javascript'] | indent | indent }}
@@ -615,7 +615,7 @@ div.nbinput.container div.input_area div[class*=highlight] > pre,
 div.nboutput.container div.output_area div[class*=highlight] > pre,
 div.nboutput.container div.output_area div[class*=highlight].math,
 div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.js-render-output,
+div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area > img{
     padding: 0.4rem;
 }
