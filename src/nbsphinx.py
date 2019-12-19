@@ -625,11 +625,6 @@ div.nboutput.container div.output_area.rendered_html > img{
     padding: 0;
 }
 
-div.nboutput.container > div.output_area > div.admonition{
-    margin: calc(20px + 0.4em) 0.4em;
-    padding: 10px 30px;
-}
-
 /* fix positioning of copybtn icon */
 a.copybtn {
     padding: 0;
