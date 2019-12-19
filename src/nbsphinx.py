@@ -630,6 +630,9 @@ a.copybtn {
     padding: 0;
     top: 0.1em;
 }
+a.copybtn > img{
+    padding: 0;
+}
 
 /* hide copybtn icon on prompts */
 .prompt.highlight-none.notranslate a.copybtn {
