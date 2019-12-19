@@ -650,6 +650,12 @@ CSS_STRING_READTHEDOCS = """
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
+/* fix copybtn overflow problem */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
 /* ... except between code cells! */
 .nblast.container + .nbinput.container {
     margin-top: -19px;
