@@ -611,16 +611,16 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 
-div.nbinput.container > div.input_area > div[class*=highlight] > pre,
-div.nboutput.container > div.output_area > div[class*=highlight] > pre,
-div.nboutput.container > div.output_area > div[class*=highlight].math,
-div.nboutput.container > div.output_area.rendered_html,
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.js-render-output,
-div.nboutput.container > div.output_area > img{
+div.nboutput.container div.output_area > img{
     padding: 0.4rem;
 }
 
-div.nboutput.container > div.output_area > div[class*=highlight]{
+div.nboutput.container div.output_area > div[class*=highlight],
     padding: 0;
 }
 
