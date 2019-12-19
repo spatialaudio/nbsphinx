@@ -621,6 +621,7 @@ div.nboutput.container div.output_area > img{
 }
 
 div.nboutput.container div.output_area > div[class*=highlight],
+div.nboutput.container div.output_area.rendered_html > img{
     padding: 0;
 }
 
