@@ -616,21 +616,11 @@ div.nboutput.container div.output_area div[class*=highlight] > pre,
 div.nboutput.container div.output_area div[class*=highlight].math,
 div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area > img{
+div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 0.4rem;
 }
 
-div.nboutput.container div.output_area > div[class*=highlight],
-div.nboutput.container div.output_area.rendered_html > img{
-    padding: 0;
-}
-
-/* fix positioning of copybtn icon from 'sphinx_copybutton' */
-a.copybtn {
-    padding: 0;
-    top: 0.1em;
-}
-a.copybtn > img{
+div.nboutput.container div.output_area > div[class*=highlight]{
     padding: 0;
 }
 
