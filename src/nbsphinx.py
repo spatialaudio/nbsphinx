@@ -635,7 +635,7 @@ a.copybtn > img{
 }
 
 /* hide copybtn icon on prompts from 'sphinx_copybutton' */
-.prompt.highlight-none.notranslate a.copybtn {
+.prompt a.copybtn {
     display: none;
 }
 
