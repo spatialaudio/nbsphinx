@@ -591,7 +591,7 @@ div.nboutput.container div.output_area > div[class*=highlight]{
     padding: 0;
 }
 
-/* hide copybtn icon on prompts from 'sphinx_copybutton' */
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
 .prompt a.copybtn {
     display: none;
 }
@@ -640,12 +640,12 @@ CSS_STRING_READTHEDOCS = """
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
-/* fix copybtn from overflow problem 'sphinx_copybutton' */
+/* fix copybtn overflow problem (needed for 'sphinx_copybutton') */
 div.nbinput.container div.input_area > div[class^='highlight'],
 div.nboutput.container div.output_area > div[class^='highlight']{
     overflow-y: hidden;
 }
-/* fix copybtn icon positioning from 'sphinx_copybutton' */
+/* fix copybtn icon positioning (needed for 'sphinx_copybutton') */
 a.copybtn > img{
     vertical-align: top;
 }
