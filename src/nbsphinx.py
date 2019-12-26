@@ -587,10 +587,6 @@ div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 0.4rem;
 }
 
-div.nboutput.container div.output_area > div[class*=highlight]{
-    padding: 0;
-}
-
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
 .prompt a.copybtn {
     display: none;
