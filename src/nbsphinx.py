@@ -640,11 +640,6 @@ CSS_STRING_READTHEDOCS = """
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
-/* fix copybtn overflow problem (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
 /* fix copybtn icon positioning (needed for 'sphinx_copybutton') */
 a.copybtn > img{
     vertical-align: top;
