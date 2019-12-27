@@ -636,11 +636,6 @@ CSS_STRING_READTHEDOCS = """
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
-/* fix copybtn icon positioning (needed for 'sphinx_copybutton') */
-a.copybtn > img{
-    vertical-align: top;
-}
-
 /* ... except between code cells! */
 .nblast.container + .nbinput.container {
     margin-top: -19px;
