@@ -48,9 +48,9 @@ matrix:
       homebrew:
         update: true
         packages:
+          - python@2
           - pandoc
           - librsvg
-          - python2
     install: *py2-install
     script: *py2-script
 
@@ -62,9 +62,11 @@ addons:
   homebrew:
     update: true
     packages:
+      - python
       - pandoc
       - librsvg
-      - python3
+before_install:
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew link --overwrite python; fi
 install:
   - python3 --version
   - python3 -m pip install Sphinx$SPHINX
