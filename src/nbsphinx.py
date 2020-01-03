@@ -587,6 +587,12 @@ div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 0.3rem;
 }
 
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
 .prompt a.copybtn {
     display: none;
@@ -653,12 +659,6 @@ CSS_STRING_READTHEDOCS = """
 
 CSS_STRING_CLOUD = """
 /* CSS overrides for cloud theme */
-
-/* fix copybtn overflow problem (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
 
 /* nicer titles and more space for info and warning logos */
 
