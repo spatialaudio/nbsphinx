@@ -14,6 +14,10 @@ extensions = [
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
 ]
 
+import sphinx_gallery
+html_static_path = [sphinx_gallery.glr_path_static()]
+html_css_files = ['gallery.css']
+
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
@@ -34,6 +38,11 @@ nbsphinx_execute_arguments = [
 
 # Environment variables to be passed to the kernel:
 os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
+
+nbsphinx_thumbnails = {
+    'gallery/thumbnail-from-conf-py': 'gallery/a-local-file.png',
+    'gallery/*-rst': '_static/copy-button.svg',
+}
 
 # This is processed by Jinja2 and inserted before each notebook
 nbsphinx_prolog = r"""

@@ -7,3 +7,4 @@ nbsphinx.egg-info/
 .python-version
 .vscode
 doc/_build
+doc/gallery/a-local-file.png

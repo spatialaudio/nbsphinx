@@ -26,7 +26,7 @@ https://nbsphinx.readthedocs.io/
 __version__ = '0.5.1'
 
 import copy
-from html.parser import HTMLParser
+import html
 import json
 import os
 import re
@@ -39,13 +39,18 @@ import jinja2
 import nbconvert
 import nbformat
 import sphinx
+import sphinx.directives
+import sphinx.environment
 import sphinx.errors
 import sphinx.transforms.post_transforms.images
+from sphinx.util.matching import patmatch
 import traitlets
 
 _ipynbversion = 4
 
 logger = sphinx.util.logging.getLogger(__name__)
+
+_BROKEN_THUMBNAIL = object()
 
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
@@ -215,8 +220,11 @@ RST_TEMPLATE = """
 
 
 {% block markdowncell %}
-{%- if 'nbsphinx-toctree' in cell.metadata or 'nbsphinx-toctree' in cell.metadata.tags %}
-{{ cell | extract_toctree }}
+{%- if 'nbsphinx-gallery' in cell.metadata
+    or 'nbsphinx-gallery' in cell.metadata.tags
+    or 'nbsphinx-toctree' in cell.metadata
+    or 'nbsphinx-toctree' in cell.metadata.tags %}
+{{ cell | extract_gallery_or_toctree }}
 {%- else %}
 {{ cell | save_attachments or super() | replace_attachments }}
 {% endif %}
@@ -739,7 +747,7 @@ class Exporter(nbconvert.RSTExporter):
                 'convert_pandoc': convert_pandoc,
                 'markdown2rst': markdown2rst,
                 'get_empty_lines': _get_empty_lines,
-                'extract_toctree': _extract_toctree,
+                'extract_gallery_or_toctree': _extract_gallery_or_toctree,
                 'save_attachments': save_attachments,
                 'replace_attachments': replace_attachments,
                 'get_output_type': _get_output_type,
@@ -798,6 +806,74 @@ class Exporter(nbconvert.RSTExporter):
                 'widgets', {}):
             resources['nbsphinx_widgets'] = True
 
+        thumbnail = {}
+
+        def warning(msg, *args):
+            logger.warning(
+                '"nbsphinx-thumbnail": ' + msg, *args,
+                location=resources.get('nbsphinx_docname'))
+            thumbnail['filename'] = _BROKEN_THUMBNAIL
+
+        for cell_index, cell in enumerate(nb.cells):
+            if 'nbsphinx-thumbnail' in cell.metadata:
+                data = cell.metadata['nbsphinx-thumbnail'].copy()
+                output_index = data.pop('output-index', -1)
+                tooltip = data.pop('tooltip', '')
+                if data:
+                    warning('Invalid key(s): %s', set(data))
+                    break
+            elif 'nbsphinx-thumbnail' in cell.metadata.get('tags', []):
+                output_index = -1
+                tooltip = ''
+            else:
+                continue
+            if cell.cell_type != 'code':
+                warning('Only allowed in code cells; cell %s has type "%s"',
+                        cell_index, cell.cell_type)
+                break
+            if thumbnail:
+                warning('Only allowed once per notebook')
+                break
+            if not cell.outputs:
+                warning('No outputs in cell %s', cell_index)
+                break
+            if tooltip:
+                thumbnail['tooltip'] = tooltip
+            if output_index == -1:
+                output_index = len(cell.outputs) - 1
+            elif output_index >= len(cell.outputs):
+                warning('Invalid "output-index" in cell %s: %s',
+                        cell_index, output_index)
+                break
+            out = cell.outputs[output_index]
+            if out.output_type not in {'display_data', 'execute_result'}:
+                warning('Unsupported output type in cell %s/output %s: "%s"',
+                        cell_index, output_index, out.output_type)
+                break
+
+            for mime_type in DISPLAY_DATA_PRIORITY_HTML:
+                if mime_type not in out.data:
+                    continue
+                if mime_type == 'image/svg+xml':
+                    suffix = '.svg'
+                elif mime_type == 'image/png':
+                    suffix = '.png'
+                elif mime_type == 'image/jpeg':
+                    suffix = '.jpg'
+                else:
+                    continue
+                thumbnail['filename'] = '{}_{}_{}{}'.format(
+                    resources['unique_key'],
+                    cell_index,
+                    output_index,
+                    suffix,
+                )
+                break
+            else:
+                warning('Unsupported MIME type(s) in cell %s/output %s: %s',
+                        cell_index, output_index, set(out.data))
+                break
+        resources['nbsphinx_thumbnail'] = thumbnail
         return rststr, resources
 
 
@@ -867,6 +943,7 @@ class NotebookParser(rst.Parser):
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = re.sub('[/ ]', '_', env.docname)
+        resources['nbsphinx_docname'] = env.docname
 
         # NB: The source file could have a different suffix
         #     if nbsphinx_custom_formats is used.
@@ -929,6 +1006,9 @@ class NotebookParser(rst.Parser):
 
         if resources.get('nbsphinx_widgets', False):
             env.nbsphinx_widgets.add(env.docname)
+
+        env.nbsphinx_thumbnails[env.docname] = resources.get(
+            'nbsphinx_thumbnail', {})
 
 
 class NotebookError(sphinx.errors.SphinxError):
@@ -1010,6 +1090,14 @@ class AdmonitionNode(docutils.nodes.Element):
     """A custom node for info and warning boxes."""
 
 
+class GalleryToc(docutils.nodes.Element):
+    """A wrapper node used for creating galleries."""
+
+
+class GalleryNode(docutils.nodes.Element):
+    """A custom node for thumbnail galleries."""
+
+
 # See http://docutils.sourceforge.net/docs/howto/rst-directives.html
 
 class NbInput(rst.Directive):
@@ -1076,6 +1164,19 @@ class NbWarning(_NbAdmonition):
     _class = 'warning'
 
 
+class NbGallery(sphinx.directives.other.TocTree):
+    """A thumbnail gallery for notebooks."""
+
+    def run(self):
+        """Wrap GalleryToc arount toctree."""
+        ret = super().run()
+        toctree = ret[-1][-1]
+        gallerytoc = GalleryToc()
+        gallerytoc.append(toctree)
+        ret[-1][-1] = gallerytoc
+        return ret
+
+
 def convert_pandoc(text, from_format, to_format):
     """Simple wrapper for markdown2rst.
 
@@ -1088,7 +1189,7 @@ def convert_pandoc(text, from_format, to_format):
     return markdown2rst(text)
 
 
-class CitationParser(HTMLParser):
+class CitationParser(html.parser.HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         if self._check_cite(attrs):
@@ -1108,7 +1209,7 @@ class CitationParser(HTMLParser):
         return False
 
     def reset(self):
-        HTMLParser.reset(self)
+        super().reset()
         self.starttag = ''
         self.endtag = ''
         self.cite = ''
@@ -1216,10 +1317,23 @@ def pandoc(source, fmt, to, filter_func=None):
     return decode(out).rstrip('\n')
 
 
-def _extract_toctree(cell):
-    """Extract links from Markdown cell and create toctree."""
-    lines = ['.. toctree::']
-    options = cell.metadata.get('nbsphinx-toctree', {})
+def _extract_gallery_or_toctree(cell):
+    """Extract links from Markdown cell and create gallery/toctree."""
+    # If both are available, "gallery" takes precedent
+    if 'nbsphinx-gallery' in cell.metadata:
+        lines = ['.. nbgallery::']
+        options = cell.metadata['nbsphinx-gallery']
+    elif 'nbsphinx-gallery' in cell.metadata.get('tags', []):
+        lines = ['.. nbgallery::']
+        options = {}
+    elif 'nbsphinx-toctree' in cell.metadata:
+        lines = ['.. toctree::']
+        options = cell.metadata['nbsphinx-toctree']
+    elif 'nbsphinx-toctree' in cell.metadata.get('tags', []):
+        lines = ['.. toctree::']
+        options = {}
+    else:
+        assert False
     try:
         for option, value in options.items():
             if value is True:
@@ -1230,24 +1344,25 @@ def _extract_toctree(cell):
                 lines.append(':{}: {}'.format(option, value))
     except AttributeError:
         raise ValueError(
-            'invalid nbsphinx-toctree option: {!r}'.format(options))
+            'invalid nbsphinx-gallery/nbsphinx-toctree option: {!r}'
+            .format(options))
 
     text = nbconvert.filters.markdown2rst(cell.source)
     settings = docutils.frontend.OptionParser(
         components=(rst.Parser,)).get_default_values()
-    toctree_node = docutils.utils.new_document('extract_toctree', settings)
+    node = docutils.utils.new_document('gallery_or_toctree', settings)
     parser = rst.Parser()
-    parser.parse(text, toctree_node)
+    parser.parse(text, node)
 
     if 'caption' not in options:
-        for sec in toctree_node.traverse(docutils.nodes.section):
+        for sec in node.traverse(docutils.nodes.section):
             assert sec.children
             assert isinstance(sec.children[0], docutils.nodes.title)
             title = sec.children[0].astext()
             lines.append(':caption: ' + title)
             break
     lines.append('')  # empty line
-    for ref in toctree_node.traverse(docutils.nodes.reference):
+    for ref in node.traverse(docutils.nodes.reference):
         lines.append(ref.astext().replace('\n', '') +
                      ' <' + unquote(ref.get('refuri')) + '>')
     return '\n    '.join(lines)
@@ -1569,6 +1684,35 @@ class GetSizeFromImages(
                 node['width'], node['height'] = map(str, size)
 
 
+original_toctree_resolve = sphinx.environment.adapters.toctree.TocTree.resolve
+
+
+def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
+    """Method for monkey-patching Sphinx's TocTree adapter.
+
+    The list of section links is never shown, regardless of the
+    ``:hidden:`` option.
+    However, this option can still be used to control whether the
+    section links are shown in higher-level tables of contents.
+
+    """
+    gallery = toctree.get('nbsphinx_gallery')
+    if gallery is not None:
+        toctree = toctree.copy()
+        toctree['hidden'] = False
+    node = original_toctree_resolve(
+        self, docname, builder, toctree, *args, **kwargs)
+    if gallery is None:
+        return node
+    assert node is not None
+    if isinstance(node[0], docutils.nodes.caption):
+        del node[1:]
+    else:
+        del node[:]
+    node += gallery
+    return node
+
+
 def config_inited(app, config):
     # Set default value for CSS prompt width (optimized for two-digit numbers)
     if config.nbsphinx_prompt_width is None:
@@ -1635,6 +1779,8 @@ def builder_inited(app):
     env = app.env
     env.nbsphinx_notebooks = {}
     env.nbsphinx_files = {}
+    if not hasattr(env, 'nbsphinx_thumbnails'):
+        env.nbsphinx_thumbnails = {}
     env.nbsphinx_widgets = set()
     env.nbsphinx_auxdir = os.path.join(env.doctreedir, 'nbsphinx')
     sphinx.util.ensuredir(env.nbsphinx_auxdir)
@@ -1691,6 +1837,10 @@ def env_purge_doc(app, env, docname):
         del env.nbsphinx_files[docname]
     except KeyError:
         pass
+    try:
+        del env.nbsphinx_thumbnails[docname]
+    except KeyError:
+        pass
     env.nbsphinx_widgets.discard(docname)
 
 
@@ -1711,6 +1861,75 @@ def env_updated(app, env):
 
     if widgets_path:
         app.add_js_file(widgets_path, **app.config.nbsphinx_widgets_options)
+
+
+def doctree_resolved(app, doctree, fromdocname):
+    # Replace GalleryToc with toctree + GalleryNode
+    for node in doctree.traverse(GalleryToc):
+        toctree = node[0]
+        if not isinstance(toctree, sphinx.addnodes.toctree):
+            # This happens for LaTeX output
+            node.replace_self(node.children)
+            continue
+        entries = []
+        for title, doc in toctree['entries']:
+            if doc in toctree['includefiles']:
+                if title is None:
+                    title = app.env.titles[doc].astext()
+                uri = app.builder.get_relative_uri(fromdocname, doc)
+                base = sphinx.util.osutil.relative_uri(
+                    app.builder.get_target_uri(fromdocname), '')
+
+                # NB: This is how Sphinx implements the "html_sidebars"
+                #     config value in StandaloneHTMLBuilder.add_sidebars()
+
+                def has_wildcard(pattern):
+                    return any(char in pattern for char in '*?[')
+
+                matched = None
+                conf_py_thumbnail = None
+                conf_py_thumbnails = app.env.config.nbsphinx_thumbnails.items()
+                for pattern, candidate in conf_py_thumbnails:
+                    if patmatch(doc, pattern):
+                        if matched:
+                            if has_wildcard(pattern):
+                                # warn if both patterns contain wildcards
+                                if has_wildcard(matched):
+                                    logger.warning(
+                                        'page %s matches two patterns in '
+                                        'nbsphinx_thumbnails: %r and %r',
+                                        doc, matched, pattern)
+                                # else the already matched pattern is more
+                                # specific than the present one, because it
+                                # contains no wildcard
+                                continue
+                        matched = pattern
+                        conf_py_thumbnail = candidate
+
+                thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
+                tooltip = thumbnail.get('tooltip', '')
+                filename = thumbnail.get('filename', '')
+                if filename is _BROKEN_THUMBNAIL:
+                    filename = os.path.join(
+                        base, '_static', 'broken_example.png')
+                elif filename:
+                    filename = os.path.join(
+                        base, app.builder.imagedir, filename)
+                elif conf_py_thumbnail:
+                    # NB: Settings from conf.py can be overwritten in notebook
+                    filename = os.path.join(base, conf_py_thumbnail)
+                else:
+                    filename = os.path.join(base, '_static', 'no_image.png')
+                entries.append((title, uri, filename, tooltip))
+            else:
+                logger.warning(
+                    'External links are not supported in gallery: %s', doc,
+                    location=fromdocname)
+        gallery = GalleryNode()
+        gallery['entries'] = entries
+        toctree['nbsphinx_gallery'] = gallery
+        node.replace_self(toctree)
+        # NB: Further processing happens in patched_toctree_resolve()
 
 
 def depart_codearea_html(self, node):
@@ -1829,6 +2048,32 @@ def depart_admonition_latex(self, node):
     self.body.append('\\end{sphinxadmonition}\n')
 
 
+def depart_gallery_html(self, node):
+    for title, uri, filename, tooltip in node['entries']:
+        if tooltip:
+            tooltip = ' tooltip="{}"'.format(html.escape(tooltip))
+        self.body.append("""\
+<div class="sphx-glr-thumbcontainer"{tooltip}>
+  <div class="figure align-center">
+    <img alt="thumbnail" src="{filename}" />
+    <p class="caption">
+      <span class="caption-text">
+        <a class="reference internal" href="{uri}">
+          <span class="std std-ref">{title}</span>
+        </a>
+      </span>
+    </p>
+  </div>
+</div>
+""".format(
+            uri=html.escape(uri),
+            title=html.escape(title),
+            tooltip=tooltip,
+            filename=html.escape(filename),
+        ))
+    self.body.append('<div class="sphx-glr-clear"></div>')
+
+
 def do_nothing(self, node):
     pass
 
@@ -1859,11 +2104,13 @@ def setup(app):
     # This will be updated in env_updated():
     app.add_config_value('nbsphinx_widgets_path', None, rebuild='html')
     app.add_config_value('nbsphinx_widgets_options', {}, rebuild='html')
+    app.add_config_value('nbsphinx_thumbnails', {}, rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
     app.add_directive('nbinfo', NbInfo)
     app.add_directive('nbwarning', NbWarning)
+    app.add_directive('nbgallery', NbGallery)
     app.add_node(CodeAreaNode,
                  html=(do_nothing, depart_codearea_html),
                  latex=(visit_codearea_latex, depart_codearea_latex))
@@ -1873,12 +2120,16 @@ def setup(app):
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
                  latex=(visit_admonition_latex, depart_admonition_latex))
+    app.add_node(GalleryNode,
+                 html=(do_nothing, depart_gallery_html),
+                 latex=(do_nothing, do_nothing))
     app.connect('builder-inited', builder_inited)
     app.connect('config-inited', config_inited)
     app.connect('html-page-context', html_page_context)
     app.connect('html-collect-pages', html_collect_pages)
     app.connect('env-purge-doc', env_purge_doc)
     app.connect('env-updated', env_updated)
+    app.connect('doctree-resolved', doctree_resolved)
     app.add_transform(CreateSectionLabels)
     app.add_transform(CreateDomainObjectLabels)
     app.add_transform(RewriteLocalLinks)
@@ -1908,9 +2159,13 @@ def setup(app):
         latex_elements.get('preamble', ''),
     ])
 
+    # Monkey-patch Sphinx TocTree adapter
+    sphinx.environment.adapters.toctree.TocTree.resolve = \
+        patched_toctree_resolve
+
     return {
         'version': __version__,
         'parallel_read_safe': True,
         'parallel_write_safe': True,
-        'env_version': 2,
+        'env_version': 3,
     }

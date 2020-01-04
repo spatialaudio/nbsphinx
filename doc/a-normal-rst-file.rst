@@ -217,3 +217,43 @@ see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
 There is an alternative Sphinx extension for creating bibliographies:
 https://bitbucket.org/wnielson/sphinx-natbib/.
 However, this project seems to be abandoned (last commit in 2011).
+
+
+Thumbnail Galleries
+-------------------
+
+With ``nbsphinx`` you can create thumbnail galleries in notebook files
+as described in :ref:`/subdir/gallery.ipynb`.
+
+If you like, you can also create such galleries in reST files
+using the ``nbgallery`` directive.
+
+It takes the same parameters as the `toctree`__ directive.
+
+__ https://www.sphinx-doc.org/en/master/usage/restructuredtext/
+    directives.html#directive-toctree
+
+.. note::
+
+    The notes regarding LaTeX in :ref:`/subdir/gallery.ipynb`
+    and :ref:`/subdir/toctree.ipynb` also apply here!
+
+The following example gallery was created using:
+
+.. code-block:: rest
+
+    .. nbgallery::
+        :caption: This is a thumbnail gallery:
+        :name: rst-gallery
+        :glob:
+        :reversed:
+
+        gallery/*-rst
+
+.. nbgallery::
+    :caption: This is a thumbnail gallery:
+    :name: rst-gallery
+    :glob:
+    :reversed:
+
+    gallery/*-rst
