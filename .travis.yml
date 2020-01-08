@@ -14,13 +14,11 @@ matrix:
   - env: SPHINX="==2.2.0"
 
   # a few Python versions using latest Sphinx release
-  - python: "3.4"
-    env: BIBTEX="==0.4.2"
   - python: "3.5"
   - python: "3.6"
   - python: "3.7"
-  - python: "nightly"
-  #- python: "pypy3"
+  - python: "3.8"
+    # - python: "nightly"
 
   - name: Python 2.7 + latest Sphinx
     python: "2.7"
