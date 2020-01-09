@@ -14,13 +14,11 @@ matrix:
   - env: SPHINX="==2.2.0"
 
   # a few Python versions using latest Sphinx release
-  - python: "3.4"
-    env: BIBTEX="==0.4.2"
   - python: "3.5"
   - python: "3.6"
   - python: "3.7"
   - python: "nightly"
-  #- python: "pypy3"
+  # - python: "pypy3"
 
   - name: Python 2.7 + latest Sphinx
     python: "2.7"
@@ -30,6 +28,7 @@ matrix:
       - python2 -m pip install sphinxcontrib-bibtex==0.4.2
       - python2 -m pip install sphinxcontrib-svg2pdfconverter
       - python2 -m pip install ipywidgets
+      - python2 -m pip install 'sphinx-copybutton<0.2.6'
     script: &py2-script
       - python2 -m nbsphinx
       # We don't execute, because the example notebooks use Python 3
@@ -53,6 +52,9 @@ matrix:
           - librsvg
     install: *py2-install
     script: *py2-script
+
+  allow_failures:
+    - python: "nightly"
 
 addons:
   apt:

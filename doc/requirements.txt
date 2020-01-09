@@ -5,3 +5,4 @@ pandas
 sphinxcontrib-bibtex
 sphinxcontrib-svg2pdfconverter
 ipywidgets
+sphinx-copybutton
