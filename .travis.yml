@@ -17,8 +17,8 @@ matrix:
   - python: "3.5"
   - python: "3.6"
   - python: "3.7"
-  - python: "3.8"
-    # - python: "nightly"
+  - python: "nightly"
+  # - python: "pypy3"
 
   - name: Python 2.7 + latest Sphinx
     python: "2.7"
@@ -52,6 +52,9 @@ matrix:
           - python2
     install: *py2-install
     script: *py2-script
+
+  allow_failures:
+    - python: "nightly"
 
 addons:
   apt:
