@@ -56,7 +56,36 @@ Again, you'll probably have to use ``python`` instead of ``python3``.
 The generated files will be available in the directories ``build/sphinx/html/``
 and ``build/sphinx/latex/``, respectively.
 
+Building Themes
+---------------
+
+The ``nbsphinx`` documentation is available in over 30 different `HTML themes`_,
+with each having its own branch ending in ``-theme``.
+
+To simplify the building and testing of themes,
+which is especially needed when changing CSS,
+we provide you with command line tool to build all themes
+or a user specified subset.
+The tool is located at ``dev_utils/theme_builder.py`` and can be run with::
+
+    python3 dev_utils/theme_builder.py
+
+On its first run, it will just create ``dev_utils/requirements_themes.txt``
+which contains the dependencies to build all themes and instructs
+you how to install them.
+And after it will by default build all supported themes.
+
+If you just want to build a subset of the themes
+(i.e. ``alabaster`` and ``sphinx_rtd_theme``), simply run::
+
+    python3 dev_utils/theme_builder.py --themes alabaster rtd
+
+for more information run::
+
+    python3 dev_utils/theme_builder.py --help
+
 .. _PyPI: https://pypi.org/project/nbsphinx/
+.. _`HTML themes`: https://nbsphinx.readthedocs.io/usage.html#HTML-Themes
 
 
 Testing
@@ -74,8 +103,8 @@ Sphinx's warnings can help spot problems, therefore it is recommended to use the
 
    python3 setup.py build_sphinx -W
 
-This flag is also used for continuous integration on
-Travis-CI (see the file ``.travis.yml``) and
+This flag is also used for continuous integration on Github Actions
+(see the files ``.github/workflows/*.yml``) and
 CircleCI (see the file ``.circleci/config.yml``).
 
 Sphinx has a ``linkcheck`` builder that can check whether all URLs used in the
