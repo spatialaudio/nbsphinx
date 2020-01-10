@@ -7,3 +7,9 @@ nbsphinx.egg-info/
 .python-version
 .vscode
 doc/_build
+
+dev_utils/*.rst
+dev_utils/doc
+dev_utils/_build
+dev_utils/temp_git
+dev_utils/theme_requirements.txt
