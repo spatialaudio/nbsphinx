@@ -8,7 +8,6 @@ nbsphinx.egg-info/
 .vscode
 doc/_build
 
-dev_utils/*.rst
 dev_utils/_build
 dev_utils/tmp
 dev_utils/requirements_themes.txt
