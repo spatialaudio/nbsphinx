@@ -9,7 +9,6 @@ nbsphinx.egg-info/
 doc/_build
 
 dev_utils/*.rst
-dev_utils/doc
 dev_utils/_build
-dev_utils/temp_git
-dev_utils/theme_requirements.txt
+dev_utils/tmp
+dev_utils/requirements_themes.txt

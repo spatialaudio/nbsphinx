@@ -5,16 +5,23 @@ import shutil
 import sys
 import os
 
+try:
+    import git
+except ImportError as e:
+    print(
+        "'GitPython', which is needed to run this tool, isn't installed."
+        "To install it, run\n:'pip install GitPython'"
+    )
+    raise e
 
-import git
 from sphinx.cmd.build import build_main
 
 REPO_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ROOT_DOC_DIR = os.path.join(REPO_ROOT_DIR, "doc")
 
 DEV_UTILS_DIR = os.path.join(REPO_ROOT_DIR, "dev_utils")
-TEMP_GIT_DIR = os.path.join(DEV_UTILS_DIR, "temp_git")
-TEMP_DOC_DIR = os.path.join(DEV_UTILS_DIR, "doc")
+TEMP_DIR = os.path.join(DEV_UTILS_DIR, "tmp")
+TEMP_DOC_DIR = os.path.join(TEMP_DIR, "doc")
 TEMP_BUILD_ROOT_DIR = os.path.join(DEV_UTILS_DIR, "_build")
 
 
@@ -72,10 +79,10 @@ class ThemeBuilder:
         Creates a temporary git repository, which is used to the the difference
         of theme branches and master 'doc/conf.py' and 'doc/requirements.txt'.
         """
-        if os.path.isdir(TEMP_GIT_DIR):
-            self.repo = git.Repo(TEMP_GIT_DIR)
+        if os.path.isdir(os.path.join(TEMP_DIR, ".git")):
+            self.repo = git.Repo(TEMP_DIR)
         else:
-            self.repo = git.Repo.init(TEMP_GIT_DIR)
+            self.repo = git.Repo.init(TEMP_DIR)
 
         remote_name = "upstream_diff_repo"
 
@@ -172,22 +179,17 @@ class ThemeBuilder:
         so they can be installed all at once.
         """
         print(
-            "Building new 'dev_utils/theme_requirements.txt'.\n"
+            "Building new 'dev_utils/requirements_themes.txt'.\n"
             "Make sure that all requirements are installed by running:\n"
-            "'pip install -r dev_utils/theme_requirements.txt'"
+            "'pip install -r dev_utils/requirements_themes.txt' "
             "from the repo root."
         )
-        # the replace is a hack for windows paths
-        theme_requirement_list = [
-            "-r {}".format(
-                os.path.join(ROOT_DOC_DIR, "requirements.txt").replace("\\", "/") + "\n"
-            )
-        ]
+        theme_requirement_list = ["-r ../doc/requirements.txt\n"]
         for theme_branche_ref in self.theme_branche_refs:
             theme_requirement_list.append(
                 self.get_diff_string(theme_branche_ref, "doc/requirements.txt")
             )
-        requirement_file_path = os.path.join(DEV_UTILS_DIR, "theme_requirements.txt")
+        requirement_file_path = os.path.join(DEV_UTILS_DIR, "requirements_themes.txt")
         with open(requirement_file_path, "w") as theme_requirements:
             theme_requirements.write("".join(theme_requirement_list))
 
@@ -202,7 +204,7 @@ class ThemeBuilder:
         for file_name in ["README.rst", "CONTRIBUTING.rst"]:
             shutil.copyfile(
                 os.path.join(REPO_ROOT_DIR, file_name),
-                os.path.join(DEV_UTILS_DIR, file_name),
+                os.path.join(TEMP_DIR, file_name),
             )
 
     def update_theme_conf(self, branch_ref):
@@ -335,13 +337,13 @@ def cli(argv=sys.argv[1:]):
         "-a",
         action="store_true",
         dest="force_all",
-        help="write all files (default: only write new and changed files)",
+        help="Write all files (default: only write new and changed files)",
     )
     parser.add_argument(
         "-l",
         action="store_true",
         dest="list_themes",
-        help="Lists all available themes and exits.",
+        help="Show all available themes and exit.",
     )
     parser.add_argument(
         "-r",
@@ -361,7 +363,7 @@ def cli(argv=sys.argv[1:]):
         return
 
     if (
-        not os.path.isfile(os.path.join(DEV_UTILS_DIR, "theme_requirements.txt"))
+        not os.path.isfile(os.path.join(DEV_UTILS_DIR, "requirements_themes.txt"))
         or args.build_requirements
     ):
         theme_builder.get_theme_requirements()
