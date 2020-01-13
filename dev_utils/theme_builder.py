@@ -262,7 +262,7 @@ class ThemeBuilder:
         str
             Theme name
         """
-        return branch_ref.split("/")[1].rstrip("-theme")
+        return branch_ref.split("/")[1].replace("-theme", "", 1)
 
     def get_theme_names(self):
         """
