@@ -19,6 +19,7 @@ was generated from Jupyter notebooks.
     subdir/*
     a-normal-rst-file
     links
+    contributing
 
 .. only:: html
 
