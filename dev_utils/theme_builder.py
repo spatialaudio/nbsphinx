@@ -297,7 +297,7 @@ class ThemeBuilder:
         Raises
         ------
         InvalidThemeException
-            [description]
+            If a theme name provided in theme_list isn't valid.
         """
         valid_themes = self.get_theme_names()
         invalid_themes = []
