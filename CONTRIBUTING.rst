@@ -43,5 +43,38 @@ Again, you'll probably have to use ``python`` instead of ``python3``.
 The generated files will be available in the directories ``build/sphinx/html/``
 and ``build/sphinx/latex/``, respectively.
 
+Building Themes
+---------------
+
+``nbsphinx`` supports over 30 different html themes,
+with each having it's own branch ending in ``-theme``.
+Those branches can on the one hand be used as an example reference
+implementation of the given theme, on the other hand each theme is also
+build as an own version on the `documentation of nbsphinx`_ and
+thus can also be used a preview what this theme would look like.
+
+To simplify the building and testing of themes,
+which is especially needed when changing CSS,
+we provide you with command line tool to build all themes
+or a user specified subset.
+The tool is located at ``dev_utils/theme_builder.py`` can be run with::
+
+    python3 dev_utils/theme_builder.py
+
+On its first run, it will just create ``dev_utils/requirements_themes.txt``
+which contains the dependencies to build to build all themes and instructs
+you how to install them.
+And after it will by default build all supported themes.
+
+If you just want to build a subset of the themes
+(i.e. ``alabaster`` and ``sphinx_rtd_theme``), simply run::
+
+    python3 dev_utils/theme_builder.py --themes alabaster rtd
+
+for more information run::
+
+    python3 dev_utils/theme_builder.py --help
+
 .. _PyPI: https://pypi.org/project/nbsphinx/
 .. _Github: https://github.com/spatialaudio/nbsphinx/
+.. _`documentation of nbsphinx`: http://nbsphinx.readthedocs.io/
