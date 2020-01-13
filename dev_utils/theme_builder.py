@@ -73,6 +73,7 @@ class ThemeBuilder:
         self.theme_branche_refs = self.get_theme_branch_refs()
         self.master_commit = self.repo.commit("{}/master".format(self.remote.name))
         self.build_args = []
+        self.shared_cache_args = ["-d", os.path.join(TEMP_DIR, "shared_build_cache")]
 
     def prepare_git(self):
         """
@@ -245,7 +246,11 @@ class ThemeBuilder:
         print("#" * 80)
         self.update_theme_conf(branch_ref)
         dest_dir = os.path.join(TEMP_BUILD_ROOT_DIR, branch_name)
-        if build_main([TEMP_DOC_DIR, dest_dir] + self.build_args) != 0:
+        build_args = [TEMP_DOC_DIR, dest_dir] + self.build_args
+        # the theme "guzzle" and "press" need
+        if self.ref_to_theme_name(branch_ref) not in ["guzzle", "press"]:
+            build_args += self.shared_cache_args
+        if build_main(build_args) != 0:
             raise Exception("An Error occurred building the docs.")
 
     def ref_to_theme_name(self, branch_ref):
