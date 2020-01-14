@@ -1,4 +1,4 @@
-git+https://github.com/bashtage/sphinx-material.git
+sphinx-material
 ipykernel
 numpy
 matplotlib
