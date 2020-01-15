@@ -71,14 +71,13 @@ class ThemeBuilder:
     def __init__(self):
         self.prepare_git()
         self.theme_branche_refs = self.get_theme_branch_refs()
-        self.master_commit = self.repo.commit("{}/master".format(self.remote.name))
         self.build_args = []
         self.shared_cache_args = ["-d", os.path.join(TEMP_DIR, "shared_build_cache")]
 
     def prepare_git(self):
         """
-        Creates a temporary git repository, which is used to the the difference
-        of theme branches and master 'doc/conf.py' and 'doc/requirements.txt'.
+        Creates a temporary git repository, which is used to extract
+        the difference of theme branches to their base branch.
         """
         if os.path.isdir(os.path.join(TEMP_DIR, ".git")):
             self.repo = git.Repo(TEMP_DIR)
@@ -113,27 +112,29 @@ class ThemeBuilder:
 
     def get_diff_string(self, branch_ref, file_path):
         """
-        Extracts the diff of the file at file_path the brach branch_ref
-        and the same file at master.
+        Extracts the diff of the last commit for the file at file_path
+        on the brach branch_ref.
 
         Parameters
         ----------
         branch_ref : str
-            Brach reference of the branch which should be compared to master.
+            Brach reference of a theme branch which should be compared to its base.
         file_path : str
             Path of the file which diff should be extracted.
 
         Returns
         -------
         str
-            Diff of the file on branch_ref and master
+            Diff of the file on branch_ref and its base
         """
-        theme_branch_commit = self.repo.commit(branch_ref)
-        diff_index = self.master_commit.diff(theme_branch_commit)
+        theme_specific_commit, base_branch_commit = list(
+            self.repo.iter_commits(branch_ref, max_count=2)
+        )
+        diff_index = base_branch_commit.diff(theme_specific_commit)
         for diff_item in diff_index.iter_change_type("M"):
             if diff_item.a_path == diff_item.b_path and diff_item.a_path == file_path:
 
-                master_blob = (
+                base_blob = (
                     diff_item.a_blob.data_stream.read()
                     .decode("utf-8")
                     .splitlines(keepends=True)
@@ -143,7 +144,7 @@ class ThemeBuilder:
                     .decode("utf-8")
                     .splitlines(keepends=True)
                 )
-                diff = ndiff(master_blob, theme_blob)
+                diff = ndiff(base_blob, theme_blob)
                 return self.diff_to_string(diff)
         return ""
 
@@ -210,7 +211,7 @@ class ThemeBuilder:
 
     def update_theme_conf(self, branch_ref):
         """
-        Appends the diff on the theme branch to the master brach,
+        Appends the diff of the theme branch to its base brach,
         to the current 'doc/conf.py'
 
         Parameters
