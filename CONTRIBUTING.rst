@@ -46,12 +46,8 @@ and ``build/sphinx/latex/``, respectively.
 Building Themes
 ---------------
 
-``nbsphinx`` supports over 30 different html themes,
+The ``nbsphinx`` documentation is available in over 30 different `HTML themes`_,
 with each having it's own branch ending in ``-theme``.
-Those branches can on the one hand be used as an example reference
-implementation of the given theme, on the other hand each theme is also
-build as an own version on the `documentation of nbsphinx`_ and
-thus can also be used a preview what this theme would look like.
 
 To simplify the building and testing of themes,
 which is especially needed when changing CSS,
@@ -77,4 +73,4 @@ for more information run::
 
 .. _PyPI: https://pypi.org/project/nbsphinx/
 .. _Github: https://github.com/spatialaudio/nbsphinx/
-.. _`documentation of nbsphinx`: http://nbsphinx.readthedocs.io/
+.. _`HTML themes`: https://nbsphinx.readthedocs.io/en/0.5.0/usage.html#HTML-Themes
