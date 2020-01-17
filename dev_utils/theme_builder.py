@@ -79,10 +79,12 @@ class ThemeBuilder:
         Creates a temporary git repository, which is used to extract
         the difference of theme branches to their base branch.
         """
+        fetch_needed = False
         if os.path.isdir(os.path.join(TEMP_DIR, ".git")):
             self.repo = git.Repo(TEMP_DIR)
         else:
             self.repo = git.Repo.init(TEMP_DIR)
+            fetch_needed = True
 
         remote_name = "upstream_diff_repo"
 
@@ -92,8 +94,16 @@ class ThemeBuilder:
             )
         else:
             self.remote = self.repo.remotes[remote_name]
-        self.remote.fetch()
+
+        if fetch_needed:
+            self.fetch_remote()
         self.repo.create_head("master", self.remote.refs.master)
+
+    def fetch_remote(self):
+        """
+        Fetches the remote refs
+        """
+        self.remote.fetch()
 
     def get_theme_branch_refs(self):
         """
@@ -357,8 +367,14 @@ def cli(argv=sys.argv[1:]):
         dest="build_requirements",
         help="Build the requirements file to build all theme.",
     )
+    parser.add_argument(
+        "--fetch", action="store_true", dest="fetch", help="Fetch remote refs",
+    )
     args = parser.parse_args(argv)
     theme_builder = ThemeBuilder()
+
+    if args.fetch:
+        theme_builder.fetch_remote()
 
     if args.list_themes:
         print(
