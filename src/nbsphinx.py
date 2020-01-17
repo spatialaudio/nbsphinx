@@ -746,6 +746,8 @@ class Exporter(nbconvert.RSTExporter):
                 'replace_attachments': replace_attachments,
                 'get_output_type': _get_output_type,
                 'json_dumps': json.dumps,
+                'basename': os.path.basename,
+                'dirname': os.path.dirname,
             })
 
     def from_notebook_node(self, nb, resources=None, **kw):
@@ -779,6 +781,10 @@ class Exporter(nbconvert.RSTExporter):
                 extra_arguments=self._execute_arguments,
                 allow_errors=allow_errors, timeout=timeout)
             nb, resources = pp.preprocess(nb, resources)
+
+        if 'nbsphinx_save_notebook' in resources:
+            # Save *executed* notebook *before* the Exporter can change it:
+            nbformat.write(nb, resources['nbsphinx_save_notebook'])
 
         # Call into RSTExporter
         rststr, resources = super(Exporter, self).from_notebook_node(
@@ -855,8 +861,7 @@ class NotebookParser(rst.Parser):
             return
 
         srcdir = os.path.dirname(env.doc2path(env.docname))
-        auxdir = os.path.join(env.doctreedir, 'nbsphinx')
-        sphinx.util.ensuredir(auxdir)
+        auxdir = env.nbsphinx_auxdir
 
         resources = {}
         # Working directory for ExecutePreprocessor
@@ -864,6 +869,14 @@ class NotebookParser(rst.Parser):
         # Sphinx doesn't accept absolute paths in images etc.
         resources['output_files_dir'] = os.path.relpath(auxdir, srcdir)
         resources['unique_key'] = re.sub('[/ ]', '_', env.docname)
+
+        # NB: The source file could have a different suffix
+        #     if nbsphinx_custom_formats is used.
+        notebookfile = env.docname + '.ipynb'
+        env.nbsphinx_notebooks[env.docname] = notebookfile
+        auxfile = os.path.join(auxdir, notebookfile)
+        sphinx.util.ensuredir(os.path.dirname(auxfile))
+        resources['nbsphinx_save_notebook'] = auxfile
 
         exporter = Exporter(
             execute=env.config.nbsphinx_execute,
@@ -917,8 +930,6 @@ class NotebookParser(rst.Parser):
             rst.Parser.parse(self, epilog, document)
 
         if resources.get('nbsphinx_widgets', False):
-            if not hasattr(env, 'nbsphinx_widgets'):
-                env.nbsphinx_widgets = set()
             env.nbsphinx_widgets.add(env.docname)
 
 
@@ -1532,8 +1543,6 @@ class CopyLinkedFiles(docutils.transforms.Transform):
                 logger.warning('Link outside source directory: %r', file,
                                location=node)
                 continue  # Link is ignored
-            if not hasattr(env, 'nbsphinx_files'):
-                env.nbsphinx_files = {}
             env.nbsphinx_files.setdefault(env.docname, []).append(file)
 
 
@@ -1615,6 +1624,14 @@ def config_inited(app, config):
             **config.nbsphinx_requirejs_options)
 
 
+def builder_inited(app):
+    app.env.nbsphinx_notebooks = {}
+    app.env.nbsphinx_files = {}
+    app.env.nbsphinx_widgets = set()
+    app.env.nbsphinx_auxdir = os.path.join(app.env.doctreedir, 'nbsphinx')
+    sphinx.util.ensuredir(app.env.nbsphinx_auxdir)
+
+
 def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
     style = ''
@@ -1631,7 +1648,7 @@ def html_page_context(app, pagename, templatename, context, doctree):
 def html_collect_pages(app):
     """This event handler is abused to copy local files around."""
     files = set()
-    for file_list in getattr(app.env, 'nbsphinx_files', {}).values():
+    for file_list in app.env.nbsphinx_files.values():
         files.update(file_list)
     status_iterator = sphinx.util.status_iterator
     for file in status_iterator(files, 'copying linked files... ',
@@ -1643,25 +1660,33 @@ def html_collect_pages(app):
         except OSError as err:
             logger = sphinx.util.logging.getLogger(__name__)
             logger.warning('Cannot copy local file %r: %s', file, err)
+    notebooks = app.env.nbsphinx_notebooks.values()
+    for notebook in status_iterator(
+            notebooks, 'copying notebooks ... ',
+            'brown', len(notebooks)):
+        sphinx.util.copyfile(
+            os.path.join(app.env.nbsphinx_auxdir, notebook),
+            os.path.join(app.builder.outdir, notebook))
     return []  # No new HTML pages are created
 
 
 def env_purge_doc(app, env, docname):
     """Remove list of local files for a given document."""
     try:
-        del env.nbsphinx_files[docname]
-    except (AttributeError, KeyError):
+        del env.nbsphinx_notebooks[docname]
+    except KeyError:
         pass
     try:
-        env.nbsphinx_widgets.discard(docname)
-    except AttributeError:
+        del env.nbsphinx_files[docname]
+    except KeyError:
         pass
+    env.nbsphinx_widgets.discard(docname)
 
 
 def env_updated(app, env):
     widgets_path = app.config.nbsphinx_widgets_path
     if widgets_path is None:
-        if getattr(env, 'nbsphinx_widgets', set()):
+        if env.nbsphinx_widgets:
             try:
                 from ipywidgets.embed import DEFAULT_EMBED_REQUIREJS_URL
             except ImportError:
@@ -1838,6 +1863,7 @@ def setup(app):
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
                  latex=(visit_admonition_latex, depart_admonition_latex))
+    app.connect('builder-inited', builder_inited)
     app.connect('config-inited', config_inited)
     app.connect('html-page-context', html_page_context)
     app.connect('html-collect-pages', html_collect_pages)
@@ -1876,5 +1902,5 @@ def setup(app):
         'version': __version__,
         'parallel_read_safe': True,
         'parallel_write_safe': True,
-        'env_version': 1,
+        'env_version': 2,
     }

@@ -39,19 +39,31 @@ os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
 nbsphinx_prolog = r"""
 {% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
 
-.. only:: html
+.. raw:: html
 
-    .. role:: raw-html(raw)
-        :format: html
-
-    .. nbinfo::
-
-        This page was generated from `{{ docname }}`__.
+    <div class="admonition note">
+      <p>This page was generated from
+        <a class="reference external" href="https://github.com/spatialaudio/nbsphinx/blob/{{ env.config.release|e }}/{{ docname|e }}">{{ docname|e }}</a>.
         Interactive online version:
-        :raw-html:`<a href="https://mybinder.org/v2/gh/spatialaudio/nbsphinx/{{ env.config.release }}?filepath={{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
-
-    __ https://github.com/spatialaudio/nbsphinx/blob/
-        {{ env.config.release }}/{{ docname }}
+        <a href="https://mybinder.org/v2/gh/spatialaudio/nbsphinx/{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
+        <a class="reference external" href="{{ env.docname|basename|e }}.ipynb">Download notebook file</a>.
+      </p>
+      <script>
+        if (document.location.host) {
+          var p = document.currentScript.previousSibling.previousSibling;
+          var a = document.createElement('a');
+          a.innerHTML = 'View in <em>nbviewer</em>';
+          a.href = `https://nbviewer.jupyter.org/url${
+            (window.location.protocol == 'https:' ? 's/' : '/') +
+            window.location.host +
+            window.location.pathname.slice(0, -4) }ipynb`;
+          a.classList.add('reference');
+          a.classList.add('external');
+          p.appendChild(a);
+          p.appendChild(document.createTextNode('.'));
+        }
+      </script>
+    </div>
 
 .. raw:: latex
 
