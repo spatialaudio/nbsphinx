@@ -47,18 +47,18 @@ Building Themes
 ---------------
 
 The ``nbsphinx`` documentation is available in over 30 different `HTML themes`_,
-with each having it's own branch ending in ``-theme``.
+with each having its own branch ending in ``-theme``.
 
 To simplify the building and testing of themes,
 which is especially needed when changing CSS,
 we provide you with command line tool to build all themes
 or a user specified subset.
-The tool is located at ``dev_utils/theme_builder.py`` can be run with::
+The tool is located at ``dev_utils/theme_builder.py`` and can be run with::
 
     python3 dev_utils/theme_builder.py
 
 On its first run, it will just create ``dev_utils/requirements_themes.txt``
-which contains the dependencies to build to build all themes and instructs
+which contains the dependencies to build all themes and instructs
 you how to install them.
 And after it will by default build all supported themes.
 
@@ -73,4 +73,4 @@ for more information run::
 
 .. _PyPI: https://pypi.org/project/nbsphinx/
 .. _Github: https://github.com/spatialaudio/nbsphinx/
-.. _`HTML themes`: https://nbsphinx.readthedocs.io/en/0.5.0/usage.html#HTML-Themes
+.. _`HTML themes`: https://nbsphinx.readthedocs.io/usage.html#HTML-Themes
