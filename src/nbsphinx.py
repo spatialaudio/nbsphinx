@@ -45,6 +45,8 @@ import traitlets
 
 _ipynbversion = 4
 
+logger = sphinx.util.logging.getLogger(__name__)
+
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
     'application/vnd.jupyter.widget-state+json',
@@ -1531,11 +1533,9 @@ class CopyLinkedFiles(docutils.transforms.Transform):
             file = os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), relpath))
             if not os.path.isfile(os.path.join(env.srcdir, file)):
-                logger = sphinx.util.logging.getLogger(__name__)
                 logger.warning('File not found: %r', file, location=node)
                 continue  # Link is ignored
             elif file.startswith('..'):
-                logger = sphinx.util.logging.getLogger(__name__)
                 logger.warning('Link outside source directory: %r', file,
                                location=node)
                 continue  # Link is ignored
@@ -1654,7 +1654,6 @@ def html_collect_pages(app):
         try:
             sphinx.util.copyfile(os.path.join(app.env.srcdir, file), target)
         except OSError as err:
-            logger = sphinx.util.logging.getLogger(__name__)
             logger.warning('Cannot copy local file %r: %s', file, err)
     notebooks = app.env.nbsphinx_notebooks.values()
     for notebook in status_iterator(
@@ -1686,7 +1685,6 @@ def env_updated(app, env):
             try:
                 from ipywidgets.embed import DEFAULT_EMBED_REQUIREJS_URL
             except ImportError:
-                logger = sphinx.util.logging.getLogger(__name__)
                 logger.warning(
                     'nbsphinx_widgets_path not given '
                     'and ipywidgets module unavailable')
