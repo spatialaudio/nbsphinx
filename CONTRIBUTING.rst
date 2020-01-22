@@ -56,6 +56,7 @@ Again, you'll probably have to use ``python`` instead of ``python3``.
 The generated files will be available in the directories ``build/sphinx/html/``
 and ``build/sphinx/latex/``, respectively.
 
+
 Building Themes
 ---------------
 
@@ -66,23 +67,28 @@ To simplify the building and testing of themes,
 which is especially needed when changing CSS,
 we provide you with command line tool to build all themes
 or a user specified subset.
-The tool is located at ``dev_utils/theme_builder.py`` and can be run with::
+The tool is located at ``theme_comparison.py`` and can be run with::
 
-    python3 dev_utils/theme_builder.py
+    python3 theme_comparison.py
 
-On its first run, it will just create ``dev_utils/requirements_themes.txt``
-which contains the dependencies to build all themes and instructs
-you how to install them.
-And after it will by default build all supported themes.
+Before doing that, the required dependencies can be obtained with::
+
+    python3 theme_comparison.py --requirements
+
+This will create a list of dependencies in
+``theme_comparison/theme_requirements.txt``.
+The dependencies can then be installed with::
+
+    python3 -m pip install -r theme_comparison/theme_requirements.txt
 
 If you just want to build a subset of the themes
-(i.e. ``alabaster`` and ``sphinx_rtd_theme``), simply run::
+(e.g. ``alabaster`` and ``sphinx_rtd_theme``), simply run::
 
-    python3 dev_utils/theme_builder.py --themes alabaster rtd
+    python3 theme_comparison.py alabaster rtd
 
-for more information run::
+For more information run::
 
-    python3 dev_utils/theme_builder.py --help
+    python3 theme_comparison.py --help
 
 .. _PyPI: https://pypi.org/project/nbsphinx/
 .. _`HTML themes`: https://nbsphinx.readthedocs.io/usage.html#HTML-Themes
