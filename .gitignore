@@ -8,3 +8,4 @@ nbsphinx.egg-info/
 .vscode
 doc/_build
 doc/gallery/a-local-file.png
+/theme_comparison/
