@@ -1,7 +1,8 @@
 .. include:: ../README.rst
 
-All content shown below -- except for the sections :doc:`a-normal-rst-file`
-and :doc:`contributing` -- was generated from Jupyter notebooks.
+All content shown below -- except for the sections :doc:`a-normal-rst-file`,
+:doc:`contributing` and :doc:`version-history` --
+was generated from Jupyter notebooks.
 
 .. toctree::
     :maxdepth: 4
@@ -20,6 +21,7 @@ and :doc:`contributing` -- was generated from Jupyter notebooks.
     a-normal-rst-file
     links
     contributing
+    version-history
 
 .. only:: html
 
