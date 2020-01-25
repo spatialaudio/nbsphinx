@@ -1632,11 +1632,12 @@ def load_requirejs(app):
 
 
 def builder_inited(app):
-    app.env.nbsphinx_notebooks = {}
-    app.env.nbsphinx_files = {}
-    app.env.nbsphinx_widgets = set()
-    app.env.nbsphinx_auxdir = os.path.join(app.env.doctreedir, 'nbsphinx')
-    sphinx.util.ensuredir(app.env.nbsphinx_auxdir)
+    env = app.env
+    env.nbsphinx_notebooks = {}
+    env.nbsphinx_files = {}
+    env.nbsphinx_widgets = set()
+    env.nbsphinx_auxdir = os.path.join(env.doctreedir, 'nbsphinx')
+    sphinx.util.ensuredir(env.nbsphinx_auxdir)
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
