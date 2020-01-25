@@ -7,7 +7,7 @@ matrix:
   - name: default Python + latest Sphinx
 
   # a few older Sphinx releases using default Python version
-  - env: SPHINX="==1.8.0" BIBTEX="==0.4.2"
+  - env: SPHINX="==1.8.1" BIBTEX="==0.4.2"
   - env: SPHINX="==1.8.5" BIBTEX="==0.4.2"
   - env: SPHINX="==2.0.0"
   - env: SPHINX="==2.1.0"
