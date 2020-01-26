@@ -144,12 +144,11 @@ class ThemeBuilder:
             paths=file_path,
             create_patch=True,
             unified=0,
-            output_indicator_new="",
         )
         for diff_item in diff_index.iter_change_type("M"):
             diff_lines = diff_item.diff.decode("utf-8").splitlines(keepends=True)
-            added_lines = filter(lambda line: not line.startswith("@@ "), diff_lines)
-            return "".join(added_lines)
+            added_lines = filter(lambda line: line.startswith("+"), diff_lines)
+            return "".join([added_line.replace("+", "", 1) for added_line in added_lines])
         return ""
 
     def get_theme_requirements(self):
