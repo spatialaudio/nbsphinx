@@ -1,3 +1,8 @@
+Version 0.5.1 (2020-01-28):
+ * This will be the last release supporting Python 2.x!
+ * Support for https://github.com/choldgraf/sphinx-copybutton
+ * Executed notebooks are now saved in the HTML output directory
+
 Version 0.5.0 (2019-11-20):
  * Automatic support for Jupyter widgets, customizable with
    ``nbsphinx_widgets_path`` (and ``nbsphinx_widgets_options``)
