@@ -20,38 +20,10 @@ matrix:
   - python: "nightly"
   # - python: "pypy3"
 
-  - name: Python 2.7 + latest Sphinx
-    python: "2.7"
-    install: &py2-install
-      - python2 --version
-      - python2 -m pip install .
-      - python2 -m pip install sphinxcontrib-bibtex==0.4.2
-      - python2 -m pip install sphinxcontrib-svg2pdfconverter
-      - python2 -m pip install ipywidgets
-      - python2 -m pip install 'sphinx-copybutton<0.2.6'
-    script: &py2-script
-      - python2 -m nbsphinx
-      # We don't execute, because the example notebooks use Python 3
-      - python2 -m sphinx doc/ doc/_build/ -W -b html -D nbsphinx_execute=never
-
   - name: default Python + latest Sphinx
     os: osx
     language: generic
     python: ""
-
-  - name: Python 2.7 + latest Sphinx
-    os: osx
-    language: generic
-    python: ""
-    addons:
-      homebrew:
-        update: true
-        packages:
-          - python@2
-          - pandoc
-          - librsvg
-    install: *py2-install
-    script: *py2-script
 
   allow_failures:
     - python: "nightly"

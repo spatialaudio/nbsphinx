@@ -12,7 +12,7 @@ setup(
     version=__version__,
     package_dir={'': 'src'},
     py_modules=['nbsphinx'],
-    python_requires='>=2.7',
+    python_requires='>=3',
     install_requires=[
         'docutils',
         'jinja2',

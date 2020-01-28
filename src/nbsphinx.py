@@ -26,16 +26,12 @@ https://nbsphinx.readthedocs.io/
 __version__ = '0.5.1'
 
 import copy
+from html.parser import HTMLParser
 import json
 import os
 import re
 import subprocess
-try:
-    from urllib.parse import unquote  # Python 3.x
-    from html.parser import HTMLParser
-except ImportError:
-    from urllib2 import unquote  # Python 2.x
-    from HTMLParser import HTMLParser
+from urllib.parse import unquote
 
 import docutils
 from docutils.parsers import rst
