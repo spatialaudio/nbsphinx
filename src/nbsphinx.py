@@ -696,7 +696,7 @@ class Exporter(nbconvert.RSTExporter):
     """
 
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
-                 allow_errors=False, timeout=30, codecell_lexer='none'):
+                 allow_errors=False, timeout=None, codecell_lexer='none'):
         """Initialize the Exporter."""
 
         # NB: The following stateful Jinja filters are a hack until
@@ -1832,7 +1832,7 @@ def setup(app):
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
     app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
-    app.add_config_value('nbsphinx_timeout', 30, rebuild='')
+    app.add_config_value('nbsphinx_timeout', None, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
     # Default value is set in config_inited():
     app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
