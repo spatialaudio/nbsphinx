@@ -213,7 +213,7 @@ RST_TEMPLATE = """
 
 
 {% block markdowncell %}
-{%- if 'nbsphinx-toctree' in cell.metadata %}
+{%- if 'nbsphinx-toctree' in cell.metadata or 'nbsphinx-toctree' in cell.metadata.tags %}
 {{ cell | extract_toctree }}
 {%- else %}
 {{ cell | save_attachments or super() | replace_attachments }}
@@ -1217,7 +1217,7 @@ def pandoc(source, fmt, to, filter_func=None):
 def _extract_toctree(cell):
     """Extract links from Markdown cell and create toctree."""
     lines = ['.. toctree::']
-    options = cell.metadata['nbsphinx-toctree']
+    options = cell.metadata.get('nbsphinx-toctree', {})
     try:
         for option, value in options.items():
             if value is True:
