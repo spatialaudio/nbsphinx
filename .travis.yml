@@ -52,4 +52,4 @@ script:
   - python3 -m sphinx doc/ doc/_build/ -W -b html
   - python3 -m sphinx doc/ doc/_build/ -W -b latex
   - python3 -m sphinx doc/ doc/_build/ -W -b epub
-  - python3 -m pytest --check-links doc/_build/html
+  - python3 -m pytest --check-links doc/_build/**/*.html doc/_build/*.html -k 'not http'
