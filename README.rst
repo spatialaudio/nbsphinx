@@ -14,7 +14,7 @@ Quick Start:
     #. Edit your ``conf.py`` and add ``'nbsphinx'`` to ``extensions``.
 
     #. Edit your ``index.rst`` and add the names of your ``*.ipynb`` files
-       to the ``toctree``.
+       to the ``toctree``. (Note: your *.ipynb files must begin with a metadata cell that has a ``# Title``.)
 
     #. Run Sphinx!
 
