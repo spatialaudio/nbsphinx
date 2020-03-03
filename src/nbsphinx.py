@@ -1401,6 +1401,10 @@ class CreateNotebookSectionAnchors(docutils.transforms.Transform):
                 continue
             all_ids.add(link_id)
             section['ids'] = [link_id]
+        if not all_ids:
+            logger.warning(
+                'Each notebook should have at least one section title',
+                location=self.document[0])
 
 
 class CreateSectionLabels(docutils.transforms.Transform):
