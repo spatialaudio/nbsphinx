@@ -782,6 +782,10 @@ class Exporter(nbconvert.RSTExporter):
             # Save *executed* notebook *before* the Exporter can change it:
             nbformat.write(nb, resources['nbsphinx_save_notebook'])
 
+        # Warn on missing title cell
+        if nb.cells[0]['cell_type'] != 'markdown' or nb.cells[0]['source'][:2] != '# ':
+            logger.warning("Notebooks must start with a markdown cell with an H1 title. E.g. \"# Title\"")
+
         # Call into RSTExporter
         rststr, resources = super(Exporter, self).from_notebook_node(
             nb, resources, **kw)
