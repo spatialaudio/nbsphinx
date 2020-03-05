@@ -39,11 +39,18 @@ Building the Documentation
 --------------------------
 
 If you make changes to the documentation, you should create the HTML
-pages locally using Sphinx and check if they look OK::
+pages locally using Sphinx and check if they look OK.
+
+Initially, you might need to install a few packages that are needed to build the
+documentation::
+
+   python3 -m pip install -r doc/requirements.txt --user
+
+To (re-)build the HTML files, use::
 
    python3 setup.py build_sphinx
 
-To check the LaTeX output, use::
+If you want to check the LaTeX output, use::
 
    python3 setup.py build_sphinx -b latex
 
