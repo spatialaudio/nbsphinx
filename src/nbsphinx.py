@@ -920,11 +920,13 @@ class NotebookParser(rst.Parser):
         formats = {
             '.ipynb': lambda s: nbformat.reads(s, as_version=_ipynbversion)}
         formats.update(env.config.nbsphinx_custom_formats)
-        suffix = os.path.splitext(env.doc2path(env.docname))[1]
-        try:
-            converter = formats[suffix]
-        except KeyError:
-            raise NotebookError('No converter for suffix {!r}'.format(suffix))
+        srcfile = env.doc2path(env.docname, base=None)
+        for format, converter in formats.items():
+            if srcfile.endswith(format):
+                break
+        else:
+            raise NotebookError(
+                'No converter was found for {!r}'.format(srcfile))
         if isinstance(converter, str):
             converter = sphinx.util.import_object(converter)
         try:
