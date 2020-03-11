@@ -25,6 +25,7 @@ https://nbsphinx.readthedocs.io/
 """
 __version__ = '0.5.1'
 
+import collections
 import copy
 import html
 import json
@@ -927,10 +928,18 @@ class NotebookParser(rst.Parser):
         else:
             raise NotebookError(
                 'No converter was found for {!r}'.format(srcfile))
+        if isinstance(converter, collections.Sequence):
+            if len(converter) != 2:
+                raise NotebookError(
+                    'The values of nbsphinx_custom_formats must be '
+                    'either strings or 2-element sequences')
+            converter, kwargs = converter
+        else:
+            kwargs = {}
         if isinstance(converter, str):
             converter = sphinx.util.import_object(converter)
         try:
-            nb = converter(inputstring)
+            nb = converter(inputstring, **kwargs)
         except Exception:
             # NB: The use of the RST parser is temporary!
             rst.Parser.parse(self, inputstring, document)
