@@ -94,6 +94,11 @@ mathjax_config = {
 # Additional files needed for generating LaTeX/PDF output:
 latex_additional_files = ['references.bib']
 
+# Support for notebook formats other than .ipynb
+nbsphinx_custom_formats = {
+    '.pct.py': ['jupytext.reads', {'fmt': 'py:percent'}],
+}
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'
