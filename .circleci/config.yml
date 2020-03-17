@@ -17,6 +17,11 @@ jobs:
     steps:
       - checkout
 
+      - store_artifacts:
+          name: Uploading overview page
+          path: .circleci/artifacts.html
+          destination: artifacts.html
+
       - restore_cache:
           keys:
             - v1-deps-{{ .Branch }}-{{ checksum "doc/requirements.txt" }}
@@ -75,11 +80,6 @@ jobs:
           name: Uploading PDF file
           path: build/sphinx/latex/nbsphinx.pdf
           destination: nbsphinx.pdf
-
-      - store_artifacts:
-          name: Uploading overview page
-          path: .circleci/artifacts.html
-          destination: artifacts.html
 
       - run:
           name: Checking for Outdated Links
