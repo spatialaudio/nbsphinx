@@ -46,6 +46,11 @@ jobs:
             apt-get install -y librsvg2-bin
 
       - run:
+          name: Show pandoc version
+          command: |
+            pandoc --version
+
+      - run:
           name: Building HTML
           command: |
             python3 setup.py build_sphinx -W -b html
