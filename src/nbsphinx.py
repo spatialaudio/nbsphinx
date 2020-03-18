@@ -1610,6 +1610,13 @@ def config_inited(app, config):
     for suffix in config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
+    # Make sure require.js is loaded after all other extensions,
+    # see https://github.com/spatialaudio/nbsphinx/issues/409
+    app.connect('builder-inited', load_requirejs)
+
+
+def load_requirejs(app):
+    config = app.config
     if config.nbsphinx_requirejs_path is None:
         config.nbsphinx_requirejs_path = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js'
     if config.nbsphinx_requirejs_options is None:
