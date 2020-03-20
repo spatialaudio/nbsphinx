@@ -1637,7 +1637,11 @@ def html_page_context(app, pagename, templatename, context, doctree):
     style = ''
     if doctree and doctree.get('nbsphinx_include_css'):
         style += CSS_STRING % app.config
-    if doctree and app.config.html_theme in ('sphinx_rtd_theme', 'julia'):
+    if doctree and app.config.html_theme in (
+            'sphinx_rtd_theme',
+            'julia',
+            'dask_sphinx_theme',
+            ):
         style += CSS_STRING_READTHEDOCS
     if doctree and app.config.html_theme.endswith('cloud'):
         style += CSS_STRING_CLOUD
@@ -1799,7 +1803,7 @@ def visit_admonition_html(self, node):
     if len(node.children) >= 2:
         node[0]['classes'].append('admonition-title')
         html_theme = self.settings.env.config.html_theme
-        if html_theme in ('sphinx_rtd_theme', 'julia'):
+        if html_theme in ('sphinx_rtd_theme', 'julia', 'dask_sphinx_theme'):
             node.children[0]['classes'].extend(['fa', 'fa-exclamation-circle'])
 
 
