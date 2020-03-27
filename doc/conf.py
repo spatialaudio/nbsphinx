@@ -12,11 +12,8 @@ extensions = [
     'sphinx.ext.mathjax',  # for math equations
     'sphinxcontrib.bibtex',  # for bibliographic references
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
+    'sphinx_gallery.load_style',  # load CSS for gallery (needs SG >= 0.6)
 ]
-
-import sphinx_gallery
-html_static_path = [sphinx_gallery.glr_path_static()]
-html_css_files = ['gallery.css']
 
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
