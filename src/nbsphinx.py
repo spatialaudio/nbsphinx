@@ -1417,7 +1417,7 @@ def _get_output_type(output):
 
 
 def _local_file_from_reference(node, document):
-    """Get local file path from reference and split it into components."""
+    """Get local file path from reference and detect fragment identifier."""
     # NB: Anonymous hyperlinks must be already resolved at this point!
     refuri = node.get('refuri')
     if not refuri:
@@ -1430,30 +1430,28 @@ def _local_file_from_reference(node, document):
         target = document.ids.get(refid)
         if not target:
             # No corresponding target, Sphinx may warn later
-            return '', '', ''
+            return '', ''
         refuri = target.get('refuri')
         if not refuri:
             # Target doesn't have URI
-            return '', '', ''
+            return '', ''
     if '://' in refuri:
         # Not a local link
-        return '', '', ''
+        return '', ''
     elif refuri.startswith('#') or refuri.startswith('mailto:'):
         # Not a local link
-        return '', '', ''
+        return '', ''
 
     # NB: We look for "fragment identifier" before unquoting
-    match = re.match(r'^([^#]+)(\.[^#]+)(#.+)$', refuri)
+    match = re.match(r'^([^#]*)(#.*)$', refuri)
     if match:
-        base = unquote(match.group(1))
-        # NB: The suffix and "fragment identifier" are not unquoted
-        suffix = match.group(2)
-        fragment = match.group(3)
+        filename = unquote(match.group(1))
+        # NB: The "fragment identifier" is not unquoted
+        fragment = match.group(2)
     else:
-        base, suffix = os.path.splitext(refuri)
-        base = unquote(base)
+        filename = unquote(refuri)
         fragment = ''
-    return base, suffix, fragment
+    return filename, fragment
 
 
 class RewriteLocalLinks(docutils.transforms.Transform):
@@ -1480,14 +1478,16 @@ class RewriteLocalLinks(docutils.transforms.Transform):
     def apply(self):
         env = self.document.settings.env
         for node in self.document.traverse(docutils.nodes.reference):
-            base, suffix, fragment = _local_file_from_reference(node,
-                                                                self.document)
-            if not base:
+            filename, fragment = _local_file_from_reference(
+                node, self.document)
+            if not filename:
                 continue
 
             for s in env.config.source_suffix:
-                if suffix.lower() == s.lower():
-                    target = base
+                if filename.lower().endswith(s.lower()):
+                    assert len(s) > 0
+                    target = filename[:-len(s)]
+                    suffix = filename[-len(s):]
                     if fragment:
                         target_ext = suffix + fragment
                         reftype = 'ref'
@@ -1510,6 +1510,10 @@ class RewriteLocalLinks(docutils.transforms.Transform):
                     refwarn=True, refexplicit=True, refdoc=env.docname)
                 xref += docutils.nodes.Text(linktext, linktext)
                 node.replace_self(xref)
+            else:
+                # NB: This is a link to an ignored (via exclude_patterns)
+                #     source file.
+                pass
 
 
 class CreateNotebookSectionAnchors(docutils.transforms.Transform):
@@ -1550,7 +1554,7 @@ class CreateSectionLabels(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
-        file_ext = os.path.splitext(env.doc2path(env.docname))[1]
+        file_ext = env.doc2path(env.docname, base=None)[len(env.docname):]
         i_still_have_to_create_the_document_label = True
         for section in self.document.traverse(docutils.nodes.section):
             assert section.children
@@ -1581,7 +1585,7 @@ class CreateDomainObjectLabels(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
-        file_ext = os.path.splitext(env.doc2path(env.docname))[1]
+        file_ext = env.doc2path(env.docname, base=None)[len(env.docname):]
         for sig in self.document.traverse(sphinx.addnodes.desc_signature):
             try:
                 title = sig['ids'][0]
@@ -1660,11 +1664,11 @@ class CopyLinkedFiles(docutils.transforms.Transform):
     def apply(self):
         env = self.document.settings.env
         for node in self.document.traverse(docutils.nodes.reference):
-            base, suffix, fragment = _local_file_from_reference(node,
-                                                                self.document)
-            if not base:
+            filename, fragment = _local_file_from_reference(
+                node, self.document)
+            if not filename:
                 continue  # Not a local link
-            relpath = base + suffix + fragment
+            relpath = filename + fragment
             file = os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), relpath))
             if not os.path.isfile(os.path.join(env.srcdir, file)):
