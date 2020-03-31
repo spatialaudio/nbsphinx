@@ -1181,11 +1181,16 @@ class NbGallery(sphinx.directives.other.TocTree):
     def run(self):
         """Wrap GalleryToc arount toctree."""
         ret = super().run()
-        toctree = ret[-1][-1]
+        try:
+            toctree_wrapper, = ret
+            toctree, = toctree_wrapper
+        except ValueError:
+            return ret
+        if not isinstance(toctree, sphinx.addnodes.toctree):
+            return ret
         gallerytoc = GalleryToc()
-        gallerytoc.append(toctree)
-        ret[-1][-1] = gallerytoc
-        return ret
+        gallerytoc += toctree_wrapper
+        return [gallerytoc]
 
 
 def convert_pandoc(text, from_format, to_format):
@@ -1707,20 +1712,18 @@ def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
     section links are shown in higher-level tables of contents.
 
     """
-    gallery = toctree.get('nbsphinx_gallery')
-    if gallery is not None:
+    gallery = toctree.get('nbsphinx_gallery', False)
+    if gallery:
         toctree = toctree.copy()
         toctree['hidden'] = False
     node = original_toctree_resolve(
         self, docname, builder, toctree, *args, **kwargs)
-    if gallery is None:
+    if not gallery or node is None:
         return node
-    assert node is not None
     if isinstance(node[0], docutils.nodes.caption):
         del node[1:]
     else:
         del node[:]
-    node += gallery
     return node
 
 
@@ -1877,11 +1880,13 @@ def env_updated(app, env):
 def doctree_resolved(app, doctree, fromdocname):
     # Replace GalleryToc with toctree + GalleryNode
     for node in doctree.traverse(GalleryToc):
-        toctree = node[0]
-        if not isinstance(toctree, sphinx.addnodes.toctree):
+        toctree_wrapper, = node
+        if (len(toctree_wrapper) != 1 or
+                not isinstance(toctree_wrapper[0], sphinx.addnodes.toctree)):
             # This happens for LaTeX output
             node.replace_self(node.children)
             continue
+        toctree, = toctree_wrapper
         entries = []
         for title, doc in toctree['entries']:
             if doc in toctree['includefiles']:
@@ -1938,8 +1943,9 @@ def doctree_resolved(app, doctree, fromdocname):
                     location=fromdocname)
         gallery = GalleryNode()
         gallery['entries'] = entries
-        toctree['nbsphinx_gallery'] = gallery
-        node.replace_self(toctree)
+        toctree['nbsphinx_gallery'] = True
+        toctree_wrapper[:] = toctree,
+        node.replace_self([toctree_wrapper, gallery])
         # NB: Further processing happens in patched_toctree_resolve()
 
 
