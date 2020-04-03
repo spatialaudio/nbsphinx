@@ -1755,6 +1755,7 @@ def config_inited(app, config):
             'nature': '5ex',
             'pandas_sphinx_theme': '5.5ex',
             'pangeo': '5ex',
+            'pydata_sphinx_theme': '5.5ex',
             'pyramid': '4.5ex',
             'pytorch_sphinx_theme': '14ex',
             'redcloud': '5ex',
