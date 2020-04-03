@@ -1,3 +1,9 @@
+Version 0.6.0 (2020-04-03):
+ * Thumbnail galleries (inspired by https://sphinx-gallery.github.io/)
+ * `nbsphinx-toctree` as cell tag
+ * Keyword arguments in `nbsphinx_custom_formats`
+ * Python 2 support has been dropped
+
 Version 0.5.1 (2020-01-28):
  * This will be the last release supporting Python 2.x!
  * Support for https://github.com/choldgraf/sphinx-copybutton
