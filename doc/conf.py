@@ -15,9 +15,6 @@ extensions = [
     'sphinx_gallery.load_style',  # load CSS for gallery (needs SG >= 0.6)
 ]
 
-# Exclude build directory and Jupyter backup files:
-exclude_patterns = ['_build', '**.ipynb_checkpoints']
-
 # Default language for syntax highlighting in reST and Markdown cells:
 highlight_language = 'none'
 
