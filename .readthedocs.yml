@@ -8,6 +8,4 @@ python:
     - method: pip
       path: .
   system_packages: true
-formats:
-  - epub
-  - pdf
+formats: all
