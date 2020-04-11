@@ -928,7 +928,8 @@ class NotebookParser(rst.Parser):
         else:
             raise NotebookError(
                 'No converter was found for {!r}'.format(srcfile))
-        if isinstance(converter, collections.abc.Sequence):
+        if (isinstance(converter, collections.abc.Sequence) and
+                not isinstance(converter, str)):
             if len(converter) != 2:
                 raise NotebookError(
                     'The values of nbsphinx_custom_formats must be '
