@@ -25,7 +25,7 @@ https://nbsphinx.readthedocs.io/
 """
 __version__ = '0.6.0'
 
-import collections
+import collections.abc
 import copy
 import html
 import json
@@ -928,7 +928,7 @@ class NotebookParser(rst.Parser):
         else:
             raise NotebookError(
                 'No converter was found for {!r}'.format(srcfile))
-        if isinstance(converter, collections.Sequence):
+        if isinstance(converter, collections.abc.Sequence):
             if len(converter) != 2:
                 raise NotebookError(
                     'The values of nbsphinx_custom_formats must be '
