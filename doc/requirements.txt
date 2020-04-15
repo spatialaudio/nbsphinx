@@ -7,4 +7,5 @@ sphinxcontrib-svg2pdfconverter
 ipywidgets
 sphinx-copybutton
 sphinx-gallery
+sphinx-togglebutton
 jupytext

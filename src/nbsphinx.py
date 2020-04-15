@@ -115,6 +115,9 @@ RST_TEMPLATE = """
 {%- if not cell.outputs %}
     :no-output:
 {%- endif %}
+{%- if 'toggle_input' in cell.metadata.tags %}
+    :class: toggle
+{%- endif %}
 
 {{ cell.source.strip('\n') | indent }}
 {% endblock input %}
@@ -1045,6 +1048,7 @@ def _create_code_nodes(directive):
         outer_classes = ['nbinput']
         if 'no-output' in directive.options:
             outer_classes.append('nblast')
+        outer_classes.append(directive.options.get('class', ''))
         inner_classes = ['input_area']
         prompt_template = config.nbsphinx_input_prompt
         if not execution_count:
@@ -1122,6 +1126,7 @@ class NbInput(rst.Directive):
         'empty-lines-before': rst.directives.nonnegative_int,
         'empty-lines-after': rst.directives.nonnegative_int,
         'no-output': rst.directives.flag,
+        'class': rst.directives.unchanged,
     }
     has_content = True
 
