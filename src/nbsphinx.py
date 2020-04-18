@@ -1774,7 +1774,8 @@ def config_inited(app, config):
     for suffix in config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
-    config.exclude_patterns.append('**.ipynb_checkpoints')
+    if '**.ipynb_checkpoints' not in config.exclude_patterns:
+        config.exclude_patterns.append('**.ipynb_checkpoints')
 
     # Make sure require.js is loaded after all other extensions,
     # see https://github.com/spatialaudio/nbsphinx/issues/409
