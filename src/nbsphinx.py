@@ -33,6 +33,7 @@ import os
 import re
 import subprocess
 from urllib.parse import unquote
+import uuid
 
 import docutils
 from docutils.parsers import rst
@@ -1245,6 +1246,45 @@ class CitationParser(html.parser.HTMLParser):
         self.cite = ''
 
 
+class ImgParser(html.parser.HTMLParser):
+    """Turn HTML <img> tags into raw RST blocks."""
+
+    def handle_starttag(self, tag, attrs):
+        self._check_img(tag, attrs)
+
+    def handle_startendtag(self, tag, attrs):
+        self._check_img(tag, attrs)
+
+    def _check_img(self, tag, attrs):
+        if tag != 'img':
+            return
+        # NB: attrs is a list of pairs
+        attrs = dict(attrs)
+        if 'src' not in attrs:
+            return
+        img_path = nbconvert.filters.posix_path(attrs['src'])
+        lines = ['image:: ' + img_path]
+        indent = ' ' * 4
+        if 'class' in attrs:
+            lines.append(indent + ':class: ' + attrs['class'])
+        if 'alt' in attrs:
+            lines.append(indent + ':alt: ' + attrs['alt'])
+        if 'width' in attrs:
+            lines.append(indent + ':width: ' + attrs['width'])
+        if 'height' in attrs:
+            lines.append(indent + ':height: ' + attrs['height'])
+
+        definition = '\n'.join(lines)
+        hex_id = uuid.uuid4().hex
+        definition = '.. |' + hex_id + '| ' + definition
+        self.obj = {'t': 'RawInline', 'c': ['rst', '|' + hex_id + '|']}
+        self.definition = definition
+
+    def reset(self):
+        super().reset()
+        self.obj = {}
+
+
 def markdown2rst(text):
     """Convert a Markdown string to reST via pandoc.
 
@@ -1259,8 +1299,14 @@ def markdown2rst(text):
 
     """
 
-    def parse_html(obj):
+    def parse_citation(obj):
         p = CitationParser()
+        p.feed(obj['c'][1])
+        p.close()
+        return p
+
+    def parse_img(obj):
+        p = ImgParser()
         p.feed(obj['c'][1])
         p.close()
         return p
@@ -1268,7 +1314,7 @@ def markdown2rst(text):
     def object_hook(obj):
         if object_hook.open_cite_tag:
             if obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
-                p = parse_html(obj)
+                p = parse_citation(obj)
                 if p.endtag == object_hook.open_cite_tag:
                     object_hook.open_cite_tag = ''
             return {'t': 'Str', 'c': ''}  # Object is replaced by empty string
@@ -1287,14 +1333,20 @@ def markdown2rst(text):
             obj = {'t': 'RawInline',
                    'c': ['rst', ':nbsphinx-math:`{}`'.format(obj['c'][1])]}
         elif obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
-            p = parse_html(obj)
+            p = parse_citation(obj)
             if p.starttag:
                 object_hook.open_cite_tag = p.starttag
             if p.cite:
                 obj = {'t': 'RawInline', 'c': ['rst', p.cite]}
+            if not p.starttag and not p.cite:
+                p = parse_img(obj)
+                if p.obj:
+                    obj = p.obj
+                    object_hook.image_definitions.append(p.definition)
         return obj
 
     object_hook.open_cite_tag = ''
+    object_hook.image_definitions = []
 
     def filter_func(text):
         json_data = json.loads(text, object_hook=object_hook)
@@ -1307,10 +1359,14 @@ def markdown2rst(text):
         input_format += '-native_divs+raw_html'
 
     rststring = pandoc(text, input_format, 'rst', filter_func=filter_func)
-    return re.sub(r'^\n( *)\x0e:nowrap:\x0f$',
-                  r'\1:nowrap:',
-                  rststring,
-                  flags=re.MULTILINE)
+    rststring = re.sub(
+        r'^\n( *)\x0e:nowrap:\x0f$',
+        r'\1:nowrap:',
+        rststring,
+        flags=re.MULTILINE)
+    rststring += '\n\n'
+    rststring += '\n'.join(object_hook.image_definitions)
+    return rststring
 
 
 def pandoc(source, fmt, to, filter_func=None):
