@@ -485,20 +485,32 @@ div.nboutput.container div.prompt pre {
 /* all prompts */
 div.nbinput.container div.prompt,
 div.nboutput.container div.prompt {
-    min-width: %(nbsphinx_prompt_width)s;
+    width: %(nbsphinx_prompt_width)s;
     padding-top: 0.3rem;
-    padding-right: 0.3rem;
-    text-align: right;
-    flex: 0;
+    position: relative;
 }
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
 @media (max-width: %(nbsphinx_responsive_width)s) {
     div.nbinput.container div.prompt,
     div.nboutput.container div.prompt {
+        width: unset;
         text-align: left;
         padding: 0.4em;
     }
     div.nboutput.container div.prompt.empty {
         padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
     }
 }
 
@@ -1733,44 +1745,6 @@ def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
 
 
 def config_inited(app, config):
-    # Set default value for CSS prompt width (optimized for two-digit numbers)
-    if config.nbsphinx_prompt_width is None:
-        config.nbsphinx_prompt_width = {
-            'agogo': '4.5ex',
-            'alabaster': '5.5ex',
-            'alabaster_jupyterhub': '5.5ex',
-            'basicstrap': '5.5ex',
-            'better': '4.5ex',
-            'bizstyle': '5.5ex',
-            'bootstrap': '5.5ex',
-            'bootstrap-astropy': '5.5ex',
-            'classic': '4.5ex',
-            'cloud': '5ex',
-            'dotted': '5ex',
-            'greencloud': '5ex',
-            'guzzle_sphinx_theme': '5.5ex',
-            'haiku': '4.5ex',
-            'julia': '5.5ex',
-            'jupyter': '5.5ex',
-            'maisie_sphinx_theme': '5.5ex',
-            'nature': '5ex',
-            'pandas_sphinx_theme': '5.5ex',
-            'pangeo': '5ex',
-            'pydata_sphinx_theme': '5.5ex',
-            'pyramid': '4.5ex',
-            'pytorch_sphinx_theme': '14ex',
-            'redcloud': '5ex',
-            'scrolls': '5.5ex',
-            'sizzle': '5ex',
-            'sphinxdoc': '5.5ex',
-            'sphinx_material': '5.5ex',
-            'sphinx_py3doc_enhanced_theme': '6.5ex',
-            'sphinx_pyviz_theme': '5.5ex',
-            'sphinx_rtd_theme': '5ex',
-            'sphinx_typlog_theme': '5.5ex',
-            'traditional': '5ex',
-        }.get(config.html_theme, '7ex')
-
     for suffix in config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
@@ -2115,8 +2089,7 @@ def setup(app):
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', None, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
-    # Default value is set in config_inited():
-    app.add_config_value('nbsphinx_prompt_width', None, rebuild='html')
+    app.add_config_value('nbsphinx_prompt_width', '4.5ex', rebuild='html')
     app.add_config_value('nbsphinx_responsive_width', '540px', rebuild='html')
     app.add_config_value('nbsphinx_prolog', None, rebuild='env')
     app.add_config_value('nbsphinx_epilog', None, rebuild='env')
