@@ -18,6 +18,7 @@ was generated from Jupyter notebooks.
     prolog-and-epilog
     custom-formats
     subdir/*
+    custom-css
     a-normal-rst-file
     links
     contributing
