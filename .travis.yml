@@ -50,6 +50,6 @@ install:
   - python3 -m pip install sphinxcontrib-bibtex$BIBTEX
 script:
   - python3 -m nbsphinx
-  - python3 -m sphinx doc/ _build/ -W -b html
-  - python3 -m sphinx doc/ _build/ -W -b latex
-  - python3 -m sphinx doc/ _build/ -W -b epub
+  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b html
+  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b latex
+  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b epub
