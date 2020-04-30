@@ -230,6 +230,8 @@ RST_TEMPLATE = """
 {%- else %}
 {{ cell | save_attachments or super() | replace_attachments }}
 {% endif %}
+..
+{# Empty comment to make sure the preceding directive (if any) is closed #}
 {% endblock markdowncell %}
 
 
