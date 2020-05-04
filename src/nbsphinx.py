@@ -97,6 +97,8 @@ RST_TEMPLATE = """
 {% block any_cell %}
 {%- if cell.metadata.nbsphinx != 'hidden' %}
 {{ super() }}
+..
+{# Empty comment to make sure the preceding directive (if any) is closed #}
 {% endif %}
 {%- endblock any_cell %}
 
@@ -201,6 +203,8 @@ RST_TEMPLATE = """
 
 
 {% block nboutput -%}
+..
+{# Empty comment to make sure the preceding directive (if any) is closed #}
 {%- set html_datatype, latex_datatype = output | get_output_type %}
 {%- if html_datatype == latex_datatype %}
 {{ insert_nboutput(html_datatype, output, cell) }}
@@ -252,12 +256,8 @@ RST_TEMPLATE = """
 
 {{ cell.source | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
-..
-{# Empty comment to make sure the preceding directive (if any) is closed #}
 {{ cell.source | markdown2rst }}
 {%- elif raw_mimetype == 'text/restructuredtext' %}
-..
-{# Empty comment to make sure the preceding directive (if any) is closed #}
 {{ cell.source }}
 {% endif %}
 {% endblock rawcell %}
