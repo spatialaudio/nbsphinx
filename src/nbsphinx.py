@@ -826,7 +826,8 @@ class Exporter(nbconvert.RSTExporter):
         def warning(msg, *args):
             logger.warning(
                 '"nbsphinx-thumbnail": ' + msg, *args,
-                location=resources.get('nbsphinx_docname'))
+                location=resources.get('nbsphinx_docname'),
+                type='nbsphinx', subtype='thumbnail')
             thumbnail['filename'] = _BROKEN_THUMBNAIL
 
         for cell_index, cell in enumerate(nb.cells):
@@ -1609,7 +1610,8 @@ class CreateNotebookSectionAnchors(docutils.transforms.Transform):
         if not all_ids:
             logger.warning(
                 'Each notebook should have at least one section title',
-                location=self.document[0])
+                location=self.document[0],
+                type='nbsphinx', subtype='notebooktitle')
 
 
 class CreateSectionLabels(docutils.transforms.Transform):
@@ -1742,11 +1744,14 @@ class CopyLinkedFiles(docutils.transforms.Transform):
             file = os.path.normpath(
                 os.path.join(os.path.dirname(env.docname), relpath))
             if not os.path.isfile(os.path.join(env.srcdir, file)):
-                logger.warning('File not found: %r', file, location=node)
+                logger.warning(
+                    'File not found: %r', file, location=node,
+                    type='nbsphinx', subtype='localfile')
                 continue  # Link is ignored
             elif file.startswith('..'):
-                logger.warning('Link outside source directory: %r', file,
-                               location=node)
+                logger.warning(
+                    'Link outside source directory: %r', file, location=node,
+                    type='nbsphinx', subtype='localfile')
                 continue  # Link is ignored
             env.nbsphinx_files.setdefault(env.docname, []).append(file)
 
@@ -1894,7 +1899,9 @@ def html_collect_pages(app):
         try:
             sphinx.util.copyfile(os.path.join(app.env.srcdir, file), target)
         except OSError as err:
-            logger.warning('Cannot copy local file %r: %s', file, err)
+            logger.warning(
+                'Cannot copy local file %r: %s', file, err,
+                type='nbsphinx', subtype='localfile')
     notebooks = app.env.nbsphinx_notebooks.values()
     for notebook in status_iterator(
             notebooks, 'copying notebooks ... ',
@@ -1914,7 +1921,8 @@ def env_updated(app, env):
             except ImportError:
                 logger.warning(
                     'nbsphinx_widgets_path not given '
-                    'and ipywidgets module unavailable')
+                    'and ipywidgets module unavailable',
+                    type='nbsphinx', subtype='ipywidgets')
             else:
                 widgets_path = DEFAULT_EMBED_REQUIREJS_URL
         else:
@@ -1961,7 +1969,8 @@ def doctree_resolved(app, doctree, fromdocname):
                                     logger.warning(
                                         'page %s matches two patterns in '
                                         'nbsphinx_thumbnails: %r and %r',
-                                        doc, matched, pattern)
+                                        doc, matched, pattern,
+                                        type='nbsphinx', subtype='thumbnail')
                                 # else the already matched pattern is more
                                 # specific than the present one, because it
                                 # contains no wildcard
@@ -1987,7 +1996,7 @@ def doctree_resolved(app, doctree, fromdocname):
             else:
                 logger.warning(
                     'External links are not supported in gallery: %s', doc,
-                    location=fromdocname)
+                    location=fromdocname, type='nbsphinx', subtype='gallery')
         gallery = GalleryNode()
         gallery['entries'] = entries
         toctree['nbsphinx_gallery'] = True
