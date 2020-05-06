@@ -1847,6 +1847,23 @@ def env_merge_info(app, env, docnames, other):
     env.nbsphinx_widgets.update(other.nbsphinx_widgets)
 
 
+def env_purge_doc(app, env, docname):
+    """Remove list of local files for a given document."""
+    try:
+        del env.nbsphinx_notebooks[docname]
+    except KeyError:
+        pass
+    try:
+        del env.nbsphinx_files[docname]
+    except KeyError:
+        pass
+    try:
+        del env.nbsphinx_thumbnails[docname]
+    except KeyError:
+        pass
+    env.nbsphinx_widgets.discard(docname)
+
+
 def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
     style = ''
@@ -1886,23 +1903,6 @@ def html_collect_pages(app):
             os.path.join(app.env.nbsphinx_auxdir, notebook),
             os.path.join(app.builder.outdir, notebook))
     return []  # No new HTML pages are created
-
-
-def env_purge_doc(app, env, docname):
-    """Remove list of local files for a given document."""
-    try:
-        del env.nbsphinx_notebooks[docname]
-    except KeyError:
-        pass
-    try:
-        del env.nbsphinx_files[docname]
-    except KeyError:
-        pass
-    try:
-        del env.nbsphinx_thumbnails[docname]
-    except KeyError:
-        pass
-    env.nbsphinx_widgets.discard(docname)
 
 
 def env_updated(app, env):
