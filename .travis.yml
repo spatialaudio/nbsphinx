@@ -52,4 +52,4 @@ script:
   - python3 -m nbsphinx
   - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b html
   - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b latex
-  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b epub
+  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow,epub.unknown_project_files -b epub
