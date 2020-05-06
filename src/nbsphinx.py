@@ -1840,6 +1840,13 @@ def builder_inited(app):
     sphinx.util.ensuredir(env.nbsphinx_auxdir)
 
 
+def env_merge_info(app, env, docnames, other):
+    env.nbsphinx_notebooks.update(other.nbsphinx_notebooks)
+    env.nbsphinx_files.update(other.nbsphinx_files)
+    env.nbsphinx_thumbnails.update(other.nbsphinx_thumbnails)
+    env.nbsphinx_widgets.update(other.nbsphinx_widgets)
+
+
 def html_page_context(app, pagename, templatename, context, doctree):
     """Add CSS string to HTML pages that contain code cells."""
     style = ''
@@ -2186,6 +2193,7 @@ def setup(app):
     app.connect('env-purge-doc', env_purge_doc)
     app.connect('env-updated', env_updated)
     app.connect('doctree-resolved', doctree_resolved)
+    app.connect('env-merge-info', env_merge_info)
     app.add_transform(CreateSectionLabels)
     app.add_transform(CreateDomainObjectLabels)
     app.add_transform(RewriteLocalLinks)
