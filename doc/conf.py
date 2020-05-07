@@ -101,7 +101,10 @@ project = 'nbsphinx'
 author = 'Matthias Geier'
 copyright = '2020, ' + author
 
-linkcheck_ignore = [r'http://localhost:\d+/']
+linkcheck_ignore = [
+    r'http://localhost:\d+/',
+    'https://github.com/spatialaudio/nbsphinx/compare/',
+]
 
 # -- Get version information and date from Git ----------------------------
 
