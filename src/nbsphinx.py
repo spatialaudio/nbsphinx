@@ -487,7 +487,7 @@ div.nboutput.container div.prompt pre {
 div.nbinput.container div.prompt,
 div.nboutput.container div.prompt {
     width: %(nbsphinx_prompt_width)s;
-    padding-top: 0.3rem;
+    padding-top: 5px;
     position: relative;
     user-select: none;
 }
