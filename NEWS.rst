@@ -1,3 +1,11 @@
+Version 0.7.0 (2020-05-08):
+ * Warnings can be suppressed with ``suppress_warnings``.
+ * ``<img>`` tags are handled in Markdown cells; the ``alt``, ``width``,
+   ``height`` and ``class`` attributes are supported.
+ * CSS: prompts protrude into left margin if ``nbsphinx_prompt_width`` is
+   too small. If you want to hide the prompts, use `custom CSS`__.
+
+   __ https://nbsphinx.readthedocs.io/en/0.7.0/custom-css.html
 Version 0.6.1 (2020-04-18):
  * ``.ipynb_checkpoints`` is automatically added to ``exclude_patterns``
 
