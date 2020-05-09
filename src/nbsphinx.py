@@ -157,6 +157,7 @@ RST_TEMPLATE = """
 
     .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
 {%- if datatype in output.metadata %}
+        :class: no-scaled-link
 {%- set width = output.metadata[datatype].width %}
 {%- if width %}
         :width: {{ width }}

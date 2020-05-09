@@ -22,9 +22,6 @@ highlight_language = 'none'
 # Don't add .txt suffix to source files:
 html_sourcelink_suffix = ''
 
-# Work-around until https://github.com/sphinx-doc/sphinx/issues/4229 is solved:
-html_scaled_image_link = False
-
 # List of arguments to be passed to the kernel that executes the notebooks:
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'pdf'}",
