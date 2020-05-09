@@ -1267,14 +1267,19 @@ class ImgParser(html.parser.HTMLParser):
         img_path = nbconvert.filters.posix_path(attrs['src'])
         lines = ['image:: ' + img_path]
         indent = ' ' * 4
+        classes = []
         if 'class' in attrs:
-            lines.append(indent + ':class: ' + attrs['class'])
+            classes.append(attrs['class'])
         if 'alt' in attrs:
             lines.append(indent + ':alt: ' + attrs['alt'])
         if 'width' in attrs:
             lines.append(indent + ':width: ' + attrs['width'])
         if 'height' in attrs:
             lines.append(indent + ':height: ' + attrs['height'])
+        if {'width', 'height'}.intersection(attrs):
+            classes.append('no-scaled-link')
+        if classes:
+            lines.append(indent + ':class: ' + ' '.join(classes))
 
         definition = '\n'.join(lines)
         hex_id = uuid.uuid4().hex
