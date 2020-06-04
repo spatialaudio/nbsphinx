@@ -96,6 +96,7 @@ master_doc = 'index'
 
 project = 'nbsphinx'
 author = 'Matthias Geier'
+copyright = '2020, ' + author
 html_show_copyright = False
 
 linkcheck_ignore = [
