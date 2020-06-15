@@ -1265,6 +1265,9 @@ class ImgParser(html.parser.HTMLParser):
         if 'src' not in attrs:
             return
         img_path = nbconvert.filters.posix_path(attrs['src'])
+        if img_path.startswith('data'):
+            # Allow multi-line data, see issue #474
+            img_path = img_path.replace('\n', '')
         lines = ['image:: ' + img_path]
         indent = ' ' * 4
         classes = []
