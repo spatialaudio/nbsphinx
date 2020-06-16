@@ -1,3 +1,6 @@
+Version 0.7.1 (2020-06-16):
+ * Avoid links on scaled images
+
 Version 0.7.0 (2020-05-08):
  * Warnings can be suppressed with ``suppress_warnings``.
  * ``<img>`` tags are handled in Markdown cells; the ``alt``, ``width``,
