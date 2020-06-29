@@ -104,6 +104,8 @@ linkcheck_ignore = [
     'https://github.com/spatialaudio/nbsphinx/compare/',
 ]
 
+nitpicky = True
+
 # -- Get version information and date from Git ----------------------------
 
 try:
