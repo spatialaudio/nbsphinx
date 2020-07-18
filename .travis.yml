@@ -8,11 +8,11 @@ matrix:
   - name: default Python + latest Sphinx
 
   # a few older Sphinx releases using default Python version
-  - env: SPHINX="==1.8.1" BIBTEX="==0.4.2"
-  - env: SPHINX="==1.8.5" BIBTEX="==0.4.2"
-  - env: SPHINX="==2.0.0"
-  - env: SPHINX="==2.2.0"
-  - env: SPHINX="==2.4.0"
+  - env: SPHINX="==1.8.1" BIBTEX="==0.4.2" NOT_NITPICKY="-Dnitpicky=0"
+  - env: SPHINX="==1.8.5" BIBTEX="==0.4.2" NOT_NITPICKY="-Dnitpicky=0"
+  - env: SPHINX="==2.0.0" NOT_NITPICKY="-Dnitpicky=0"
+  - env: SPHINX="==2.2.0" NOT_NITPICKY="-Dnitpicky=0"
+  - env: SPHINX="==2.4.0" NOT_NITPICKY="-Dnitpicky=0"
   - env: SPHINX="==3.0.0"
   - env: SPHINX="==3.1.0"
 
@@ -52,6 +52,6 @@ install:
   - python3 -m pip install sphinxcontrib-bibtex$BIBTEX
 script:
   - python3 -m nbsphinx
-  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b html
-  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow -b latex
-  - python3 -m sphinx doc/ _build/ -W -Dsuppress_warnings=git.too_shallow,epub.unknown_project_files -b epub
+  - python3 -m sphinx doc/ _build/ -W $NOT_NITPICKY -Dsuppress_warnings=git.too_shallow -b html
+  - python3 -m sphinx doc/ _build/ -W $NOT_NITPICKY -Dsuppress_warnings=git.too_shallow -b latex
+  - python3 -m sphinx doc/ _build/ -W $NOT_NITPICKY -Dsuppress_warnings=git.too_shallow,epub.unknown_project_files -b epub
