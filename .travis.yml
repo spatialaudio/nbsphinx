@@ -11,8 +11,10 @@ matrix:
   - env: SPHINX="==1.8.1" BIBTEX="==0.4.2"
   - env: SPHINX="==1.8.5" BIBTEX="==0.4.2"
   - env: SPHINX="==2.0.0"
-  - env: SPHINX="==2.1.0"
   - env: SPHINX="==2.2.0"
+  - env: SPHINX="==2.4.0"
+  - env: SPHINX="==3.0.0"
+  - env: SPHINX="==3.1.0"
 
   # a few Python versions using latest Sphinx release
   - python: "3.5"
