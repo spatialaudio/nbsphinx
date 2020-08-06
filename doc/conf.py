@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 
 # Use sphinx-quickstart to create your own conf.py file!
