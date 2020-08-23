@@ -7,5 +7,6 @@ python:
     - requirements: doc/requirements.txt
     - method: pip
       path: .
+    - requirements: doc/fallback_theme.txt
   system_packages: true
 formats: all

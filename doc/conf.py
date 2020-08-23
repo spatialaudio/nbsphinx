@@ -163,3 +163,15 @@ latex_show_pagerefs = True
 # These are just defined to avoid Sphinx warnings related to EPUB:
 version = release
 suppress_warnings = ['epub.unknown_project_files']
+
+# -- Set default HTML theme (if none was given above) ---------------------
+
+if 'html_theme' not in globals():
+    try:
+        import insipid_sphinx_theme
+    except ImportError:
+        pass
+    else:
+        html_theme = 'insipid'
+        html_copy_source = False
+        html_add_permalinks = '\N{SECTION SIGN}'
