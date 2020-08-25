@@ -215,7 +215,7 @@ For a possible work-around,
 see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
 
 There is an alternative Sphinx extension for creating bibliographies:
-https://bitbucket.org/wnielson/sphinx-natbib/.
+``https://bitbucket.org/wnielson/sphinx-natbib/``.
 However, this project seems to be abandoned (last commit in 2011).
 
 
