@@ -81,11 +81,6 @@ jobs:
           path: build/sphinx/latex/nbsphinx.pdf
           destination: nbsphinx.pdf
 
-      - run:
-          name: Checking for Outdated Links
-          command: |
-            python3 setup.py build_sphinx -W -b linkcheck
-
 workflows:
   version: 2
   build-me-my-docs:
