@@ -15,7 +15,7 @@ newest development version (a.k.a. "master") with Git::
 
    git clone https://github.com/spatialaudio/nbsphinx.git
    cd nbsphinx
-   python3 -m pip install -e . --user
+   python3 -m pip install -e .
 
 ... where ``-e`` stands for ``--editable``.
 
@@ -42,7 +42,7 @@ pages locally using Sphinx and check if they look OK.
 Initially, you might need to install a few packages that are needed to build the
 documentation::
 
-   python3 -m pip install -r doc/requirements.txt --user
+   python3 -m pip install -r doc/requirements.txt
 
 To (re-)build the HTML files, use::
 
