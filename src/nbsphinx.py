@@ -438,6 +438,11 @@ div.nboutput.container div.output_area .highlight {
     box-shadow: none;
 }
 
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
 div.nbinput.container div.prompt *,
 div.nboutput.container div.prompt * {
     background: none;
