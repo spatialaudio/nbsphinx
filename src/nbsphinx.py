@@ -25,6 +25,7 @@ https://nbsphinx.readthedocs.io/
 """
 __version__ = '0.7.1'
 
+import asyncio
 import collections.abc
 import copy
 import html
@@ -32,6 +33,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from urllib.parse import unquote
 import uuid
 
@@ -47,6 +49,15 @@ import sphinx.errors
 import sphinx.transforms.post_transforms.images
 from sphinx.util.matching import patmatch
 import traitlets
+
+# Ensure that notebooks will be executed properly with python>= 3.8 on windows
+# See: https://github.com/jupyter/jupyter_client/issues/583
+if (
+    sys.version_info[0] == 3
+    and sys.version_info[1] >= 8
+    and sys.platform.startswith("win")
+):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 _ipynbversion = 4
 
