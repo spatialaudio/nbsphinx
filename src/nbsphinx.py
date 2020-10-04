@@ -32,6 +32,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from urllib.parse import unquote
 import uuid
 
@@ -47,6 +48,13 @@ import sphinx.errors
 import sphinx.transforms.post_transforms.images
 from sphinx.util.matching import patmatch
 import traitlets
+
+
+if sys.version_info >= (3, 8) and sys.platform == 'win32':
+    # See: https://github.com/jupyter/jupyter_client/issues/583
+    import asyncio
+
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 _ipynbversion = 4
 
