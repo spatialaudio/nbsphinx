@@ -159,10 +159,13 @@ Domain Objects
 
 .. py:function:: example_python_function(foo)
 
-    This is just for testing domain object links. See
-    :ref:`this section </markdown-cells.ipynb#Links-to-Domain-Objects>`.
+    This is just for testing domain object links.
 
     :param str foo: Example string parameter
+
+    .. seealso::
+
+        :ref:`/markdown-cells.ipynb#Links-to-Domain-Objects`
 
 Citations
 ---------
