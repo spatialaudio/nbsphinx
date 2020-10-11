@@ -204,6 +204,10 @@ RST_TEMPLATE = """
     .. raw:: html
 
         <script type="{{ datatype }}">{{ output.data[datatype] | json_dumps }}</script>
+{%- elif datatype == '' %}
+{# Empty output data #}
+
+    ..
 {% else %}
 
     .. nbwarning:: Data type cannot be displayed: {{ datatype }}
