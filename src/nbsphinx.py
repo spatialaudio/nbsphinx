@@ -189,7 +189,7 @@ RST_TEMPLATE = """
 
     .. raw:: html
 
-{{ output.data['text/html'] | indent | indent }}
+{{ (output.data['text/html'] or '<!-- empty output -->') | indent | indent }}
 {%- elif datatype == 'application/javascript' %}
 
     .. raw:: html
@@ -255,19 +255,19 @@ RST_TEMPLATE = """
 {%- if raw_mimetype == '' %}
 .. raw:: html
 
-{{ cell.source | indent }}
+{{ (cell.source or '<!-- empty raw cell -->') | indent }}
 
 .. raw:: latex
 
-{{ cell.source | indent }}
+{{ (cell.source or '% empty raw cell') | indent }}
 {%- elif raw_mimetype == 'text/html' %}
 .. raw:: html
 
-{{ cell.source | indent }}
+{{ (cell.source or '<!-- empty raw cell -->') | indent }}
 {%- elif raw_mimetype == 'text/latex' %}
 .. raw:: latex
 
-{{ cell.source | indent }}
+{{ (cell.source or '% empty raw cell') | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
 {{ cell.source | markdown2rst }}
 {%- elif raw_mimetype == 'text/restructuredtext' %}
