@@ -35,7 +35,7 @@ to surround it with backticks: `a notebook link`_.
 You can also use an `anonymous hyperlink target`_, like this: link__.
 If you have multiple of those, their order matters!
 
-.. _anonymous hyperlink target: http://docutils.sourceforge.net/docs/ref/rst/
+.. _anonymous hyperlink target: https://docutils.sourceforge.io/docs/ref/rst/
                                 restructuredtext.html#anonymous-hyperlinks
 
 __ subdir/a-notebook-in-a-subdir.ipynb
@@ -49,7 +49,7 @@ __ subdir/a-notebook-in-a-subdir.ipynb
 Finally, you can use `Embedded URIs`_, like this
 `link <subdir/a-notebook-in-a-subdir.ipynb>`_.
 
-.. _Embedded URIs: http://docutils.sourceforge.net/docs/ref/rst/
+.. _Embedded URIs: https://docutils.sourceforge.io/docs/ref/rst/
                    restructuredtext.html#embedded-uris-and-aliases
 
 .. code-block:: rst
