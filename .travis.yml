@@ -17,7 +17,6 @@ matrix:
   - env: SPHINX="==3.1.0"
 
   # a few Python versions using latest Sphinx release
-  - python: "3.5"
   - python: "3.6"
   - python: "3.7"
   - python: "nightly"
