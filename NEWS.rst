@@ -1,3 +1,14 @@
+Version 0.8.0 -- 2020-10-20 -- PyPI__ -- diff__
+ * Don't overwrite Pygments background in notebook code cells.
+   To get rid of those ugly greenish code blocks,
+   remove ``pygments_style = 'sphinx'`` from your ``conf.py``.
+ * Switch documentation to
+   `insipid <https://insipid-sphinx-theme.readthedocs.io/>`_ theme by default
+ * Require Python 3.6+
+
+__ https://pypi.org/project/nbsphinx/0.8.0/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.7.1...0.8.0
+
 Version 0.7.1 -- 2020-06-16 -- PyPI__ -- diff__
  * Avoid links on scaled images
 
