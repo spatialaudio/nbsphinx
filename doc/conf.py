@@ -118,6 +118,7 @@ except Exception:
 
 # -- Options for HTML output ----------------------------------------------
 
+html_favicon = 'favicon.svg'
 html_title = project + ' version ' + release
 
 # -- Options for LaTeX output ---------------------------------------------
