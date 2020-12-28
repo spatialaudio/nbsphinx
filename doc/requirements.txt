@@ -2,7 +2,7 @@ ipykernel
 numpy
 matplotlib
 pandas
-sphinxcontrib-bibtex
+sphinxcontrib-bibtex<2
 sphinxcontrib-svg2pdfconverter
 ipywidgets
 sphinx-copybutton
