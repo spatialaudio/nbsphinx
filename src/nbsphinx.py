@@ -765,7 +765,7 @@ class Exporter(nbconvert.RSTExporter):
                 # For now, this works only if there is a single MIME bundle
                 (mime_type, data), = bundle.items()
                 text = re.sub(
-                    r'^(\s*\.\. (\|[^|]*\| image|figure)::) attachment:{0}$'
+                    r'^(\s*\.\. ((\|[^|]*\| )?image|figure)::) attachment:{0}$'
                         .format(filename),
                     r'\1 data:{0};base64,{1}'.format(mime_type, data),
                     text, flags=re.MULTILINE)
