@@ -1,3 +1,9 @@
+Version 0.8.1 -- 2021-01-18 -- PyPI__ -- diff__
+ * Minor fixes and documentation update
+
+__ https://pypi.org/project/nbsphinx/0.8.1/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.0...0.8.1
+
 Version 0.8.0 -- 2020-10-20 -- PyPI__ -- diff__
  * Don't overwrite Pygments background in notebook code cells.
    To get rid of those ugly greenish code blocks,
