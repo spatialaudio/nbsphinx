@@ -195,21 +195,31 @@ as explained in the next section.
 References
 ----------
 
-After installing and enabling_ the sphinxcontrib.bibtex_ extension,
-you can create a list of references from a BibTeX file like this:
+After installing the sphinxcontrib.bibtex_ extension, you have to enable it in
+your ``conf.py`` and select the BibTeX file(s) you want to use:
+
+.. code-block:: python
+
+    extensions = [
+        'nbsphinx',
+        'sphinxcontrib.bibtex',
+        # Probably more extensions here ...
+    ]
+
+    bibtex_bibfiles = ['my-references.bib']
+
+Then you can create a list of references in any reStructuredText file
+(or `reST cell <raw-cells.ipynb#reST>`_ in a notebook) like this:
 
 .. code-block:: rst
 
-    .. bibliography:: references.bib
+    .. bibliography::
 
 Have a look at the documentation for all the available options.
 
-.. _enabling: usage.ipynb#extensions
-
 The list of references may look something like this (in HTML output):
 
-.. bibliography:: references.bib
-    :all:
+.. bibliography::
     :style: alpha
 
 However, in the LaTeX/PDF output the list of references will not appear here,

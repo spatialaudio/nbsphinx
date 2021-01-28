@@ -80,8 +80,7 @@ mathjax_config = {
     'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
 }
 
-# Additional files needed for generating LaTeX/PDF output:
-latex_additional_files = ['references.bib']
+bibtex_bibfiles = ['references.bib']
 
 # Support for notebook formats other than .ipynb
 nbsphinx_custom_formats = {
