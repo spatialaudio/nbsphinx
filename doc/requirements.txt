@@ -5,7 +5,6 @@ pandas
 sphinxcontrib-bibtex>=2.1
 sphinxcontrib-svg2pdfconverter
 ipywidgets
-sphinx-copybutton
 sphinx-gallery
 jupytext
 sphinx-last-updated-by-git

@@ -6,7 +6,6 @@ import os
 # Select nbsphinx and, if needed, other Sphinx extensions:
 extensions = [
     'nbsphinx',
-    'sphinx_copybutton',  # for "copy to clipboard" buttons
     'sphinx.ext.mathjax',  # for math equations
     'sphinxcontrib.bibtex',  # for bibliographic references
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
@@ -31,7 +30,7 @@ os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
 
 nbsphinx_thumbnails = {
     'gallery/thumbnail-from-conf-py': 'gallery/a-local-file.png',
-    'gallery/*-rst': '_static/copy-button.svg',
+    'gallery/*-rst': 'images/notebook_icon.png',
 }
 
 # This is processed by Jinja2 and inserted before each notebook
