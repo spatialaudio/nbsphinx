@@ -6,6 +6,8 @@ jobs:
     steps:
     - name: Clone repo
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Install pandoc
       run: |
         sudo apt-get install pandoc
