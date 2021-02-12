@@ -227,6 +227,30 @@ but at the end of the document.
 For a possible work-around,
 see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
 
+With a sphinxcontrib.bibtex_ version of ``>= 2.0.0`` it is 
+possible to create footnote bibliographies with footnote 
+citations like :footcite:`perez2011python`.
+
+.. code-block:: rst
+
+    :footcite:`perez2011python`
+
+These citations are restricted to their own document and the assembly of the
+bibliography is invoked with the
+
+.. code-block:: rst
+
+    .. footbibliography::
+
+directive. For example, a footnote bibliography might 
+look like this (in HTML output):
+
+.. footbibliography::
+
+In the LaTeX/PDF output, there is no list of references appearing right 
+here or anywhere else in the document. Instead, the footnote citations 
+are placed into the footnotes of their respective pages.
+
 There is an alternative Sphinx extension for creating bibliographies:
 ``https://bitbucket.org/wnielson/sphinx-natbib/``.
 However, this project seems to be abandoned (last commit in 2011).
