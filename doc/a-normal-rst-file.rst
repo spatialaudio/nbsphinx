@@ -167,36 +167,16 @@ Domain Objects
 
         :ref:`/markdown-cells.ipynb#Links-to-Domain-Objects`
 
-Citations
----------
-
-You could use `standard Sphinx citations`_, but it might be more practical to
-use the sphinxcontrib.bibtex_ extension.
-
-If you install and enable this extension,
-you can create citations like :cite:`perez2011python`:
-
-.. code-block:: rst
-
-    :cite:`perez2011python`
-
-You can create similar citations in Jupyter notebooks with a special HTML
-syntax, see the section about `citations in Markdown cells`_.
-
-.. _standard Sphinx Citations: https://www.sphinx-doc.org/en/master/usage/
-    restructuredtext/basics.html#citations
-.. _sphinxcontrib.bibtex: https://sphinxcontrib-bibtex.readthedocs.io/
-.. _citations in Markdown cells: markdown-cells.ipynb#Citations
-
-For those citations to work, you also need to specify a BibTeX file,
-as explained in the next section.
-
 
 References
 ----------
 
+There are different ways of handling references, for example you could use the 
+`standard Sphinx citations`_, but it might be more practical to use the 
+sphinxcontrib.bibtex_ extension.
+
 After installing the sphinxcontrib.bibtex_ extension, you have to enable it in
-your ``conf.py`` and select the BibTeX file(s) you want to use:
+your ``conf.py`` and select at least one BibTeX file you want to use:
 
 .. code-block:: python
 
@@ -208,7 +188,27 @@ your ``conf.py`` and select the BibTeX file(s) you want to use:
 
     bibtex_bibfiles = ['my-references.bib']
 
-Then you can create a list of references in any reStructuredText file
+Afterwards all the references defined in the bibliography file(s) can be used
+throughout the documents as detailed in the following.
+
+.. _standard Sphinx Citations: https://www.sphinx-doc.org/en/master/usage/
+    restructuredtext/basics.html#citations
+.. _sphinxcontrib.bibtex: https://sphinxcontrib-bibtex.readthedocs.io/
+
+Citations
+^^^^^^^^^
+
+You can create citations like :cite:`perez2011python`:
+
+.. code-block:: rst
+
+    :cite:`perez2011python`
+
+You can create similar citations in Jupyter notebooks with a special HTML
+syntax, see the section about 
+`citations in Markdown cells <markdown-cells.ipynb#Citations>`__.
+
+You can create a list of references in any reStructuredText file
 (or `reST cell <raw-cells.ipynb#reST>`_ in a notebook) like this:
 
 .. code-block:: rst
@@ -227,6 +227,9 @@ but at the end of the document.
 For a possible work-around,
 see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
 
+Footnote citations
+^^^^^^^^^^^^^^^^^^
+
 With a sphinxcontrib.bibtex_ version of ``>= 2.0.0`` it is 
 possible to create footnote bibliographies with footnote 
 citations like :footcite:`perez2011python`.
@@ -235,8 +238,11 @@ citations like :footcite:`perez2011python`.
 
     :footcite:`perez2011python`
 
-These citations are restricted to their own document and the assembly of the
-bibliography is invoked with the
+Also footnote citations can be used within Jupyter notebooks with a special HTML syntax,
+see the section about 
+`footnote citations in Markdown cells <markdown-cells.ipynb#Footnote-citations>`__.
+Footnote citations are restricted to their own document and the assembly of the 
+bibliography is (analogously to citations) invoked with the
 
 .. code-block:: rst
 
@@ -250,10 +256,6 @@ look like this (in HTML output):
 In the LaTeX/PDF output, there is no list of references appearing right 
 here or anywhere else in the document. Instead, the footnote citations 
 are placed into the footnotes of their respective pages.
-
-There is an alternative Sphinx extension for creating bibliographies:
-``https://bitbucket.org/wnielson/sphinx-natbib/``.
-However, this project seems to be abandoned (last commit in 2011).
 
 
 Thumbnail Galleries
