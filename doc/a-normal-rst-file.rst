@@ -176,7 +176,7 @@ There are different ways of handling references, for example you could use the
 sphinxcontrib.bibtex_ extension.
 
 After installing the sphinxcontrib.bibtex_ extension, you have to enable it in
-your ``conf.py`` and select at least one BibTeX file you want to use:
+your ``conf.py`` and select the BibTeX file(s) you want to use:
 
 .. code-block:: python
 
@@ -189,7 +189,7 @@ your ``conf.py`` and select at least one BibTeX file you want to use:
     bibtex_bibfiles = ['my-references.bib']
 
 Afterwards all the references defined in the bibliography file(s) can be used
-throughout the documents as detailed in the following.
+throughout the Jupyter notebooks and other source files as detailed in the following.
 
 .. _standard Sphinx Citations: https://www.sphinx-doc.org/en/master/usage/
     restructuredtext/basics.html#citations
@@ -241,8 +241,8 @@ citations like :footcite:`perez2011python`.
 Also footnote citations can be used within Jupyter notebooks with a special HTML syntax,
 see the section about 
 `footnote citations in Markdown cells <markdown-cells.ipynb#Footnote-citations>`__.
-Footnote citations are restricted to their own document and the assembly of the 
-bibliography is (analogously to citations) invoked with the
+Footnote citations are restricted to their own source file and the assembly of the 
+bibliography is (analogously to normal citations) invoked with the
 
 .. code-block:: rst
 
@@ -254,8 +254,8 @@ look like this (in HTML output):
 .. footbibliography::
 
 In the LaTeX/PDF output, there is no list of references appearing right 
-here or anywhere else in the document. Instead, the footnote citations 
-are placed into the footnotes of their respective pages.
+here. Instead, the footnote citations are placed into the footnotes of 
+their respective pages.
 
 
 Thumbnail Galleries
