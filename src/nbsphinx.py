@@ -1266,6 +1266,9 @@ class CitationParser(html.parser.HTMLParser):
             if name == 'data-cite':
                 self.cite = ':cite:`' + value + '`'
                 return True
+            elif name == 'data-footcite':
+                self.cite = ':footcite:`' + value + '`'
+                return True
         return False
 
     def reset(self):
