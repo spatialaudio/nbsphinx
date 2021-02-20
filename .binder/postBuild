@@ -2,4 +2,4 @@
 
 set -e
 
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
+# add your shell commands here

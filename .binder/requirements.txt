@@ -2,4 +2,4 @@ matplotlib
 pandas
 ipywidgets
 jupytext
-jupyterlab>=2
+jupyterlab>=3
