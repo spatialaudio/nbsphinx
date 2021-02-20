@@ -2,17 +2,14 @@ dist: bionic
 language: python
 python:
   - "3.8"
-env:
-  global:
-    - BIBTEX="<2"
 matrix:
   include:
 
   - name: default Python + latest Sphinx
 
   # a few older Sphinx releases using default Python version
-  - env: SPHINX="==1.8.1" BIBTEX="==0.4.2" NOT_NITPICKY="-Dnitpicky=0"
-  - env: SPHINX="==1.8.5" BIBTEX="==0.4.2" NOT_NITPICKY="-Dnitpicky=0"
+  - env: SPHINX="==1.8.1" NOT_NITPICKY="-Dnitpicky=0"
+  - env: SPHINX="==1.8.5" NOT_NITPICKY="-Dnitpicky=0"
   - env: SPHINX="==2.0.0" NOT_NITPICKY="-Dnitpicky=0"
   - env: SPHINX="==2.2.0" NOT_NITPICKY="-Dnitpicky=0"
   - env: SPHINX="==2.4.0" NOT_NITPICKY="-Dnitpicky=0"
@@ -50,8 +47,6 @@ install:
   - python3 --version
   - python3 -m pip install Sphinx$SPHINX
   - python3 -m pip install .
-  - python3 -m pip install $(grep -iv bibtex doc/requirements.txt)
-  - python3 -m pip install sphinxcontrib-bibtex$BIBTEX
 script:
   - python3 -m nbsphinx
   - python3 -m sphinx doc/ _build/ -W $NOT_NITPICKY -Dsuppress_warnings=git.too_shallow -b html
