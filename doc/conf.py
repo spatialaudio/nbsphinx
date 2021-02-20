@@ -13,9 +13,6 @@ extensions = [
     'sphinx_last_updated_by_git',  # get "last updated" from Git
 ]
 
-# Default language for syntax highlighting in reST and Markdown cells:
-highlight_language = 'none'
-
 # Don't add .txt suffix to source files:
 html_sourcelink_suffix = ''
 
