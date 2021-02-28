@@ -1,3 +1,11 @@
+Version 0.8.2 -- 2021-02-28 -- PyPI__ -- diff__
+ * Add support for ``data-footcite`` HTML attribute
+ * Disable automatic highlighting in notebooks,
+   setting ``highlight_language`` is no longer needed
+
+__ https://pypi.org/project/nbsphinx/0.8.2/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.1...0.8.2
+
 Version 0.8.1 -- 2021-01-18 -- PyPI__ -- diff__
  * Minor fixes and documentation update
 

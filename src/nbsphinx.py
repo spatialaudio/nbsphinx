@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2020 Matthias Geier
+# Copyright (c) 2015-2021 Matthias Geier
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 https://nbsphinx.readthedocs.io/
 
 """
-__version__ = '0.8.1'
+__version__ = '0.8.2'
 
 import collections.abc
 import copy
