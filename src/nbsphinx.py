@@ -112,6 +112,7 @@ RST_TEMPLATE = """
 
 
 {% block input -%}
+{% if 'remove-input' not in cell.metadata.tags %}
 .. nbinput:: {% if cell.metadata.magics_language -%}
 {{ cell.metadata.magics_language }}
 {%- elif nb.metadata.language_info -%}
@@ -128,6 +129,7 @@ RST_TEMPLATE = """
 {%- endif %}
 
 {{ cell.source.strip('\n') | indent }}
+{% endif %}
 {% endblock input %}
 
 
@@ -216,6 +218,7 @@ RST_TEMPLATE = """
 
 
 {% block nboutput -%}
+{% if 'remove-output' not in cell.metadata.tags %}
 ..
 {# Empty comment to make sure the preceding directive (if any) is closed #}
 {%- set html_datatype, latex_datatype = output | get_output_type %}
@@ -228,6 +231,7 @@ RST_TEMPLATE = """
 .. only:: latex
 
 {{ insert_nboutput(latex_datatype, output, cell) | indent }}
+{% endif %}
 {% endif %}
 {% endblock nboutput %}
 
