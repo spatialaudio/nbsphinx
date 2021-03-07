@@ -2253,8 +2253,9 @@ def setup(app):
     # see https://github.com/sphinx-doc/sphinx/issues/2155:
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
 
-    # Work-around until https://github.com/sphinx-doc/sphinx/pull/5504 is done:
+    # See also https://github.com/sphinx-doc/sphinx/pull/5504
     mathjax_config = app.config._raw_config.setdefault('mathjax_config', {})
+    # MathJax v2:
     mathjax_config.setdefault(
         'tex2jax',
         {
@@ -2262,6 +2263,21 @@ def setup(app):
             'processEscapes': True,
             'ignoreClass': 'document',
             'processClass': 'math|output_area',
+        }
+    )
+    # MathJax v3:
+    mathjax_config.setdefault(
+        'tex',
+        {
+            'inlineMath': [['$', '$'], ['\\(', '\\)']],
+            'processEscapes': True,
+        }
+    )
+    mathjax_config.setdefault(
+        'options',
+        {
+            'ignoreHtmlClass': 'document',
+            'processHtmlClass': 'math|output_area',
         }
     )
 
