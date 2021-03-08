@@ -103,7 +103,7 @@ RST_TEMPLATE = """
 
 
 {% block any_cell %}
-{%- if cell.metadata.nbsphinx != 'hidden' and 'remove-cell' not in cell.metadata.tags %}
+{%- if cell.metadata.nbsphinx != 'hidden' %}
 {{ super() }}
 ..
 {# Empty comment to make sure the preceding directive (if any) is closed #}
@@ -112,7 +112,6 @@ RST_TEMPLATE = """
 
 
 {% block input -%}
-{% if 'remove-input' not in cell.metadata.tags %}
 .. nbinput:: {% if cell.metadata.magics_language -%}
 {{ cell.metadata.magics_language }}
 {%- elif nb.metadata.language_info -%}
@@ -129,7 +128,6 @@ RST_TEMPLATE = """
 {%- endif %}
 
 {{ cell.source.strip('\n') | indent }}
-{% endif %}
 {% endblock input %}
 
 
@@ -218,7 +216,6 @@ RST_TEMPLATE = """
 
 
 {% block nboutput -%}
-{% if 'remove-output' not in cell.metadata.tags %}
 ..
 {# Empty comment to make sure the preceding directive (if any) is closed #}
 {%- set html_datatype, latex_datatype = output | get_output_type %}
@@ -231,7 +228,6 @@ RST_TEMPLATE = """
 .. only:: latex
 
 {{ insert_nboutput(latex_datatype, output, cell) | indent }}
-{% endif %}
 {% endif %}
 {% endblock nboutput %}
 
@@ -789,6 +785,12 @@ class Exporter(nbconvert.RSTExporter):
                 'HighlightMagicsPreprocessor': {'enabled': True},
                 # Work around https://github.com/jupyter/nbconvert/issues/720:
                 'RegexRemovePreprocessor': {'enabled': False},
+                'TagRemovePreprocessor': {
+                    'enabled': True,
+                    'remove_cell_tags': ('remove-cell',),
+                    'remove_all_outputs_tags': ('remove-output',),
+                    'remove_input_tags': ('remove-input',),
+                },
             }),
             filters={
                 'convert_pandoc': convert_pandoc,
