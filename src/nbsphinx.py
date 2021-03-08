@@ -103,7 +103,7 @@ RST_TEMPLATE = """
 
 
 {% block any_cell %}
-{%- if cell.metadata.nbsphinx != 'hidden' %}
+{%- if cell.metadata.nbsphinx != 'hidden' and 'remove-cell' not in cell.metadata.tags %}
 {{ super() }}
 ..
 {# Empty comment to make sure the preceding directive (if any) is closed #}
