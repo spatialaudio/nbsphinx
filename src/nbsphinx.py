@@ -938,6 +938,7 @@ class NotebookParser(rst.Parser):
             CreateNotebookSectionAnchors,
             ReplaceAlertDivs,
             CopyLinkedFiles,
+            ForceEquations,
         ]
 
     def parse(self, inputstring, document):
@@ -1794,6 +1795,16 @@ class CopyLinkedFiles(docutils.transforms.Transform):
                     type='nbsphinx', subtype='localfile')
                 continue  # Link is ignored
             env.nbsphinx_files.setdefault(env.docname, []).append(file)
+
+
+class ForceEquations(docutils.transforms.Transform):
+    """Unconditionally enable equations on notebooks."""
+
+    default_priority = 900  # after checking for equations in MathDomain
+
+    def apply(self):
+        env = self.document.settings.env
+        env.get_domain('math').data['has_equations'][env.docname] = True
 
 
 class GetSizeFromImages(
