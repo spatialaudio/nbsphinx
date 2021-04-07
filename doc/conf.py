@@ -19,7 +19,7 @@ html_sourcelink_suffix = ''
 # List of arguments to be passed to the kernel that executes the notebooks:
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'pdf'}",
-    "--InlineBackend.rc={'figure.dpi': 96}",
+    "--InlineBackend.rc=figure.dpi=96",
 ]
 
 # Environment variables to be passed to the kernel:
