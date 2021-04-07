@@ -1876,6 +1876,7 @@ def load_requirejs(app):
 
 def builder_inited(app):
     env = app.env
+    env.settings['line_length_limit'] = 100_000_000
     env.nbsphinx_notebooks = {}
     env.nbsphinx_files = {}
     if not hasattr(env, 'nbsphinx_thumbnails'):
