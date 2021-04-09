@@ -1,3 +1,9 @@
+Version 0.8.3 -- 2021-04-09 -- PyPI__ -- diff__
+ * Increase ``line_length_limit`` (for `docutils` 0.17+)
+
+__ https://pypi.org/project/nbsphinx/0.8.3/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.2...0.8.3
+
 Version 0.8.2 -- 2021-02-28 -- PyPI__ -- diff__
  * Add support for ``data-footcite`` HTML attribute
  * Disable automatic highlighting in notebooks,
