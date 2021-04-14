@@ -25,6 +25,7 @@ matrix:
 
   - name: default Python + latest Sphinx
     os: osx
+    osx_image: xcode12.2
     language: generic
     python: ""
 
