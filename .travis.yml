@@ -1,7 +1,7 @@
 dist: bionic
 language: python
 python:
-  - "3.8"
+  - "3.9"
 matrix:
   include:
 
@@ -19,6 +19,7 @@ matrix:
   # a few Python versions using latest Sphinx release
   - python: "3.6"
   - python: "3.7"
+  - python: "3.8"
   - python: "nightly"
   - python: "pypy3"
 
