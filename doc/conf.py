@@ -170,4 +170,4 @@ if 'html_theme' not in globals():
     else:
         html_theme = 'insipid'
         html_copy_source = False
-        html_add_permalinks = '\N{SECTION SIGN}'
+        html_permalinks_icon = '\N{SECTION SIGN}'
