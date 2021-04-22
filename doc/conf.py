@@ -72,8 +72,8 @@ nbsphinx_epilog = r"""
     {{ docname | escape_latex }}}} ends here.}}
 """
 
-mathjax_config = {
-    'TeX': {'equationNumbers': {'autoNumber': 'AMS', 'useLabelIds': True}},
+mathjax3_config = {
+    'tex': {'tags': 'ams', 'useLabelIds': True},
 }
 
 bibtex_bibfiles = ['references.bib']

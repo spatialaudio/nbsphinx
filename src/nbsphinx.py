@@ -1873,6 +1873,45 @@ def config_inited(app, config):
     # see https://github.com/spatialaudio/nbsphinx/issues/409
     app.connect('builder-inited', load_requirejs)
 
+    # See also https://github.com/sphinx-doc/sphinx/pull/5504
+    if hasattr(config, 'mathjax3_config') and config.mathjax2_config is None:
+        # NB: If mathjax_path is used in Sphinx >= 4 to load MathJax v2,
+        # this only works if mathjax_config or mathjax2_config is specified.
+        if config.mathjax3_config is None:
+            config.mathjax3_config = {}
+        mathjax3_config = config.mathjax3_config
+        tex = {
+            'inlineMath': [['$', '$'], ['\\(', '\\)']],
+            'processEscapes': True,
+        }
+        tex.update(mathjax3_config.get('tex', {}))
+        mathjax3_config['tex'] = tex
+        options = {
+            'ignoreHtmlClass': 'document',
+            'processHtmlClass': 'math|output_area',
+        }
+        options.update(mathjax3_config.get('options', {}))
+        mathjax3_config['options'] = options
+    else:
+        if hasattr(config, 'mathjax2_config'):
+            # Sphinx >= 4.0
+            if config.mathjax2_config is None:
+                config.mathjax2_config = {}
+            mathjax2_config = config.mathjax2_config
+        else:
+            # Sphinx < 4.0
+            if config.mathjax_config is None:
+                config.mathjax_config = {}
+            mathjax2_config = config.mathjax_config
+        tex2jax = {
+            'inlineMath': [['$', '$'], ['\\(', '\\)']],
+            'processEscapes': True,
+            'ignoreClass': 'document',
+            'processClass': 'math|output_area',
+        }
+        tex2jax.update(mathjax2_config.get('tex2jax', {}))
+        mathjax2_config['tex2jax'] = tex2jax
+
 
 def load_requirejs(app):
     config = app.config
@@ -2270,18 +2309,6 @@ def setup(app):
     # behave like Sphinx's "code-block",
     # see https://github.com/sphinx-doc/sphinx/issues/2155:
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
-
-    # Work-around until https://github.com/sphinx-doc/sphinx/pull/5504 is done:
-    mathjax_config = app.config._raw_config.setdefault('mathjax_config', {})
-    mathjax_config.setdefault(
-        'tex2jax',
-        {
-            'inlineMath': [['$', '$'], ['\\(', '\\)']],
-            'processEscapes': True,
-            'ignoreClass': 'document',
-            'processClass': 'math|output_area',
-        }
-    )
 
     # Add LaTeX definitions to preamble
     latex_elements = app.config._raw_config.setdefault('latex_elements', {})
