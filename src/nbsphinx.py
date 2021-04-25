@@ -1798,13 +1798,18 @@ class CopyLinkedFiles(docutils.transforms.Transform):
 
 
 class ForceEquations(docutils.transforms.Transform):
-    """Unconditionally enable equations on notebooks."""
+    """Unconditionally enable equations on notebooks.
+
+    Except if ``nbsphinx_assume_equations`` is set to ``False``.
+
+    """
 
     default_priority = 900  # after checking for equations in MathDomain
 
     def apply(self):
         env = self.document.settings.env
-        env.get_domain('math').data['has_equations'][env.docname] = True
+        if env.config.nbsphinx_assume_equations:
+            env.get_domain('math').data['has_equations'][env.docname] = True
 
 
 class GetSizeFromImages(
@@ -2229,6 +2234,7 @@ def setup(app):
     app.add_config_value('nbsphinx_widgets_path', None, rebuild='html')
     app.add_config_value('nbsphinx_widgets_options', {}, rebuild='html')
     app.add_config_value('nbsphinx_thumbnails', {}, rebuild='html')
+    app.add_config_value('nbsphinx_assume_equations', True, rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
