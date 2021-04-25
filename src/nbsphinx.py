@@ -745,7 +745,8 @@ class Exporter(nbconvert.RSTExporter):
     """
 
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
-                 allow_errors=False, timeout=None, codecell_lexer='none'):
+                 allow_errors=False, timeout=None, codecell_lexer='none',
+                 markdown_renderer='pandoc'):
         """Initialize the Exporter."""
 
         # NB: The following stateful Jinja filters are a hack until
@@ -772,6 +773,14 @@ class Exporter(nbconvert.RSTExporter):
             del attachment_storage[:]
             return text
 
+        renderer_cls = MARKDOWN_RENDERERS.get(markdown_renderer)
+        if renderer_cls is None:
+            known = ", ".join(MARKDOWN_RENDERERS.keys())
+            raise ValueError(
+                'invalid renderer option: {!r} (known renderers: {})'.format(markdown_renderer, known)
+            )
+        renderer = renderer_cls()
+
         self._execute = execute
         self._kernel_name = kernel_name
         self._execute_arguments = execute_arguments
@@ -787,8 +796,8 @@ class Exporter(nbconvert.RSTExporter):
                 'RegexRemovePreprocessor': {'enabled': False},
             }),
             filters={
-                'convert_pandoc': convert_pandoc,
-                'markdown2rst': markdown2rst,
+                'convert_pandoc': renderer.convert_pandoc,
+                'markdown2rst': renderer.markdown2rst,
                 'get_empty_lines': _get_empty_lines,
                 'extract_gallery_or_toctree': _extract_gallery_or_toctree,
                 'save_attachments': save_attachments,
@@ -1015,6 +1024,7 @@ class NotebookParser(rst.Parser):
             allow_errors=env.config.nbsphinx_allow_errors,
             timeout=env.config.nbsphinx_timeout,
             codecell_lexer=env.config.nbsphinx_codecell_lexer,
+            markdown_renderer=env.config.nbsphinx_markdown_renderer
         )
 
         try:
@@ -1238,18 +1248,6 @@ class NbGallery(sphinx.directives.other.TocTree):
         return [gallerytoc]
 
 
-def convert_pandoc(text, from_format, to_format):
-    """Simple wrapper for markdown2rst.
-
-    In nbconvert version 5.0, the use of markdown2rst in the RST
-    template was replaced by the new filter function convert_pandoc.
-
-    """
-    if from_format != 'markdown' and to_format != 'rst':
-        raise ValueError('Unsupported conversion')
-    return markdown2rst(text)
-
-
 class CitationParser(html.parser.HTMLParser):
 
     def handle_starttag(self, tag, attrs):
@@ -1326,88 +1324,136 @@ class ImgParser(html.parser.HTMLParser):
         self.obj = {}
 
 
-def markdown2rst(text):
-    """Convert a Markdown string to reST via pandoc.
+class MarkdownRenderer:
+    def convert_pandoc(self, text, from_format, to_format):
+        """Simple wrapper for markdown2rst.
 
-    This is very similar to nbconvert.filters.markdown.markdown2rst(),
-    except that it uses a pandoc filter to convert raw LaTeX blocks to
-    "math" directives (instead of "raw:: latex" directives).
+        In nbconvert version 5.0, the use of markdown2rst in the RST
+        template was replaced by the new filter function convert_pandoc.
 
-    NB: At some point, pandoc changed its behavior!  In former times,
-    it converted LaTeX math environments to RawBlock ("latex"), at some
-    later point this was changed to RawInline ("tex").
-    Either way, we convert it to Math/DisplayMath.
+        """
+        if from_format != 'markdown' and to_format != 'rst':
+            raise ValueError('Unsupported conversion')
 
+        return self.markdown2rst(text)
+
+
+class CommonMarkMarkdownRenderer(MarkdownRenderer):
+    """ Convert a Markdown string to reST via commonmark.
     """
+    def __init__(self):
+        try:
+            import commonmark
+        except ModuleNotFoundError as e:
+            raise ModuleNotFoundError(e.msg + '. Please install it (such as with \'pip install commonmark\') to use \'nbsphinx_markdown_renderer = "commonmark"\'') from e
 
-    def parse_citation(obj):
-        p = CitationParser()
-        p.feed(obj['c'][1])
-        p.close()
-        return p
+        class AnonymousLinks(commonmark.ReStructuredTextRenderer):
+            def link(self, node, entering):
+                if entering:
+                    self.out('`')
+                else:
+                    # use anonymous hyperlinks `<...>`__ instead of named ones _
+                    self.out(' <%s>`__' % node.destination)
 
-    def parse_img(obj):
-        p = ImgParser()
-        p.feed(obj['c'][1])
-        p.close()
-        return p
+        self._parser = commonmark.Parser()
+        self._renderer = AnonymousLinks()
 
-    def object_hook(obj):
-        if object_hook.open_cite_tag:
-            if obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
+    def markdown2rst(self, text):
+        """
+        This is very similar to nbconvert.filters.markdown.markdown2rst(), except
+        that it uses commonmark (with some extensions) instead of Pandoc, for speed.
+        """
+
+        ast = self._parser.parse(text)
+        return self._renderer.render(ast)
+
+
+class PandocMarkdownRenderer(MarkdownRenderer):
+    def markdown2rst(self, text):
+        """Convert a Markdown string to reST via pandoc.
+
+        This is very similar to nbconvert.filters.markdown.markdown2rst(),
+        except that it uses a pandoc filter to convert raw LaTeX blocks to
+        "math" directives (instead of "raw:: latex" directives).
+
+        NB: At some point, pandoc changed its behavior!  In former times,
+        it converted LaTeX math environments to RawBlock ("latex"), at some
+        later point this was changed to RawInline ("tex").
+        Either way, we convert it to Math/DisplayMath.
+
+        """
+
+        def parse_citation(obj):
+            p = CitationParser()
+            p.feed(obj['c'][1])
+            p.close()
+            return p
+
+        def parse_img(obj):
+            p = ImgParser()
+            p.feed(obj['c'][1])
+            p.close()
+            return p
+
+        def object_hook(obj):
+            if object_hook.open_cite_tag:
+                if obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
+                    p = parse_citation(obj)
+                    if p.endtag == object_hook.open_cite_tag:
+                        object_hook.open_cite_tag = ''
+                return {'t': 'Str', 'c': ''}  # Object is replaced by empty string
+
+            if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
+                obj['t'] = 'Para'
+                obj['c'] = [{
+                    't': 'Math',
+                    'c': [
+                        {'t': 'DisplayMath', 'c': []},
+                        # Special marker characters are removed below:
+                        '\x0e:nowrap:\x0f\n\n' + obj['c'][1],
+                    ]
+                }]
+            elif obj.get('t') == 'RawInline' and obj['c'][0] == 'tex':
+                obj = {'t': 'RawInline',
+                       'c': ['rst', ':nbsphinx-math:`{}`'.format(obj['c'][1])]}
+            elif obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
                 p = parse_citation(obj)
-                if p.endtag == object_hook.open_cite_tag:
-                    object_hook.open_cite_tag = ''
-            return {'t': 'Str', 'c': ''}  # Object is replaced by empty string
+                if p.starttag:
+                    object_hook.open_cite_tag = p.starttag
+                if p.cite:
+                    obj = {'t': 'RawInline', 'c': ['rst', p.cite]}
+                if not p.starttag and not p.cite:
+                    p = parse_img(obj)
+                    if p.obj:
+                        obj = p.obj
+                        object_hook.image_definitions.append(p.definition)
+            return obj
 
-        if obj.get('t') == 'RawBlock' and obj['c'][0] == 'latex':
-            obj['t'] = 'Para'
-            obj['c'] = [{
-                't': 'Math',
-                'c': [
-                    {'t': 'DisplayMath', 'c': []},
-                    # Special marker characters are removed below:
-                    '\x0e:nowrap:\x0f\n\n' + obj['c'][1],
-                ]
-            }]
-        elif obj.get('t') == 'RawInline' and obj['c'][0] == 'tex':
-            obj = {'t': 'RawInline',
-                   'c': ['rst', ':nbsphinx-math:`{}`'.format(obj['c'][1])]}
-        elif obj.get('t') == 'RawInline' and obj['c'][0] == 'html':
-            p = parse_citation(obj)
-            if p.starttag:
-                object_hook.open_cite_tag = p.starttag
-            if p.cite:
-                obj = {'t': 'RawInline', 'c': ['rst', p.cite]}
-            if not p.starttag and not p.cite:
-                p = parse_img(obj)
-                if p.obj:
-                    obj = p.obj
-                    object_hook.image_definitions.append(p.definition)
-        return obj
+        object_hook.open_cite_tag = ''
+        object_hook.image_definitions = []
 
-    object_hook.open_cite_tag = ''
-    object_hook.image_definitions = []
+        def filter_func(text):
+            json_data = json.loads(text, object_hook=object_hook)
+            return json.dumps(json_data)
 
-    def filter_func(text):
-        json_data = json.loads(text, object_hook=object_hook)
-        return json.dumps(json_data)
+        input_format = 'markdown'
+        input_format += '-implicit_figures'
+        v = nbconvert.utils.pandoc.get_pandoc_version()
+        if nbconvert.utils.version.check_version(v, '1.13'):
+            input_format += '-native_divs+raw_html'
 
-    input_format = 'markdown'
-    input_format += '-implicit_figures'
-    v = nbconvert.utils.pandoc.get_pandoc_version()
-    if nbconvert.utils.version.check_version(v, '1.13'):
-        input_format += '-native_divs+raw_html'
+        rststring = pandoc(text, input_format, 'rst', filter_func=filter_func)
+        rststring = re.sub(
+            r'^\n( *)\x0e:nowrap:\x0f$',
+            r'\1:nowrap:',
+            rststring,
+            flags=re.MULTILINE)
+        rststring += '\n\n'
+        rststring += '\n'.join(object_hook.image_definitions)
+        return rststring
 
-    rststring = pandoc(text, input_format, 'rst', filter_func=filter_func)
-    rststring = re.sub(
-        r'^\n( *)\x0e:nowrap:\x0f$',
-        r'\1:nowrap:',
-        rststring,
-        flags=re.MULTILINE)
-    rststring += '\n\n'
-    rststring += '\n'.join(object_hook.image_definitions)
-    return rststring
+MARKDOWN_RENDERERS = {"pandoc": PandocMarkdownRenderer, "commonmark": CommonMarkMarkdownRenderer}
+
 
 
 def pandoc(source, fmt, to, filter_func=None):
@@ -2218,6 +2264,7 @@ def setup(app):
     app.add_config_value('nbsphinx_widgets_path', None, rebuild='html')
     app.add_config_value('nbsphinx_widgets_options', {}, rebuild='html')
     app.add_config_value('nbsphinx_thumbnails', {}, rebuild='html')
+    app.add_config_value('nbsphinx_markdown_renderer', 'pandoc', rebuild='env')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
