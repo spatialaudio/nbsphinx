@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Build multiple versions of the docs with different themes.
 
-If no THEME-NAME is given, all theme branches are built.
+If no THEME-NAMES are given, all theme branches will be built.
 
-A requirements file can be created with the --requirements flag.
+All options after -- are passed to Sphinx.
+
+A requirements file can be created with the --requirements (or -r) flag.
 Those requirements can be installed with:
 
     python3 -m pip install -r theme_comparison/theme_requirements.txt
@@ -18,6 +20,7 @@ from sphinx.cmd.build import build_main
 
 parser = argparse.ArgumentParser(
     description=__doc__,
+    usage='%(prog)s [OPTIONS] [THEME-NAMES] [-- SPHINX-OPTIONS]',
     formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument(
     '-l', '--list-themes', action='store_true',
@@ -29,8 +32,8 @@ parser.add_argument(
     '-f', '--fetch', action='store_true',
     help='fetch latest data from "upstream"')
 parser.add_argument(
-    'themes', metavar='THEME-NAME', nargs='*',
-    help='theme name (according to "*-theme" branch name)')
+    'themes', metavar='THEME-NAMES', nargs=argparse.REMAINDER,
+    help='theme names (according to "*-theme" branch names)')
 args = parser.parse_args()
 
 main_dir = Path(__file__).resolve().parent / 'theme_comparison'
@@ -61,8 +64,15 @@ if args.list_themes:
         print(theme)
     parser.exit(0)
 
-if args.themes:
-    selected_themes, requested_themes = [], args.themes
+try:
+    end_of_args = args.themes.index('--')
+except ValueError:
+    end_of_args = len(args.themes)
+requested_themes = args.themes[:end_of_args]
+sphinx_options = args.themes[end_of_args + 1:]
+
+if requested_themes:
+    selected_themes = []
     for theme, branch in available_themes:
         if theme in requested_themes:
             selected_themes.append((theme, branch))
@@ -125,6 +135,7 @@ def build_docs(name, branch):
         '-Dversion=dummy',
         '-Dtoday=dummy',
         '-Dhtml_title=nbsphinx-theme-comparison',
+        *sphinx_options,
     ])
     if result != 0:
         parser.exit(result)
