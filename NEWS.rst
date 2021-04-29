@@ -1,3 +1,11 @@
+Version 0.8.4 -- 2021-04-29 -- PyPI__ -- diff__
+ * Support for ``mathjax3_config`` (for Sphinx >= 4)
+ * Force loading MathJax on HTML pages generated from notebooks
+   (can be disabled with ``nbsphinx_assume_equations = False``)
+
+__ https://pypi.org/project/nbsphinx/0.8.4/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.3...0.8.4
+
 Version 0.8.3 -- 2021-04-09 -- PyPI__ -- diff__
  * Increase ``line_length_limit`` (for `docutils` 0.17+)
 
