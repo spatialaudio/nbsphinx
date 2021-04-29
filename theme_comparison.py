@@ -14,7 +14,6 @@ Those requirements can be installed with:
 import argparse
 from pathlib import Path
 
-import git
 from sphinx.cmd.build import build_main
 
 
@@ -35,6 +34,13 @@ parser.add_argument(
     'themes', metavar='THEME-NAMES', nargs=argparse.REMAINDER,
     help='theme names (according to "*-theme" branch names)')
 args = parser.parse_args()
+
+try:
+    import git
+except ImportError as e:
+    parser.exit(
+        'The Python package GitPython has to be installed:\n\n'
+        '    python3 -m pip install GitPython\n')
 
 main_dir = Path(__file__).resolve().parent / 'theme_comparison'
 main_dir.mkdir(exist_ok=True)
