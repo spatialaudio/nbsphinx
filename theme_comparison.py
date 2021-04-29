@@ -23,10 +23,10 @@ parser.add_argument(
     '-l', '--list-themes', action='store_true',
     help='show list of available themes and exit')
 parser.add_argument(
-    '--requirements', action='store_true',
+    '-r', '--requirements', action='store_true',
     help='create theme_requirements.txt and exit')
 parser.add_argument(
-    '--fetch', action='store_true',
+    '-f', '--fetch', action='store_true',
     help='fetch latest data from "upstream"')
 parser.add_argument(
     'themes', metavar='THEME-NAME', nargs='*',
