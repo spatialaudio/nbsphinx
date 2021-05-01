@@ -19,13 +19,13 @@ myst_update_mathjax = False
 ## Links to Notebooks (and Other Sphinx Source Files)
 
 Links to Sphinx source files can be created like in
-[Markdown cells of notebooks](markdown-cells.html#Links-to-Other-Notebooks).
+[Markdown cells of notebooks](markdown-cells.ipynb#Links-to-Other-Notebooks).
 
 
 ## Math
 
 Math equation can be used just like in
-[Markdown cells of notebooks](markdown-cells.html#Equations).
+[Markdown cells of notebooks](markdown-cells.ipynb#Equations).
 
 Inline like this: $\text{e}^{i\pi} = -1$.
 
