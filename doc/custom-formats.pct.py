@@ -68,7 +68,8 @@
 # .. literalinclude:: conf.py
 #     :language: python
 #     :start-at: nbsphinx_custom_formats
-#     :lines: -3
+#     :lines: -4
+#     :emphasize-lines: 2
 
 # %% [markdown]
 # Another example is [this gallery example page](gallery/due-rst.pct.py).

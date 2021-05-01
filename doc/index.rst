@@ -20,6 +20,7 @@ was generated from Jupyter notebooks.
     subdir/*
     custom-css
     a-normal-rst-file
+    a-markdown-file
     links
     contributing
     version-history
