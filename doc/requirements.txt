@@ -8,3 +8,4 @@ ipywidgets
 sphinx-gallery
 jupytext
 sphinx-last-updated-by-git
+myst-parser

@@ -10,6 +10,7 @@ extensions = [
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
     'sphinx_gallery.load_style',  # load CSS for gallery (needs SG >= 0.6)
     'sphinx_last_updated_by_git',  # get "last updated" from Git
+    'myst_parser',  # for Markdown source files
 ]
 
 # Don't add .txt suffix to source files:
@@ -81,6 +82,8 @@ bibtex_bibfiles = ['references.bib']
 nbsphinx_custom_formats = {
     '.pct.py': ['jupytext.reads', {'fmt': 'py:percent'}],
 }
+
+myst_update_mathjax = False
 
 # -- The settings below this line are not specific to nbsphinx ------------
 
