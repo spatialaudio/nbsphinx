@@ -85,6 +85,8 @@ nbsphinx_custom_formats = {
 
 myst_update_mathjax = False
 
+myst_enable_extensions = ['dollarmath', 'amsmath']
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'

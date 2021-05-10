@@ -31,6 +31,6 @@ Inline like this: $\text{e}^{i\pi} = -1$.
 
 Or as a separate block:
 
-\begin{equation}
+\begin{equation*}
 \int\limits_{-\infty}^\infty f(x) \delta(x - x_0) dx = f(x_0)
-\end{equation}
+\end{equation*}
