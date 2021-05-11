@@ -43,6 +43,7 @@ import nbconvert
 import nbformat
 import sphinx
 import sphinx.directives
+import sphinx.directives.other
 import sphinx.environment
 import sphinx.errors
 import sphinx.transforms.post_transforms.images
