@@ -1,3 +1,11 @@
+Version 0.8.5 -- 2021-05-12 -- PyPI__ -- diff__
+ * Freeze Jinja2 version to 2.11 (for now, until a bugfix is found)
+ * Add ``theme_comparison.py`` tool for creating multiple versions
+   (with different HTML themes) of the docs at once
+
+__ https://pypi.org/project/nbsphinx/0.8.5/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.4...0.8.5
+
 Version 0.8.4 -- 2021-04-29 -- PyPI__ -- diff__
  * Support for ``mathjax3_config`` (for Sphinx >= 4)
  * Force loading MathJax on HTML pages generated from notebooks
