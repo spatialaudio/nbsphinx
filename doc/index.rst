@@ -1,8 +1,18 @@
 .. include:: ../README.rst
 
-All content shown below -- except for the sections :doc:`a-normal-rst-file`,
-:doc:`contributing` and :doc:`version-history` --
-was generated from Jupyter notebooks.
+All content shown below
+was generated from Jupyter notebooks,
+except for the sections :doc:`a-normal-rst-file`,
+:doc:`contributing` and :doc:`version-history`,
+which were generated from Sphinx's built-in `reStructuredText`__ format.
+The sections
+:doc:`custom-formats`,
+:doc:`gallery/due-rst` and
+:doc:`a-markdown-file`
+are using alternative storage formats for Jupyter notebooks,
+see :doc:`custom-formats` for details.
+
+__ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 
 .. toctree::
     :maxdepth: 4
