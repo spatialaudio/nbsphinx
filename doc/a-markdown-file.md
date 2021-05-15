@@ -31,7 +31,7 @@ Links to other Sphinx source files can be created like in
 
 ## Math
 
-Math equation can be used just like in
+Mathematical equations can be used just like in
 [Markdown cells of notebooks](markdown-cells.ipynb#Equations).
 
 Inline like this: $\text{e}^{i\pi} = -1$.
@@ -41,3 +41,18 @@ Or as a separate block:
 \begin{equation*}
 \int\limits_{-\infty}^\infty f(x) \delta(x - x_0) dx = f(x_0)
 \end{equation*}
+
+
+## Tables
+
+A     | B     | A and B
+------|-------|--------
+False | False | False
+True  | False | False
+False | True  | False
+True  | True  | True
+
+
+## Images
+
+![Jupyter notebook icon](images/notebook_icon.png)
