@@ -6,7 +6,7 @@ For an example, see the
 [Sphinx documentation](https://www.sphinx-doc.org/en/master/usage/markdown.html).
 
 Alternatively, when using `nbsphinx` it is also possible to use Markdown
-files via [custom notebook formats](custom-formats.ipynb).
+files via [custom notebook formats](custom-formats.pct.py).
 
 You only need to install the [jupytext](https://jupytext.readthedocs.io/)
 package and add a configuration setting to `conf.py`,
