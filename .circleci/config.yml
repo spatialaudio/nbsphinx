@@ -22,6 +22,12 @@ jobs:
           path: .circleci/artifacts.html
           destination: artifacts.html
 
+      - run:
+          name: Installing apt Packages
+          command: |
+            apt-get update
+            apt-get install -y python3-pip librsvg2-bin
+
       - restore_cache:
           keys:
             - v1-deps-{{ .Branch }}-{{ checksum "doc/requirements.txt" }}
@@ -43,12 +49,6 @@ jobs:
           paths:
             - ~/.cache/pip
           key: v1-deps-{{ .Branch }}-{{ checksum "doc/requirements.txt" }}
-
-      - run:
-          name: Installing apt Packages
-          command: |
-            apt-get update
-            apt-get install -y librsvg2-bin
 
       - run:
           name: Show pandoc version
