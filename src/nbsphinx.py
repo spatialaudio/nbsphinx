@@ -1051,11 +1051,11 @@ class NotebookParser(rst.Parser):
 
         if resources.get('nbsphinx_orphan', False):
             rst.Parser.parse(self, ':orphan:', document)
-        rst.Parser.parse(self, '.. highlight:: none', document)
         if env.config.nbsphinx_prolog:
             prolog = exporter.environment.from_string(
                 env.config.nbsphinx_prolog).render(env=env)
             rst.Parser.parse(self, prolog, document)
+        rst.Parser.parse(self, '.. highlight:: none', document)
         rst.Parser.parse(self, rststring, document)
         if env.config.nbsphinx_epilog:
             epilog = exporter.environment.from_string(
