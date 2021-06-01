@@ -15,7 +15,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'docutils',
-        'jinja2~=2.11',
+        'jinja2',
         'nbconvert!=5.4',
         'traitlets',
         'nbformat',

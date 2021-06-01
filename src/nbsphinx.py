@@ -241,9 +241,9 @@ RST_TEMPLATE = """
 
 {% block markdowncell %}
 {%- if 'nbsphinx-gallery' in cell.metadata
-    or 'nbsphinx-gallery' in cell.metadata.tags
+    or 'nbsphinx-gallery' in cell.metadata.get('tags', [])
     or 'nbsphinx-toctree' in cell.metadata
-    or 'nbsphinx-toctree' in cell.metadata.tags %}
+    or 'nbsphinx-toctree' in cell.metadata.get('tags', []) %}
 {{ cell | extract_gallery_or_toctree }}
 {%- else %}
 {{ cell | save_attachments or super() | replace_attachments }}
@@ -279,7 +279,7 @@ RST_TEMPLATE = """
 
 {% block footer %}
 
-{% if 'application/vnd.jupyter.widget-state+json' in nb.metadata.widgets %}
+{% if 'application/vnd.jupyter.widget-state+json' in nb.metadata.get('widgets', {})%}
 
 .. raw:: html
 
