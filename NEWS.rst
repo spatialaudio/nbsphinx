@@ -1,3 +1,9 @@
+Version 0.8.6 -- 2021-06-03 -- PyPI__ -- diff__
+ * Support for Jinja2 version 3
+
+__ https://pypi.org/project/nbsphinx/0.8.6/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.5...0.8.6
+
 Version 0.8.5 -- 2021-05-12 -- PyPI__ -- diff__
  * Freeze Jinja2 version to 2.11 (for now, until a bugfix is found)
  * Add ``theme_comparison.py`` tool for creating multiple versions
