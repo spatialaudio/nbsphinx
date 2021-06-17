@@ -1889,7 +1889,7 @@ def config_inited(app, config):
         mathjax3_config['tex'] = tex
         options = {
             'ignoreHtmlClass': 'document',
-            'processHtmlClass': 'math|output_area',
+            'processHtmlClass': 'tex2jax_process|mathjax_process|math|output_area',
         }
         options.update(mathjax3_config.get('options', {}))
         mathjax3_config['options'] = options
@@ -1908,7 +1908,7 @@ def config_inited(app, config):
             'inlineMath': [['$', '$'], ['\\(', '\\)']],
             'processEscapes': True,
             'ignoreClass': 'document',
-            'processClass': 'math|output_area',
+            'processClass': 'tex2jax_process|mathjax_process|math|output_area',
         }
         tex2jax.update(mathjax2_config.get('tex2jax', {}))
         mathjax2_config['tex2jax'] = tex2jax
