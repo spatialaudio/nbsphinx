@@ -1864,6 +1864,8 @@ def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
 
 
 def config_inited(app, config):
+    if '.ipynb' not in config.source_suffix:
+        app.add_source_suffix('.ipynb', 'jupyter_notebook')
     for suffix in config.nbsphinx_custom_formats:
         app.add_source_suffix(suffix, 'jupyter_notebook')
 
@@ -2250,7 +2252,6 @@ def do_nothing(self, node):
 
 def setup(app):
     """Initialize Sphinx extension."""
-    app.add_source_suffix('.ipynb', 'jupyter_notebook')
     app.add_source_parser(NotebookParser)
 
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
