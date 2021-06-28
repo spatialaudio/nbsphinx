@@ -19,7 +19,7 @@ Quick Start:
     #. Run Sphinx!
 
 Online documentation (and example of use):
-    http://nbsphinx.readthedocs.io/
+    https://nbsphinx.readthedocs.io/
 
 Source code repository (and issue tracker):
     https://github.com/spatialaudio/nbsphinx/
