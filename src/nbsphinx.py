@@ -1876,6 +1876,26 @@ def config_inited(app, config):
     # see https://github.com/spatialaudio/nbsphinx/issues/409
     app.connect('builder-inited', load_requirejs)
 
+    # http://docs.mathjax.org/en/v3.1-latest/options/document.html
+    # http://docs.mathjax.org/en/v2.7-latest/options/preprocessors/tex2jax.html
+    mathjax_inline_math = [['$', '$'], ['\\(', '\\)']]
+    mathjax_ignore_class = (
+        'tex2jax_ignore'  # MathJax 2 default
+        '|'
+        'mathjax_ignore'  # Mathjax 3 default
+        '|'
+        'document'  # Main page content
+    )
+    mathjax_process_class = (
+        'tex2jax_process'  # MathJax 2 default
+        '|'
+        'mathjax_process'  # Mathjax 3 default
+        '|'
+        'math'  # Used by Sphinx
+        '|'
+        'output_area'  # Jupyter code cells
+    )
+
     # See also https://github.com/sphinx-doc/sphinx/pull/5504
     if hasattr(config, 'mathjax3_config') and config.mathjax2_config is None:
         # NB: If mathjax_path is used in Sphinx >= 4 to load MathJax v2,
@@ -1884,15 +1904,14 @@ def config_inited(app, config):
             config.mathjax3_config = {}
         mathjax3_config = config.mathjax3_config
         tex = {
-            'inlineMath': [['$', '$'], ['\\(', '\\)']],
+            'inlineMath': mathjax_inline_math,
             'processEscapes': True,
         }
         tex.update(mathjax3_config.get('tex', {}))
         mathjax3_config['tex'] = tex
         options = {
-            'ignoreHtmlClass': 'document',
-            'processHtmlClass':
-            'tex2jax_process|mathjax_process|math|output_area',
+            'ignoreHtmlClass': mathjax_ignore_class,
+            'processHtmlClass': mathjax_process_class,
         }
         options.update(mathjax3_config.get('options', {}))
         mathjax3_config['options'] = options
@@ -1908,11 +1927,10 @@ def config_inited(app, config):
                 config.mathjax_config = {}
             mathjax2_config = config.mathjax_config
         tex2jax = {
-            'inlineMath': [['$', '$'], ['\\(', '\\)']],
+            'inlineMath': mathjax_inline_math,
             'processEscapes': True,
-            'ignoreClass': 'document',
-            'processClass':
-            'tex2jax_process|mathjax_process|math|output_area',
+            'ignoreClass': mathjax_ignore_class,
+            'processClass': mathjax_process_class,
         }
         tex2jax.update(mathjax2_config.get('tex2jax', {}))
         mathjax2_config['tex2jax'] = tex2jax
