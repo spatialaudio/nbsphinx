@@ -171,8 +171,8 @@ Domain Objects
 References
 ----------
 
-There are different ways of handling references, for example you could use the 
-`standard Sphinx citations`_, but it might be more practical to use the 
+There are different ways of handling references, for example you could use the
+`standard Sphinx citations`_, but it might be more practical to use the
 sphinxcontrib.bibtex_ extension.
 
 After installing the sphinxcontrib.bibtex_ extension, you have to enable it in
@@ -205,7 +205,7 @@ You can create citations like :cite:`perez2011python`:
     :cite:`perez2011python`
 
 You can create similar citations in Jupyter notebooks with a special HTML
-syntax, see the section about 
+syntax, see the section about
 `citations in Markdown cells <markdown-cells.ipynb#Citations>`__.
 
 You can create a list of references in any reStructuredText file
@@ -230,8 +230,8 @@ see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
 Footnote citations
 ^^^^^^^^^^^^^^^^^^
 
-With a sphinxcontrib.bibtex_ version of ``>= 2.0.0`` it is 
-possible to create footnote bibliographies with footnote 
+With a sphinxcontrib.bibtex_ version of ``>= 2.0.0`` it is
+possible to create footnote bibliographies with footnote
 citations like :footcite:`perez2011python`.
 
 .. code-block:: rst
@@ -239,22 +239,22 @@ citations like :footcite:`perez2011python`.
     :footcite:`perez2011python`
 
 Also footnote citations can be used within Jupyter notebooks with a special HTML syntax,
-see the section about 
+see the section about
 `footnote citations in Markdown cells <markdown-cells.ipynb#Footnote-citations>`__.
-Footnote citations are restricted to their own source file and the assembly of the 
+Footnote citations are restricted to their own source file and the assembly of the
 bibliography is (analogously to normal citations) invoked with the
 
 .. code-block:: rst
 
     .. footbibliography::
 
-directive. For example, a footnote bibliography might 
+directive. For example, a footnote bibliography might
 look like this (in HTML output):
 
 .. footbibliography::
 
-In the LaTeX/PDF output, there is no list of references appearing right 
-here. Instead, the footnote citations are placed into the footnotes of 
+In the LaTeX/PDF output, there is no list of references appearing right
+here. Instead, the footnote citations are placed into the footnotes of
 their respective pages.
 
 
