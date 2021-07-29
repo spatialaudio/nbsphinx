@@ -1229,14 +1229,14 @@ class NbGallery(sphinx.directives.other.TocTree):
         """Wrap GalleryToc arount toctree."""
         ret = super().run()
         try:
-            toctree_wrapper, = ret
+            toctree_wrapper = ret[-1]
             toctree, = toctree_wrapper
-        except ValueError:
+        except (IndexError, TypeError, ValueError):
             return ret
         if not isinstance(toctree, sphinx.addnodes.toctree):
             return ret
         gallerytoc = GalleryToc()
-        gallerytoc += toctree_wrapper
+        gallerytoc.extend(ret)
         return [gallerytoc]
 
 
