@@ -2170,11 +2170,21 @@ def depart_codearea_latex(self, node):
     if lines[0].startswith(r'\fvset{'):  # Sphinx >= 1.6.6 and < 1.8.3
         out.append(lines[0])
         del lines[0]
-    assert 'Verbatim' in lines[0]
-    out.append(lines[0])
+    # Sphinx 4.1.0 added "sphinxuseclass" environments around "sphinxVerbatim"
+    for begin_verbatim, line in enumerate(lines):
+        if line.startswith(r'\begin{sphinxVerbatim}'):
+            break
+    else:
+        assert False
+    for end_verbatim, line in enumerate(reversed(lines)):
+        if line == r'\end{sphinxVerbatim}':
+            break
+    else:
+        assert False
+    out.extend(lines[:begin_verbatim + 1])
     code_lines = (
         [''] * node.get('empty-lines-before', 0) +
-        lines[1:-1] +
+        lines[begin_verbatim + 1:-end_verbatim - 1] +
         [''] * node.get('empty-lines-after', 0)
     )
     prompt = node['prompt']
@@ -2185,8 +2195,7 @@ def depart_codearea_latex(self, node):
         assert code_lines
         code_lines[0] = prefix + code_lines[0]
     out.extend(code_lines)
-    assert 'Verbatim' in lines[-1]
-    out.append(lines[-1])
+    out.extend(lines[-end_verbatim - 1:])
     out.append('}')  # End of scope for colors
     out.append('')
     self.body.append('\n'.join(out))
