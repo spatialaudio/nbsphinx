@@ -1,3 +1,9 @@
+Version 0.8.7 -- 2021-08-10 -- PyPI__ -- diff__
+ * Fix assertion error in LaTeX build with Sphinx 4.1.0+
+
+__ https://pypi.org/project/nbsphinx/0.8.7/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.6...0.8.7
+
 Version 0.8.6 -- 2021-06-03 -- PyPI__ -- diff__
  * Support for Jinja2 version 3
 
