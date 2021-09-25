@@ -10,7 +10,7 @@ jobs:
         fetch-depth: 0
     - name: Install pandoc
       run: |
-        sudo apt-get install pandoc
+        sudo apt-get install --no-install-recommends pandoc
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
