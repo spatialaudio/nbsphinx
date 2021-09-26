@@ -83,6 +83,10 @@ nbsphinx_custom_formats = {
     '.md': ['jupytext.reads', {'fmt': 'Rmd'}],
 }
 
+# Import Matplotlib to avoid this message in notebooks:
+# "Matplotlib is building the font cache; this may take a moment."
+import matplotlib.pyplot
+
 # -- The settings below this line are not specific to nbsphinx ------------
 
 master_doc = 'index'
