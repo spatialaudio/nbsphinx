@@ -284,7 +284,7 @@ RST_TEMPLATE = """
 .. raw:: html
 
     <script type="application/vnd.jupyter.widget-state+json">
-    {{ nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] | json_dumps }}
+    {{ nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] | json_dumps | escape_html_script }}
     </script>
 {% endif %}
 {{ super() }}
