@@ -61,7 +61,7 @@ _ipynbversion = 4
 
 logger = sphinx.util.logging.getLogger(__name__)
 
-_BROKEN_THUMBNAIL = object()
+_BROKEN_THUMBNAIL = None
 
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
@@ -2356,5 +2356,5 @@ def setup(app):
         'version': __version__,
         'parallel_read_safe': True,
         'parallel_write_safe': True,
-        'env_version': 3,
+        'env_version': 4,
     }
