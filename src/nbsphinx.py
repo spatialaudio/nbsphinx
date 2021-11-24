@@ -795,7 +795,12 @@ class Exporter(nbconvert.RSTExporter):
                 'save_attachments': save_attachments,
                 'replace_attachments': replace_attachments,
                 'get_output_type': _get_output_type,
-                'json_dumps': json.dumps,
+                'json_dumps': lambda s: re.sub(
+                    r'<(/script)',
+                    r'<\\\1',
+                    json.dumps(s),
+                    flags=re.IGNORECASE,
+                ),
                 'basename': os.path.basename,
                 'dirname': os.path.dirname,
             })
