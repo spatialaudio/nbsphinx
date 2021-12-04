@@ -2133,9 +2133,9 @@ def depart_codearea_html(self, node):
     """Add empty lines before and after the code."""
     text = self.body[-1]
     text = text.replace('<pre>',
-                        '<pre>\n' + '\n' * node.get('empty-lines-before', 0))
+                        '<pre>' + '<br/>' * node.get('empty-lines-before', 0))
     text = text.replace('</pre>',
-                        '\n' * node.get('empty-lines-after', 0) + '</pre>')
+                        '<br/>' * node.get('empty-lines-after', 0) + '</pre>')
     self.body[-1] = text
 
 
