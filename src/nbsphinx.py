@@ -1061,6 +1061,8 @@ class NotebookParser(rst.Parser):
                 env.config.nbsphinx_prolog).render(env=env)
             rst.Parser.parse(self, prolog, document)
         rst.Parser.parse(self, '.. highlight:: none', document)
+        if 'sphinx_codeautolink' in env.config.extensions:
+            rst.Parser.parse(self, '.. autolink-concat:: on', document)
         rst.Parser.parse(self, rststring, document)
         if env.config.nbsphinx_epilog:
             epilog = exporter.environment.from_string(
