@@ -10,7 +10,18 @@ extensions = [
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
     'sphinx_gallery.load_style',  # load CSS for gallery (needs SG >= 0.6)
     'sphinx_last_updated_by_git',  # get "last updated" from Git
+    'sphinx_codeautolink',  # automatic links from code to documentation
+    'sphinx.ext.intersphinx',  # links to other Sphinx projects (e.g. NumPy)
 ]
+
+# These projects are also used for the sphinx_codeautolink extension:
+intersphinx_mapping = {
+    'IPython': ('https://ipython.readthedocs.io/en/stable/', None),
+    'matplotlib': ('https://matplotlib.org/', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'pandas': ('https://pandas.pydata.org/docs/', None),
+    'python': ('https://docs.python.org/3/', None),
+}
 
 # Don't add .txt suffix to source files:
 html_sourcelink_suffix = ''
