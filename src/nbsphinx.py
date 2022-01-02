@@ -162,9 +162,12 @@ RST_TEMPLATE = """
 {{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
         \\end{sphinxVerbatim}
 
+{# NB: The "raw" directive doesn't work with empty content #}
+{%- if output.data[datatype].strip() %}
     .. raw:: text
 
 {{ output.data[datatype] | indent | indent }}
+{%- endif %}
 
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
