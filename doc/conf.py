@@ -1,6 +1,6 @@
 import os
 
-# Use sphinx-quickstart to create your own conf.py file!
+# You can use sphinx-quickstart to create your own conf.py file!
 # After that, you have to edit a few things.  See below.
 
 # Select nbsphinx and, if needed, other Sphinx extensions:
@@ -25,12 +25,6 @@ intersphinx_mapping = {
 
 # Don't add .txt suffix to source files:
 html_sourcelink_suffix = ''
-
-# List of arguments to be passed to the kernel that executes the notebooks:
-nbsphinx_execute_arguments = [
-    "--InlineBackend.figure_formats={'svg', 'pdf'}",
-    "--InlineBackend.rc=figure.dpi=96",
-]
 
 # Environment variables to be passed to the kernel:
 os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
