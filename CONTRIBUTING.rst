@@ -10,8 +10,12 @@ Contributions are always welcome!
 Development Installation
 ------------------------
 
-Instead of pip-installing the latest release from PyPI_, you should get the
-newest development version (a.k.a. "master") with Git::
+.. _prerequisites: https://nbsphinx.readthedocs.io/installation.html
+   #nbsphinx-Prerequisites
+
+Make sure that the necessary prerequisites_ are installed.
+Then, instead of ``pip``-installing the latest release from PyPI_,
+you should get the newest development version (a.k.a. "master") with Git::
 
    git clone https://github.com/spatialaudio/nbsphinx.git
    cd nbsphinx

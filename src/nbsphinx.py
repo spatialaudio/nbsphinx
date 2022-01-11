@@ -23,7 +23,7 @@
 https://nbsphinx.readthedocs.io/
 
 """
-__version__ = '0.8.7'
+__version__ = '0.8.8'
 
 import collections.abc
 import copy
@@ -61,7 +61,7 @@ _ipynbversion = 4
 
 logger = sphinx.util.logging.getLogger(__name__)
 
-_BROKEN_THUMBNAIL = object()
+_BROKEN_THUMBNAIL = None
 
 # See nbconvert/exporters/html.py:
 DISPLAY_DATA_PRIORITY_HTML = (
@@ -161,6 +161,13 @@ RST_TEMPLATE = """
         \\begin{sphinxVerbatim}[commandchars=\\\\\\{\\}]
 {{ output.data[datatype] | escape_latex | ansi2latex | indent | indent }}
         \\end{sphinxVerbatim}
+
+{# NB: The "raw" directive doesn't work with empty content #}
+{%- if output.data[datatype].strip() %}
+    .. raw:: text
+
+{{ output.data[datatype] | indent | indent }}
+{%- endif %}
 
 {%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
 
@@ -644,7 +651,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -795,7 +802,12 @@ class Exporter(nbconvert.RSTExporter):
                 'save_attachments': save_attachments,
                 'replace_attachments': replace_attachments,
                 'get_output_type': _get_output_type,
-                'json_dumps': json.dumps,
+                'json_dumps': lambda s: re.sub(
+                    r'<(/script)',
+                    r'<\\\1',
+                    json.dumps(s),
+                    flags=re.IGNORECASE,
+                ),
                 'basename': os.path.basename,
                 'dirname': os.path.dirname,
             })
@@ -1056,6 +1068,8 @@ class NotebookParser(rst.Parser):
                 env.config.nbsphinx_prolog).render(env=env)
             rst.Parser.parse(self, prolog, document)
         rst.Parser.parse(self, '.. highlight:: none', document)
+        if 'sphinx_codeautolink' in env.config.extensions:
+            rst.Parser.parse(self, '.. autolink-concat:: on', document)
         rst.Parser.parse(self, rststring, document)
         if env.config.nbsphinx_epilog:
             epilog = exporter.environment.from_string(
@@ -2128,9 +2142,9 @@ def depart_codearea_html(self, node):
     """Add empty lines before and after the code."""
     text = self.body[-1]
     text = text.replace('<pre>',
-                        '<pre>\n' + '\n' * node.get('empty-lines-before', 0))
+                        '<pre>' + '<br/>' * node.get('empty-lines-before', 0))
     text = text.replace('</pre>',
-                        '\n' * node.get('empty-lines-after', 0) + '</pre>')
+                        '<br/>' * node.get('empty-lines-after', 0) + '</pre>')
     self.body[-1] = text
 
 
@@ -2249,6 +2263,14 @@ def depart_admonition_latex(self, node):
     self.body.append('\\end{sphinxadmonition}\n')
 
 
+def visit_admonition_text(self, node):
+    self.new_state(0)
+
+
+def depart_admonition_text(self, node):
+    self.end_state()
+
+
 def depart_gallery_html(self, node):
     for title, uri, filename, tooltip in node['entries']:
         if tooltip:
@@ -2313,16 +2335,20 @@ def setup(app):
     app.add_directive('nbgallery', NbGallery)
     app.add_node(CodeAreaNode,
                  html=(do_nothing, depart_codearea_html),
-                 latex=(visit_codearea_latex, depart_codearea_latex))
+                 latex=(visit_codearea_latex, depart_codearea_latex),
+                 text=(do_nothing, do_nothing))
     app.add_node(FancyOutputNode,
                  html=(do_nothing, do_nothing),
-                 latex=(visit_fancyoutput_latex, depart_fancyoutput_latex))
+                 latex=(visit_fancyoutput_latex, depart_fancyoutput_latex),
+                 text=(do_nothing, do_nothing))
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
-                 latex=(visit_admonition_latex, depart_admonition_latex))
+                 latex=(visit_admonition_latex, depart_admonition_latex),
+                 text=(visit_admonition_text, depart_admonition_text))
     app.add_node(GalleryNode,
                  html=(do_nothing, depart_gallery_html),
-                 latex=(do_nothing, do_nothing))
+                 latex=(do_nothing, do_nothing),
+                 text=(do_nothing, do_nothing))
     app.connect('builder-inited', builder_inited)
     app.connect('config-inited', config_inited)
     app.connect('html-page-context', html_page_context)
@@ -2356,5 +2382,5 @@ def setup(app):
         'version': __version__,
         'parallel_read_safe': True,
         'parallel_write_safe': True,
-        'env_version': 3,
+        'env_version': 4,
     }
