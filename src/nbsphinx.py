@@ -661,7 +661,6 @@ div.rendered_html table {
   border: none;
   border-collapse: collapse;
   border-spacing: 0;
-  color: black;
   font-size: 12px;
   table-layout: fixed;
 }
@@ -691,6 +690,10 @@ div.rendered_html th {
 .jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
+}
+body[data-theme="dark"] .jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+body[data-theme="dark"] div.rendered_html tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, .1);
 }
 .jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
