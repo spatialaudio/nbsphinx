@@ -691,8 +691,8 @@ div.rendered_html th {
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
-body[data-theme="dark"] .jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-body[data-theme="dark"] div.rendered_html tbody tr:nth-child(odd) {
+*[data-theme="dark"] .jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+*[data-theme="dark"] div.rendered_html tbody tr:nth-child(odd) {
   background: rgba(255, 255, 255, .1);
 }
 .jp-RenderedHTMLCommon tbody tr:hover,
