@@ -1929,10 +1929,13 @@ def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
 
 
 def config_inited(app, config):
-    if '.ipynb' not in config.source_suffix:
-        app.add_source_suffix('.ipynb', 'jupyter_notebook')
-    for suffix in config.nbsphinx_custom_formats:
-        app.add_source_suffix(suffix, 'jupyter_notebook')
+    suffixes = [".ipynb", *config.nbsphinx_custom_formats]
+    for suffix in suffixes:
+        if (
+            suffix not in config.source_suffix
+            and suffix not in app.registry.source_suffix
+        ):
+            app.add_source_suffix(suffix, 'jupyter_notebook')
 
     if '**.ipynb_checkpoints' not in config.exclude_patterns:
         config.exclude_patterns.append('**.ipynb_checkpoints')
