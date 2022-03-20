@@ -656,25 +656,18 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
+:is(.jp-RenderedHTMLCommon, div.rendered_html) table {
   border: none;
   border-collapse: collapse;
   border-spacing: 0;
   font-size: 12px;
   table-layout: fixed;
 }
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
+:is(.jp-RenderedHTMLCommon, div.rendered_html) thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
+:is(.jp-RenderedHTMLCommon, div.rendered_html) :is(tr, th, td) {
   text-align: right;
   vertical-align: middle;
   padding: 0.5em 0.5em;
@@ -683,20 +676,29 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
+:is(.jp-RenderedHTMLCommon, div.rendered_html) th {
   font-weight: bold;
 }
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
+@media (prefers-color-scheme: light) {
+  body:not([data-theme="dark"]) {
+    --nbsphinx-table-row-odd-bg: #f5f5f5;
+  }
 }
-*[data-theme="dark"] .jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-*[data-theme="dark"] div.rendered_html tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, .1);
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) {
+    --nbsphinx-table-row-odd-bg: rgba(255, 255, 255, .1);
+  }
 }
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
+body[data-theme="light"]) {
+  --nbsphinx-table-row-odd-bg: #f5f5f5;
+}
+body[data-theme="dark"] {
+  --nbsphinx-table-row-odd-bg: rgba(255, 255, 255, .1);
+}
+:is(.jp-RenderedHTMLCommon, div.rendered_html) tbody tr:nth-child(odd) {
+  background: var(--nbsphinx-table-row-odd-bg);
+}
+:is(.jp-RenderedHTMLCommon, div.rendered_html) tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 """
