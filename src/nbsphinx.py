@@ -363,7 +363,7 @@ LATEX_PREAMBLE = r"""
     \setbox\nbsphinxbox\vtop{{#1\par}}
     % reserve some space at bottom of page, else start new page
     \needspace{\dimexpr2.5\baselineskip+\ht\nbsphinxbox+\dp\nbsphinxbox}
-    % mimick vertical spacing from \section command
+    % mimic vertical spacing from \section command
       \addpenalty\@secpenalty
       \@tempskipa 3.5ex \@plus 1ex \@minus .2ex\relax
       \addvspace\@tempskipa
@@ -1248,7 +1248,7 @@ class NbGallery(sphinx.directives.other.TocTree):
     """A thumbnail gallery for notebooks."""
 
     def run(self):
-        """Wrap GalleryToc arount toctree."""
+        """Wrap GalleryToc around toctree."""
         ret = super().run()
         try:
             toctree_wrapper = ret[-1]
