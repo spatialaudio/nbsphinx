@@ -181,7 +181,11 @@ RST_TEMPLATE = """
 {%- set height = output.metadata[datatype].height %}
 {%- if height %}
         :height: {{ height }}
-{% endif %}
+{%- endif %}
+{%- set alt = output.metadata[datatype].alt %}
+{%- if alt %}
+        :alt: {{ alt }}
+{%- endif %}
 {% endif %}
 {%- elif datatype in ['text/markdown'] %}
 
