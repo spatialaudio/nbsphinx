@@ -1,3 +1,10 @@
+Version 0.8.9 -- 2022-06-04 -- PyPI__ -- diff__
+ * CSS: support tables in widgets
+ * Avoid empty "raw" directive
+
+__ https://pypi.org/project/nbsphinx/0.8.9/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.8...0.8.9
+
 Version 0.8.8 -- 2021-12-31 -- PyPI__ -- diff__
  * Support for the ``sphinx_codeautolink`` extension
  * Basic support for the ``text`` builder
