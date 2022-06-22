@@ -760,8 +760,11 @@ class Exporter(nbconvert.RSTExporter):
 
     """
 
+    # TODO: define default preprocessors to include our one to write out notebook just after execution
+
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
-                 allow_errors=False, timeout=None, codecell_lexer='none'):
+                 allow_errors=False, timeout=None, codecell_lexer='none',
+                 nbconvert_config=None):
         """Initialize the Exporter."""
 
         # NB: The following stateful Jinja filters are a hack until
@@ -795,13 +798,16 @@ class Exporter(nbconvert.RSTExporter):
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
-        super(Exporter, self).__init__(
-            template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
-            config=traitlets.config.Config({
+        if nbconvert_config is None:
+            nbconvert_config = {
                 'HighlightMagicsPreprocessor': {'enabled': True},
                 # Work around https://github.com/jupyter/nbconvert/issues/720:
                 'RegexRemovePreprocessor': {'enabled': False},
-            }),
+            }
+
+        super(Exporter, self).__init__(
+            template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
+            config=traitlets.config.Config(nbconvert_config),
             filters={
                 'convert_pandoc': convert_pandoc,
                 'markdown2rst': markdown2rst,
@@ -846,6 +852,9 @@ class Exporter(nbconvert.RSTExporter):
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
+            # TODO: Here, just add the execute preprocessor to the exporter list of preprocessors
+            # rather than executing directly. We can still pass appropriate config values in
+            # and that way the tag remove preprocessor is run *before* execution rather than after.
             pp = nbconvert.preprocessors.ExecutePreprocessor(
                 kernel_name=self._kernel_name,
                 extra_arguments=self._execute_arguments,
@@ -853,6 +862,7 @@ class Exporter(nbconvert.RSTExporter):
             nb, resources = pp.preprocess(nb, resources)
 
         if 'nbsphinx_save_notebook' in resources:
+            # TODO: maybe we write our *own* preprocessor to hook into this stage, right after the execute preprocessor, to save the notebook
             # Save *executed* notebook *before* the Exporter can change it:
             nbformat.write(nb, resources['nbsphinx_save_notebook'])
 
@@ -1037,6 +1047,7 @@ class NotebookParser(rst.Parser):
             allow_errors=env.config.nbsphinx_allow_errors,
             timeout=env.config.nbsphinx_timeout,
             codecell_lexer=env.config.nbsphinx_codecell_lexer,
+            nbconvert_config=env.config.nbsphinx_nbconvert_config
         )
 
         try:
@@ -2316,6 +2327,7 @@ def setup(app):
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
     app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
+    app.add_config_value('nbsphinx_nbconvert_config', None, rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', None, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
