@@ -873,7 +873,9 @@ class Exporter(nbconvert.RSTExporter):
 
         preprocessors.append(Writer())
         # Find the existing execute preprocessor and replace it
-        i = next((i for i,p in enumerate(self._preprocessors) if isinstance(p, nbconvert.preprocessors.ExecutePreprocessor)), len(self._preprocessors))
+        i = next((i for i, p in enumerate(self._preprocessors)
+            if isinstance(p, nbconvert.preprocessors.ExecutePreprocessor)),
+                len(self._preprocessors))
         self._preprocessors[i:i+1] = preprocessors
 
         # Call into RSTExporter
