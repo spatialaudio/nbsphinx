@@ -749,6 +749,13 @@ div.admonition.inline-title p.admonition-title {
 """
 
 
+class Writer(nbconvert.preprocessors.Preprocessor):
+    def preprocess(self, nb, resources):
+        if 'nbsphinx_save_notebook' in resources:
+            # Save *executed* notebook *before* the Exporter can change it:
+            nbformat.write(nb, resources['nbsphinx_save_notebook'])
+        return nb, resources
+
 class Exporter(nbconvert.RSTExporter):
     """Convert Jupyter notebooks to reStructuredText.
 
@@ -759,8 +766,6 @@ class Exporter(nbconvert.RSTExporter):
     conversion.
 
     """
-
-    # TODO: define default preprocessors to include our one to write out notebook just after execution
 
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
                  allow_errors=False, timeout=None, codecell_lexer='none',
@@ -804,7 +809,6 @@ class Exporter(nbconvert.RSTExporter):
                 # Work around https://github.com/jupyter/nbconvert/issues/720:
                 'RegexRemovePreprocessor': {'enabled': False},
             }
-
         super(Exporter, self).__init__(
             template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
             config=traitlets.config.Config(nbconvert_config),
@@ -848,23 +852,29 @@ class Exporter(nbconvert.RSTExporter):
             not any(c.get('outputs') or c.get('execution_count')
                     for c in nb.cells if c.cell_type == 'code')
         )
+        preprocessors = []
         if auto_execute or execute == 'always':
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
-            # TODO: Here, just add the execute preprocessor to the exporter list of preprocessors
-            # rather than executing directly. We can still pass appropriate config values in
-            # and that way the tag remove preprocessor is run *before* execution rather than after.
-            pp = nbconvert.preprocessors.ExecutePreprocessor(
+            preprocessors.append(nbconvert.preprocessors.ExecutePreprocessor(
                 kernel_name=self._kernel_name,
                 extra_arguments=self._execute_arguments,
-                allow_errors=allow_errors, timeout=timeout)
-            nb, resources = pp.preprocess(nb, resources)
+                allow_errors=allow_errors, timeout=timeout))
+            # pp = nbconvert.preprocessors.ExecutePreprocessor(
+            #     kernel_name=self._kernel_name,
+            #     extra_arguments=self._execute_arguments,
+            #     allow_errors=allow_errors, timeout=timeout)
+            # nb, resources = pp.preprocess(nb, resources)
 
-        if 'nbsphinx_save_notebook' in resources:
-            # TODO: maybe we write our *own* preprocessor to hook into this stage, right after the execute preprocessor, to save the notebook
-            # Save *executed* notebook *before* the Exporter can change it:
-            nbformat.write(nb, resources['nbsphinx_save_notebook'])
+        # if 'nbsphinx_save_notebook' in resources:
+        #     # Save *executed* notebook *before* the Exporter can change it:
+        #     nbformat.write(nb, resources['nbsphinx_save_notebook'])
+
+        preprocessors.append(Writer())
+        # Find the existing execute preprocessor and replace it
+        i = next((i for i,p in enumerate(self._preprocessors) if isinstance(p, nbconvert.preprocessors.ExecutePreprocessor)), len(self._preprocessors))
+        self._preprocessors[i:i+1] = preprocessors
 
         # Call into RSTExporter
         rststr, resources = super(Exporter, self).from_notebook_node(
