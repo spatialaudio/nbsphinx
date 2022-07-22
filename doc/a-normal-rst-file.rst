@@ -305,3 +305,25 @@ The following example gallery was created using:
     :reversed:
 
     gallery/*-rst
+
+
+Thumbnail Links Galleries (HTML only)
+-------------------------------------
+
+In some case it is desired to just create thumbnail links to existing notebooks,
+already included in a ``toctree``. This can be used e.g. to link to a subset
+of notebooks from API documentation to highlight the use of some functionality.
+For this there is a dedicated ``nblinkgallery`` directive.
+
+The following example gallery was created using:
+
+.. code-block:: rest
+
+    .. nblinkgallery::
+        gallery/multiple-outputs
+        gallery/no-thumbnail
+
+.. nblinkgallery::
+    gallery/multiple-outputs
+    gallery/no-thumbnail
+

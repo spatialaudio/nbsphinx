@@ -36,6 +36,7 @@ import subprocess
 import sys
 from urllib.parse import unquote
 import uuid
+from pathlib import Path
 
 import docutils
 from docutils.parsers import rst
@@ -1233,6 +1234,10 @@ class GalleryNode(docutils.nodes.Element):
     """A custom node for thumbnail galleries."""
 
 
+class GalleryLinks(docutils.nodes.Element):
+    """A wrapper node used for creating gallery links."""
+
+
 # See http://docutils.sourceforge.net/docs/howto/rst-directives.html
 
 class NbInput(rst.Directive):
@@ -1315,6 +1320,23 @@ class NbGallery(sphinx.directives.other.TocTree):
         gallerytoc = GalleryToc()
         gallerytoc.extend(ret)
         return [gallerytoc]
+
+
+class NbLinkGallery(sphinx.util.docutils.SphinxDirective):
+    """A thumbnail gallery for notebooks as links"""
+    has_content = True
+
+    def run(self):
+        """Check and collect notebook links"""
+        gallery_links = GalleryLinks()
+        gallery_links["glob"] = False
+        gallery_links['entries'] = []
+        gallery_links['includefiles'] = []
+
+        _ = sphinx.directives.other.TocTree.parse_content(
+            self=self, toctree=gallery_links
+        )
+        return [gallery_links]
 
 
 def convert_pandoc(text, from_format, to_format):
@@ -2132,7 +2154,56 @@ def env_updated(app, env):
         app.add_js_file(widgets_path, **app.config.nbsphinx_widgets_options)
 
 
+def has_wildcard(pattern):
+    return any(char in pattern for char in '*?[')
+
+
+def get_thumbnail_filename(app, thumbnail, doc):
+    # NB: This is how Sphinx implements the "html_sidebars"
+    #     config value in StandaloneHTMLBuilder.add_sidebars()
+
+    matched = None
+    conf_py_thumbnail = None
+    conf_py_thumbnails = app.env.config.nbsphinx_thumbnails.items()
+
+    for pattern, candidate in conf_py_thumbnails:
+        if patmatch(doc, pattern):
+            if matched:
+                if has_wildcard(pattern):
+                    # warn if both patterns contain wildcards
+                    if has_wildcard(matched):
+                        logger.warning(
+                            'page %s matches two patterns in '
+                            'nbsphinx_thumbnails: %r and %r',
+                            doc, matched, pattern,
+                            type='nbsphinx', subtype='thumbnail')
+                    # else the already matched pattern is more
+                    # specific than the present one, because it
+                    # contains no wildcard
+                    continue
+            matched = pattern
+            conf_py_thumbnail = candidate
+
+    filename = thumbnail.get('filename', '')
+
+    if filename is _BROKEN_THUMBNAIL:
+        filename = os.path.join('_static', 'broken_example.png')
+    elif filename:
+        filename = os.path.join(app.builder.imagedir, filename)
+    elif conf_py_thumbnail:
+        # NB: Settings from conf.py can be overwritten in notebook
+        filename = conf_py_thumbnail
+    else:
+        filename = os.path.join('_static', 'no_image.png')
+
+    return filename
+
+
 def doctree_resolved(app, doctree, fromdocname):
+    base = sphinx.util.osutil.relative_uri(
+        app.builder.get_target_uri(fromdocname), ''
+    )
+
     # Replace GalleryToc with toctree + GalleryNode
     for node in doctree.traverse(GalleryToc):
         toctree_wrapper, = node
@@ -2147,62 +2218,48 @@ def doctree_resolved(app, doctree, fromdocname):
             if doc in toctree['includefiles']:
                 if title is None:
                     title = app.env.titles[doc].astext()
+
                 uri = app.builder.get_relative_uri(fromdocname, doc)
-                base = sphinx.util.osutil.relative_uri(
-                    app.builder.get_target_uri(fromdocname), '')
-
-                # NB: This is how Sphinx implements the "html_sidebars"
-                #     config value in StandaloneHTMLBuilder.add_sidebars()
-
-                def has_wildcard(pattern):
-                    return any(char in pattern for char in '*?[')
-
-                matched = None
-                conf_py_thumbnail = None
-                conf_py_thumbnails = app.env.config.nbsphinx_thumbnails.items()
-                for pattern, candidate in conf_py_thumbnails:
-                    if patmatch(doc, pattern):
-                        if matched:
-                            if has_wildcard(pattern):
-                                # warn if both patterns contain wildcards
-                                if has_wildcard(matched):
-                                    logger.warning(
-                                        'page %s matches two patterns in '
-                                        'nbsphinx_thumbnails: %r and %r',
-                                        doc, matched, pattern,
-                                        type='nbsphinx', subtype='thumbnail')
-                                # else the already matched pattern is more
-                                # specific than the present one, because it
-                                # contains no wildcard
-                                continue
-                        matched = pattern
-                        conf_py_thumbnail = candidate
 
                 thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
                 tooltip = thumbnail.get('tooltip', '')
-                filename = thumbnail.get('filename', '')
-                if filename is _BROKEN_THUMBNAIL:
-                    filename = os.path.join(
-                        base, '_static', 'broken_example.png')
-                elif filename:
-                    filename = os.path.join(
-                        base, app.builder.imagedir, filename)
-                elif conf_py_thumbnail:
-                    # NB: Settings from conf.py can be overwritten in notebook
-                    filename = os.path.join(base, conf_py_thumbnail)
-                else:
-                    filename = os.path.join(base, '_static', 'no_image.png')
+                filename = get_thumbnail_filename(
+                    app=app, thumbnail=thumbnail, doc=doc
+                )
+                filename = os.path.join(base, filename)
                 entries.append((title, uri, filename, tooltip))
             else:
                 logger.warning(
                     'External links are not supported in gallery: %s', doc,
-                    location=fromdocname, type='nbsphinx', subtype='gallery')
+                    location=fromdocname, type='nbsphinx', subtype='gallery'
+                )
+
         gallery = GalleryNode()
         gallery['entries'] = entries
         toctree['nbsphinx_gallery'] = True
         toctree_wrapper[:] = toctree,
         node.replace_self([toctree_wrapper, gallery])
         # NB: Further processing happens in patched_toctree_resolve()
+
+    for node in doctree.traverse(GalleryLinks):
+        entries = []
+
+        for _, doc in node["entries"]:
+            thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
+
+            title = app.env.titles[doc].astext()
+            tooltip = thumbnail.get('tooltip', '')
+
+            filename = get_thumbnail_filename(
+                app=app, thumbnail=thumbnail, doc=doc
+            )
+
+            uri = app.builder.get_relative_uri(fromdocname, doc)
+            entries.append((title, uri, filename, tooltip))
+
+        gallery = GalleryNode()
+        gallery['entries'] = entries
+        node.replace_self([gallery])
 
 
 def depart_codearea_html(self, node):
@@ -2396,6 +2453,7 @@ def setup(app):
     app.add_directive('nbinfo', NbInfo)
     app.add_directive('nbwarning', NbWarning)
     app.add_directive('nbgallery', NbGallery)
+    app.add_directive('nblinkgallery', NbLinkGallery)
     app.add_node(CodeAreaNode,
                  html=(do_nothing, depart_codearea_html),
                  latex=(visit_codearea_latex, depart_codearea_latex),
