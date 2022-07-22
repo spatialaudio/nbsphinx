@@ -35,6 +35,7 @@ import subprocess
 import sys
 from urllib.parse import unquote
 import uuid
+from pathlib import Path
 
 import docutils
 from docutils.parsers import rst
@@ -1178,6 +1179,10 @@ class GalleryNode(docutils.nodes.Element):
     """A custom node for thumbnail galleries."""
 
 
+class GalleryLinks(docutils.nodes.Element):
+    """A wrapper node used for creating gallery links."""
+
+
 # See http://docutils.sourceforge.net/docs/howto/rst-directives.html
 
 class NbInput(rst.Directive):
@@ -1260,6 +1265,29 @@ class NbGallery(sphinx.directives.other.TocTree):
         gallerytoc = GalleryToc()
         gallerytoc.extend(ret)
         return [gallerytoc]
+
+
+class NbLinkGallery(sphinx.util.docutils.SphinxDirective):
+    """A thumbnail gallery for notebooks as links"""
+    has_content = True
+
+    def run(self):
+        """Check and collect notebook links"""
+        path = Path(self.env.srcdir) / self.env.docname
+
+        links = []
+
+        for entry in self.content:
+            filename = (path.parent / entry).resolve()
+
+            if not filename.exists():
+                raise ValueError(f"Link to non-existent file {filename}")
+
+            links.append(filename)
+
+        gallery_links = GalleryLinks()
+        gallery_links["links"] = links
+        return [gallery_links]
 
 
 def convert_pandoc(text, from_format, to_format):
@@ -2341,6 +2369,7 @@ def setup(app):
     app.add_directive('nbinfo', NbInfo)
     app.add_directive('nbwarning', NbWarning)
     app.add_directive('nbgallery', NbGallery)
+    app.add_directive('nblinkgallery', NbLinkGallery)
     app.add_node(CodeAreaNode,
                  html=(do_nothing, depart_codearea_html),
                  latex=(visit_codearea_latex, depart_codearea_latex),
