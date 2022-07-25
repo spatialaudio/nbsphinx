@@ -298,7 +298,7 @@ The following example gallery was created using:
     gallery/*-rst
 
 
-Thumbnail Links Galleries
+Thumbnail Links Galleries (HTML only)
 -------------------------
 
 In some case it is desired to just create thumbnail links to existing notebooks,
