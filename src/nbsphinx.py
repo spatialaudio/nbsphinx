@@ -1273,20 +1273,14 @@ class NbLinkGallery(sphinx.util.docutils.SphinxDirective):
 
     def run(self):
         """Check and collect notebook links"""
-        path = Path(self.env.srcdir) / self.env.docname
-
-        links = []
-
-        for entry in self.content:
-            filename = (path.parent / entry).resolve()
-
-            if not filename.exists():
-                raise ValueError(f"Link to non-existent file {filename}")
-
-            links.append(filename)
-
         gallery_links = GalleryLinks()
-        gallery_links["links"] = links
+        gallery_links["glob"] = False
+        gallery_links['entries'] = []
+        gallery_links['includefiles'] = []
+
+        _ = sphinx.directives.other.TocTree.parse_content(
+            self=self, toctree=gallery_links
+        )
         return [gallery_links]
 
 
@@ -2106,6 +2100,9 @@ def has_wildcard(pattern):
 
 
 def get_thumbnail_filename(app, thumbnail, doc):
+    # NB: This is how Sphinx implements the "html_sidebars"
+    #     config value in StandaloneHTMLBuilder.add_sidebars()
+
     matched = None
     conf_py_thumbnail = None
     conf_py_thumbnails = app.env.config.nbsphinx_thumbnails.items()
@@ -2165,9 +2162,6 @@ def doctree_resolved(app, doctree, fromdocname):
 
                 uri = app.builder.get_relative_uri(fromdocname, doc)
 
-                # NB: This is how Sphinx implements the "html_sidebars"
-                #     config value in StandaloneHTMLBuilder.add_sidebars()
-
                 thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
                 tooltip = thumbnail.get('tooltip', '')
                 filename = get_thumbnail_filename(
@@ -2188,15 +2182,10 @@ def doctree_resolved(app, doctree, fromdocname):
         node.replace_self([toctree_wrapper, gallery])
         # NB: Further processing happens in patched_toctree_resolve()
 
-    path = Path(app.env.srcdir)
-
     for node in doctree.traverse(GalleryLinks):
         entries = []
 
-        for link in node["links"]:
-            path_link = link.relative_to(path)
-            doc = str(path_link.parent / path_link.stem)
-
+        for _, doc in node["entries"]:
             thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
 
             title = app.env.titles[doc].astext()
