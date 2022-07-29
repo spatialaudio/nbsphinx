@@ -311,10 +311,10 @@ The following example gallery was created using:
 .. code-block:: rest
 
     .. nblinkgallery::
-        gallery/multiple-outputs.ipynb
-        gallery/no-thumbnail.ipynb
+        gallery/multiple-outputs
+        gallery/no-thumbnail
 
 .. nblinkgallery::
-    gallery/multiple-outputs.ipynb
-    gallery/no-thumbnail.ipynb
+    gallery/multiple-outputs
+    gallery/no-thumbnail
 
