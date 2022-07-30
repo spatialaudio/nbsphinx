@@ -299,6 +299,15 @@ RST_TEMPLATE = """
 """.replace('__RST_DEFAULT_TEMPLATE__', nbconvert.RSTExporter().template_file)
 
 
+# MEMO: the nbsphinxfancyoutput environment recycles some internal Sphinx
+# LaTeX macros, as testify the @ in their names.  At 5.1.0 these macros
+# got modified so we now have two cases for the nbsphinxfancyoutput
+# definition: Sphinx >= 5.1.0 or Sphinx < 5.1.0 (and >= 1.7.0 at least).
+
+# MEMO: since Sphinx 2.0 the upstream \sphinxincludegraphics is similar and
+# slightly better than the \nbsphinxincludegraphics defined here.  So for the
+# >= 5.1.0 branch of nbsphinxfancyoutput, the code does no replacement of
+# \sphinxincludegraphics by \nbsphinxincludegraphics anymore.
 LATEX_PREAMBLE = r"""
 % Jupyter Notebook code cell colors
 \definecolor{nbsphinxin}{HTML}{307FC1}
@@ -327,7 +336,39 @@ LATEX_PREAMBLE = r"""
 \definecolor{ansi-default-inverse-bg}{HTML}{000000}
 
 % Define an environment for non-plain-text code cell outputs (e.g. images)
+\newbox\nbsphinxpromptbox
 \makeatletter
+\@ifpackagelater{sphinx}{2022/06/30}{% "later" means here "at least"
+% In this branch Sphinx is at least at 5.1.0
+\newenvironment{nbsphinxfancyoutput}{%
+\sphinxcolorlet{VerbatimColor}{white}%
+\sphinxcolorlet{VerbatimBorderColor}{nbsphinx-code-border}%
+\spx@verb@boxes@fcolorbox@setup
+    % for \sphinxincludegraphics check of maximal height
+    \spx@image@maxheight         \textheight
+    \advance\spx@image@maxheight -\spx@boxes@border@top
+    \advance\spx@image@maxheight -\spx@boxes@padding@top
+    \advance\spx@image@maxheight -\spx@boxes@padding@bottom
+    \advance\spx@image@maxheight -\spx@boxes@border@bottom
+    \advance\spx@image@maxheight -\baselineskip
+\def\sphinxVerbatim@Before{\nbsphinxfancyaddprompt}%
+\def\sphinxVerbatim@After {\@empty}%
+\def\FrameCommand     {\sphinxVerbatim@FrameCommand}%
+\def\FirstFrameCommand{\sphinxVerbatim@FirstFrameCommand}%
+\def\MidFrameCommand  {\sphinxVerbatim@MidFrameCommand}%
+\def\LastFrameCommand {\sphinxVerbatim@LastFrameCommand}%
+\MakeFramed{\advance\hsize-\width\@totalleftmargin\z@\linewidth\hsize\@setminipage}%
+\lineskip=1ex\lineskiplimit=1ex\raggedright%
+}{\par\unskip\@minipagefalse\endMakeFramed}
+\def\nbsphinxfancyaddprompt{\ifvoid\nbsphinxpromptbox\else
+    \kern\spx@boxes@border@top\kern\spx@boxes@padding@top
+    \copy\nbsphinxpromptbox
+    \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
+    \kern-\spx@boxes@padding@top\kern-\spx@boxes@border@top
+    \nointerlineskip
+    \fi}
+}% End of Sphinx >= 5.1.0 branch
+{% This branch for Sphinx < 5.1.0
 \newenvironment{nbsphinxfancyoutput}{%
     % Avoid fatal error with framed.sty if graphics too long to fit on one page
     \let\sphinxincludegraphics\nbsphinxincludegraphics
@@ -343,14 +384,14 @@ LATEX_PREAMBLE = r"""
 \MakeFramed{\advance\hsize-\width\@totalleftmargin\z@\linewidth\hsize\@setminipage}%
 \lineskip=1ex\lineskiplimit=1ex\raggedright%
 }{\par\unskip\@minipagefalse\endMakeFramed}
-\makeatother
-\newbox\nbsphinxpromptbox
 \def\nbsphinxfancyaddprompt{\ifvoid\nbsphinxpromptbox\else
     \kern\fboxrule\kern\fboxsep
     \copy\nbsphinxpromptbox
     \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
     \kern-\fboxsep\kern-\fboxrule\nointerlineskip
     \fi}
+}% end of Sphinx < 5.1.0 branch
+\makeatother
 \newlength\nbsphinxcodecellspacing
 \setlength{\nbsphinxcodecellspacing}{0pt}
 
@@ -404,6 +445,8 @@ LATEX_PREAMBLE = r"""
 }% end of \nbsphinxstopnotebook
 
 % Ensure height of an included graphics fits in nbsphinxfancyoutput frame
+% The Sphinx >= 5.1.0 version of nbsphinxfancyoutput does not use this macro
+% as \sphinxincludegraphics is since Sphinx 2.0 similar and slightly better.
 \newdimen\nbsphinx@image@maxheight % set in nbsphinxfancyoutput environment
 \newcommand*{\nbsphinxincludegraphics}[2][]{%
     \gdef\spx@includegraphics@options{#1}%
