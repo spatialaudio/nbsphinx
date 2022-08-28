@@ -28,6 +28,7 @@ __version__ = '0.8.9'
 import collections.abc
 import copy
 import html
+from itertools import chain
 import json
 import os
 import re
@@ -1929,13 +1930,14 @@ def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
 
 
 def config_inited(app, config):
-    suffixes = [".ipynb", *config.nbsphinx_custom_formats]
-    for suffix in suffixes:
-        if (
-            suffix not in config.source_suffix
-            and suffix not in app.registry.source_suffix
-        ):
-            app.add_source_suffix(suffix, 'jupyter_notebook')
+    for suffix in config.nbsphinx_custom_formats:
+        app.add_source_suffix(suffix, 'jupyter_notebook')
+    if '.ipynb' in chain(config.source_suffix, app.registry.source_suffix):
+        # We don't interfere if '.ipynb' has been added by the user in conf.py
+        # or by another Sphinx extension that has been loaded earlier.
+        pass
+    else:
+        app.add_source_suffix('.ipynb', 'jupyter_notebook')
 
     if '**.ipynb_checkpoints' not in config.exclude_patterns:
         config.exclude_patterns.append('**.ipynb_checkpoints')
