@@ -2328,21 +2328,15 @@ def depart_admonition_text(self, node):
 
 
 def depart_gallery_html(self, node):
+    self.body.append('<div class="sphx-glr-thumbnails">\n')
     for title, uri, filename, tooltip in node['entries']:
         if tooltip:
             tooltip = ' tooltip="{}"'.format(html.escape(tooltip))
         self.body.append("""\
 <div class="sphx-glr-thumbcontainer"{tooltip}>
-  <div class="figure align-center">
-    <img alt="thumbnail" src="{filename}" />
-    <p class="caption">
-      <span class="caption-text">
-        <a class="reference internal" href="{uri}">
-          <span class="std std-ref">{title}</span>
-        </a>
-      </span>
-    </p>
-  </div>
+  <img alt="{title}" src="{filename}" />
+  <p><a class="reference internal" href="{uri}"><span class="std std-ref">{title}</span></a></p>
+  <div class="sphx-glr-thumbnail-title">{title}</div>
 </div>
 """.format(
             uri=html.escape(uri),
@@ -2350,7 +2344,7 @@ def depart_gallery_html(self, node):
             tooltip=tooltip,
             filename=html.escape(filename),
         ))
-    self.body.append('<div class="sphx-glr-clear"></div>')
+    self.body.append('</div>\n')
 
 
 def do_nothing(self, node):
