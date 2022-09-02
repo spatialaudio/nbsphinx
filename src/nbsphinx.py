@@ -2334,7 +2334,7 @@ def depart_gallery_html(self, node):
             tooltip = ' tooltip="{}"'.format(html.escape(tooltip))
         self.body.append("""\
 <div class="sphx-glr-thumbcontainer"{tooltip}>
-  <img alt="{title}" src="{filename}" />
+  <img alt="" src="{filename}" />
   <p><a class="reference internal" href="{uri}"><span class="std std-ref">{title}</span></a></p>
   <div class="sphx-glr-thumbnail-title">{title}</div>
 </div>
