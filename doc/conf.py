@@ -26,6 +26,11 @@ intersphinx_mapping = {
 # Don't add .txt suffix to source files:
 html_sourcelink_suffix = ''
 
+# List of arguments to be passed to the kernel that executes the notebooks:
+nbsphinx_execute_arguments = [
+    "--InlineBackend.figure_formats={'svg', 'pdf'}",
+]
+
 # Environment variables to be passed to the kernel:
 os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
 
