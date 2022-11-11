@@ -1175,7 +1175,10 @@ def _create_code_nodes(directive):
 
     outer_node = docutils.nodes.container(classes=outer_classes)
     if execution_count:
-        prompt = prompt_template % (execution_count,)
+        if '%s' in prompt_template:
+            prompt = prompt_template % (execution_count,)
+        else:
+            prompt = prompt_template
         prompt_node = docutils.nodes.literal_block(
             prompt, prompt, language='none', classes=['prompt'])
     else:
