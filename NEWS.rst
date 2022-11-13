@@ -1,3 +1,10 @@
+Version 0.8.10 -- 2022-11-13 -- PyPI__ -- diff__
+ * Fix handling of ``source_suffix``
+ * A few LaTeX fixes
+
+__ https://pypi.org/project/nbsphinx/0.8.10/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.9...0.8.10
+
 Version 0.8.9 -- 2022-06-04 -- PyPI__ -- diff__
  * CSS: support tables in widgets
  * Avoid empty "raw" directive
