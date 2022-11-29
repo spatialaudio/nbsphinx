@@ -344,6 +344,8 @@ LATEX_PREAMBLE = r"""
 \newenvironment{nbsphinxfancyoutput}{%
 \sphinxcolorlet{VerbatimColor}{white}%
 \sphinxcolorlet{VerbatimBorderColor}{nbsphinx-code-border}%
+\sphinxsetup{pre_border-radius=0pt}
+\sphinxsetup{pre_box-decoration-break=clone}
 \spx@verb@boxes@fcolorbox@setup
     % for \sphinxincludegraphics check of maximal height
     \spx@image@maxheight         \textheight
@@ -2236,8 +2238,15 @@ def depart_codearea_latex(self, node):
         else:
             out.append(r'\sphinxsetup{VerbatimColor={named}{white}}')
 
-    out.append(
-        r'\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}')
+    out.extend([
+        r'\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}',
+        r'\makeatletter',
+        r'\@ifpackagelater{sphinx}{2022/06/30}{% Sphinx >= 5.1.0',
+        r'\sphinxsetup{pre_border-radius=0pt}',
+        r'\sphinxsetup{pre_box-decoration-break=clone}',
+        r'}{}',
+        r'\makeatother',
+    ])
     if lines[0].startswith(r'\fvset{'):  # Sphinx >= 1.6.6 and < 1.8.3
         out.append(lines[0])
         del lines[0]
