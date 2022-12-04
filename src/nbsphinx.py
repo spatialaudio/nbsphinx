@@ -32,6 +32,7 @@ from itertools import chain
 import json
 import os
 import re
+import datetime
 import subprocess
 import sys
 from urllib.parse import unquote
@@ -122,6 +123,10 @@ RST_TEMPLATE = """
 {{ resources.codecell_lexer }}
 {%- endif -%}
 {{ insert_empty_lines(cell.source) }}
+{%- if cell.metadata.ExecuteTime %}
+    :execution-start: {{ cell.metadata.ExecuteTime.start_time }}
+    :execution-end: {{ cell.metadata.ExecuteTime.end_time }}
+{%- endif %}
 {%- if cell.execution_count %}
     :execution-count: {{ cell.execution_count }}
 {%- endif %}
@@ -532,7 +537,7 @@ div.nboutput.container {
     display: -webkit-flex;
     display: flex;
     align-items: flex-start;
-    margin: 0;
+    margin: 7px 0 0 0;
     width: 100%%;
 }
 @media (max-width: %(nbsphinx_responsive_width)s) {
@@ -620,7 +625,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    /*background: #f5f5f5;*/
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -740,6 +745,27 @@ div.rendered_html tbody tr:nth-child(odd) {
 .jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
+}
+
+/* Execution timestamps & timigs */
+.timing {
+    margin-top: 7px 0 0 0;
+    border-top: 1px solid #CCC;
+    padding-top: 3px;
+    padding-left: 5px!important;
+    background-color: var(--pst-color-surface, transparent);
+    color: var(--pst-color-text-base, #777777);
+}
+
+.timing > p {
+    font-size: 70%%!important;
+    font-family: monospace;
+    margin-bottom: 0px;
+    padding-bottom: 3px;
+}
+
+div[class*="highlight-"] {
+    margin: 0px!important;
 }
 """
 
@@ -1152,8 +1178,32 @@ class FancyOutputNode(docutils.nodes.Element):
 
 def _create_code_nodes(directive):
     """Create nodes for an input or output code cell."""
+
+    def get_timestamp(start, end):
+
+        time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        t_start = datetime.datetime.strptime(start, time_format)
+        t_end = datetime.datetime.strptime(end, time_format)
+        duration = (t_end - t_start).total_seconds()
+        hours, remainder = divmod(duration, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        duration_str = ''.join((
+            f'{hours:.0f}h' if hours else '',
+            f' {minutes:.0f}m' if minutes else '',
+            f' {seconds:.2f}s' if seconds > 1. else '',
+            f'{round(seconds % 1)}ms' if duration < 1. else '',
+        ))
+
+        finished = t_end.strftime('%H:%M:%S %Y-%m-%d')
+
+        return f'executed in {duration_str}, finished {finished}'
+
+
     directive.state.document['nbsphinx_include_css'] = True
     execution_count = directive.options.get('execution-count')
+    execution_start = directive.options.get('execution-start')
+    execution_end = directive.options.get('execution-end')
     config = directive.state.document.settings.env.config
     if isinstance(directive, NbInput):
         outer_classes = ['nbinput']
@@ -1183,6 +1233,7 @@ def _create_code_nodes(directive):
         prompt_node = docutils.nodes.container(classes=['prompt', 'empty'])
     # NB: Prompts are added manually in LaTeX output
     outer_node += sphinx.addnodes.only('', prompt_node, expr='html')
+    inner_node = docutils.nodes.container(classes=inner_classes)
 
     if isinstance(directive, NbInput):
         text = '\n'.join(directive.content.data)
@@ -1190,10 +1241,15 @@ def _create_code_nodes(directive):
             language = directive.arguments[0]
         else:
             language = 'none'
-        inner_node = docutils.nodes.literal_block(
-            text, text, language=language, classes=inner_classes)
+        inner_node += docutils.nodes.literal_block(
+            text, text, language=language)
+        if config.nbsphinx_timings and execution_start:
+            timestamp = get_timestamp(execution_start, execution_end)
+            timestamp_par = docutils.nodes.paragraph(text = timestamp)
+            timing_div = docutils.nodes.container(
+                '', timestamp_par, classes=['timing'])
+            inner_node += timing_div
     else:
-        inner_node = docutils.nodes.container(classes=inner_classes)
         sphinx.util.nodes.nested_parse_with_titles(
             directive.state, directive.content, inner_node)
 
@@ -1232,6 +1288,8 @@ class NbInput(rst.Directive):
     optional_arguments = 1  # lexer name
     final_argument_whitespace = False
     option_spec = {
+        'execution-start': rst.directives.unchanged,
+        'execution-end': rst.directives.unchanged,
         'execution-count': rst.directives.positive_int,
         'empty-lines-before': rst.directives.nonnegative_int,
         'empty-lines-after': rst.directives.nonnegative_int,
@@ -2384,6 +2442,7 @@ def setup(app):
     app.add_config_value('nbsphinx_widgets_options', {}, rebuild='html')
     app.add_config_value('nbsphinx_thumbnails', {}, rebuild='html')
     app.add_config_value('nbsphinx_assume_equations', True, rebuild='env')
+    app.add_config_value('nbsphinx_timings', True, rebuild='html')
 
     app.add_directive('nbinput', NbInput)
     app.add_directive('nboutput', NbOutput)
