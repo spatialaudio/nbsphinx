@@ -336,6 +336,17 @@ LATEX_PREAMBLE = r"""
 \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
 \definecolor{ansi-default-inverse-bg}{HTML}{000000}
 
+% Defaults for all code blocks, including, but not limited to code cells:
+\sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
+\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
+\makeatletter
+\@ifpackagelater{sphinx}{2022/06/30}{% Sphinx >= 5.1.0
+% Restore settings from Sphinx < 5.1.0:
+\sphinxsetup{pre_border-radius=0pt}
+\sphinxsetup{pre_box-decoration-break=clone}
+}{}
+\makeatother
+
 % Define an environment for non-plain-text code cell outputs (e.g. images)
 \newbox\nbsphinxpromptbox
 \makeatletter
@@ -343,9 +354,6 @@ LATEX_PREAMBLE = r"""
 % In this branch Sphinx is at least at 5.1.0
 \newenvironment{nbsphinxfancyoutput}{%
 \sphinxcolorlet{VerbatimColor}{white}%
-\sphinxcolorlet{VerbatimBorderColor}{nbsphinx-code-border}%
-\sphinxsetup{pre_border-radius=0pt}
-\sphinxsetup{pre_box-decoration-break=clone}
 \spx@verb@boxes@fcolorbox@setup
     % for \sphinxincludegraphics check of maximal height
     \spx@image@maxheight         \textheight
@@ -2225,7 +2233,6 @@ def depart_codearea_latex(self, node):
     out.append('{')  # Start a scope for colors
     if 'nbinput' in node.parent['classes']:
         promptcolor = 'nbsphinxin'
-        out.append(r'\sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}')
     else:
         out.append(r"""
 \kern-\sphinxverbatimsmallskipamount\kern-\baselineskip
@@ -2237,16 +2244,6 @@ def depart_codearea_latex(self, node):
             out.append(r'\sphinxsetup{VerbatimColor={named}{nbsphinx-stderr}}')
         else:
             out.append(r'\sphinxsetup{VerbatimColor={named}{white}}')
-
-    out.extend([
-        r'\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}',
-        r'\makeatletter',
-        r'\@ifpackagelater{sphinx}{2022/06/30}{% Sphinx >= 5.1.0',
-        r'\sphinxsetup{pre_border-radius=0pt}',
-        r'\sphinxsetup{pre_box-decoration-break=clone}',
-        r'}{}',
-        r'\makeatother',
-    ])
     if lines[0].startswith(r'\fvset{'):  # Sphinx >= 1.6.6 and < 1.8.3
         out.append(lines[0])
         del lines[0]
