@@ -26,7 +26,7 @@ jobs:
           name: Installing apt Packages
           command: |
             apt-get -y update
-            apt-get install -y --no-install-recommends python3-pip librsvg2-bin
+            apt-get install -y --no-install-recommends python3-pip librsvg2-bin binutils
 
       - restore_cache:
           keys:
