@@ -155,9 +155,10 @@ latex_elements = {
 }{
     \renewcommand{\ttdefault}{lmtt}  % typewriter font from lmodern
 }
-\usepackage{booktabs}  % for Pandas dataframes
 """,
 }
+
+latex_table_style = ['booktabs']
 
 latex_documents = [
     (master_doc, 'nbsphinx.tex', project, author, 'howto'),
