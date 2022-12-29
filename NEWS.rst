@@ -1,3 +1,9 @@
+Version 0.8.11 -- 2022-12-29 -- PyPI__ -- diff__
+ * LaTeX: apply code cell border style to all code blocks
+
+__ https://pypi.org/project/nbsphinx/0.8.11/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.10...0.8.11
+
 Version 0.8.10 -- 2022-11-13 -- PyPI__ -- diff__
  * Fix handling of ``source_suffix``
  * A few LaTeX fixes
