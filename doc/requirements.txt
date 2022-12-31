@@ -6,7 +6,7 @@ pandas
 sphinxcontrib-bibtex>=2.1
 sphinxcontrib-svg2pdfconverter
 ipywidgets
-sphinx-gallery
+sphinx-gallery<0.11  # https://github.com/spatialaudio/nbsphinx/issues/655
 jupytext
 sphinx-last-updated-by-git
 sphinx-codeautolink
