@@ -8,7 +8,6 @@ extensions = [
     'nbsphinx',
     'sphinxcontrib.bibtex',  # for bibliographic references
     'sphinxcontrib.rsvgconverter',  # for SVG->PDF conversion in LaTeX output
-    'sphinx_gallery.load_style',  # load CSS for gallery (needs SG >= 0.6)
     'sphinx_last_updated_by_git',  # get "last updated" from Git
     'sphinx_codeautolink',  # automatic links from code to documentation
     'sphinx.ext.intersphinx',  # links to other Sphinx projects (e.g. NumPy)
@@ -37,6 +36,7 @@ os.environ['MY_DUMMY_VARIABLE'] = 'Hello from conf.py!'
 nbsphinx_thumbnails = {
     'gallery/thumbnail-from-conf-py': 'gallery/a-local-file.png',
     'gallery/*-rst': 'images/notebook_icon.png',
+    'orphan': '_static/favicon.svg',
 }
 
 # This is processed by Jinja2 and inserted before each notebook

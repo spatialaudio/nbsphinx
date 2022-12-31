@@ -316,7 +316,7 @@ __ https://www.sphinx-doc.org/en/master/usage/restructuredtext/
 
 .. note::
 
-    The notes regarding LaTeX in :ref:`/subdir/gallery.ipynb`
+    The notes regarding LaTeX in :ref:`/gallery/gallery-with-nested-documents.ipynb`
     and :ref:`/subdir/toctree.ipynb` also apply here!
 
 The following example gallery was created using:

@@ -1770,10 +1770,12 @@ def env_purge_doc(app, env, docname):
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
-    """Add CSS file for HTML pages that contain code cells."""
+    """Add CSS files for code cells and galleries."""
+    # NB: the CSS files are copied in html_collect_pages().
     if doctree and doctree.get('nbsphinx_code_css'):
-        # NB: the file is copied in html_collect_pages():
         app.add_css_file('nbsphinx-code-cells.css')
+    if doctree and doctree.get('nbsphinx_gallery_css'):
+        app.add_css_file('nbsphinx-gallery.css')
 
 
 def html_collect_pages(app):
@@ -1804,7 +1806,12 @@ def html_collect_pages(app):
         'nbsphinx_responsive_width': app.config.nbsphinx_responsive_width,
         'nbsphinx_prompt_width': app.config.nbsphinx_prompt_width,
     }
-    assets = 'nbsphinx-code-cells.css_t',
+    assets = (
+        'nbsphinx-code-cells.css_t',
+        'nbsphinx-gallery.css',
+        'nbsphinx-no-thumbnail.svg',
+        'nbsphinx-broken-thumbnail.svg',
+    )
     for a in assets:
         sphinx.util.fileutil.copy_asset(
             os.path.join(os.path.dirname(__file__), '_static', a),
@@ -1885,7 +1892,7 @@ def doctree_resolved(app, doctree, fromdocname):
                 filename = thumbnail.get('filename', '')
                 if filename is _BROKEN_THUMBNAIL:
                     filename = os.path.join(
-                        base, '_static', 'broken_example.png')
+                        base, '_static', 'nbsphinx-broken-thumbnail.svg')
                 elif filename:
                     filename = os.path.join(
                         base, app.builder.imagedir, filename)
@@ -1893,7 +1900,8 @@ def doctree_resolved(app, doctree, fromdocname):
                     # NB: Settings from conf.py can be overwritten in notebook
                     filename = os.path.join(base, conf_py_thumbnail)
                 else:
-                    filename = os.path.join(base, '_static', 'no_image.png')
+                    filename = os.path.join(
+                        base, '_static', 'nbsphinx-no-thumbnail.svg')
                 entries.append((title, uri, filename, tooltip))
             else:
                 logger.warning(
@@ -1927,6 +1935,7 @@ def doctree_resolved(app, doctree, fromdocname):
             toctree['nbsphinx_gallery'] = True
             node.replace_self([toctree_wrapper, gallery])
             # NB: Further processing happens in patched_toctree_resolve()
+        doctree['nbsphinx_gallery_css'] = True
 
 
 def depart_codearea_html(self, node):
@@ -2059,29 +2068,22 @@ def depart_admonition_text(self, node):
 
 
 def depart_gallery_html(self, node):
+    self.body.append('<div class="nbsphinx-gallery">\n')
     for title, uri, filename, tooltip in node['entries']:
         if tooltip:
-            tooltip = ' tooltip="{}"'.format(html.escape(tooltip))
+            tooltip = ' title="{}"'.format(html.escape(tooltip))
         self.body.append("""\
-<div class="sphx-glr-thumbcontainer"{tooltip}>
-  <div class="figure align-center">
-    <img alt="thumbnail" src="{filename}" />
-    <p class="caption">
-      <span class="caption-text">
-        <a class="reference internal" href="{uri}">
-          <span class="std std-ref">{title}</span>
-        </a>
-      </span>
-    </p>
-  </div>
-</div>
+<a class="reference internal" href="{uri}"{tooltip}>
+  <div><img alt="" src="{filename}"></div>
+  <div>{title}</div>
+</a>
 """.format(
             uri=html.escape(uri),
             title=html.escape(title),
             tooltip=tooltip,
             filename=html.escape(filename),
         ))
-    self.body.append('<div class="sphx-glr-clear"></div>')
+    self.body.append('</div>\n')
 
 
 def do_nothing(self, node):
