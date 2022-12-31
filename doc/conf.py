@@ -52,14 +52,17 @@ nbsphinx_prolog = r"""
       <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/spatialaudio/nbsphinx/{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.</span>
       <script>
         if (document.location.host) {
-          $(document.currentScript).replaceWith(
-            '<a class="reference external" ' +
-            'href="https://nbviewer.jupyter.org/url' +
+          let nbviewer_link = document.createElement('a');
+          nbviewer_link.setAttribute('href',
+            'https://nbviewer.org/url' +
             (window.location.protocol == 'https:' ? 's/' : '/') +
             window.location.host +
             window.location.pathname.slice(0, -4) +
-            'ipynb">View in <em>nbviewer</em></a>.'
-          );
+            'ipynb');
+          nbviewer_link.innerHTML = 'View in <em>nbviewer</em>';
+          nbviewer_link.classList.add('reference');
+          nbviewer_link.classList.add('external');
+          document.currentScript.replaceWith(nbviewer_link, '.');
         }
       </script>
     </div>
