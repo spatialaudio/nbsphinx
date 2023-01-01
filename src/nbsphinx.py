@@ -1933,7 +1933,7 @@ def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
         self, docname, builder, toctree, *args, **kwargs)
     if not gallery or node is None:
         return node
-    if isinstance(node[0], docutils.nodes.caption):
+    if isinstance(node[0], (docutils.nodes.caption, docutils.nodes.title)):
         del node[1:]
     else:
         del node[:]
