@@ -267,15 +267,48 @@ here. Instead, the footnote citations are placed into the footnotes of
 their respective pages.
 
 
+Thumbnail Link Galleries (HTML only)
+-------------------------------------
+
+In some case it is desired to create thumbnail links to existing notebooks,
+already included in a ``toctree``. This can be used e.g. to link to a subset
+of notebooks from API documentation to highlight the use of some functionality.
+For this there is a dedicated ``nblinkgallery`` directive.
+
+The following example gallery was created using:
+
+.. code-block:: rest
+
+    .. nblinkgallery::
+        :caption: A few links
+        :name: rst-link-gallery
+
+        gallery/multiple-outputs
+        gallery/no-thumbnail
+        gallery/cell-metadata
+        orphan
+
+.. nblinkgallery::
+    :caption: A few links
+    :name: rst-link-gallery
+
+    gallery/multiple-outputs
+    gallery/no-thumbnail
+    gallery/cell-metadata
+    orphan
+
+.. seealso::
+
+    `Link Galleries in Jupyter Notebooks <gallery/gallery-with-links.ipynb>`_
+
+
 Thumbnail Galleries
 -------------------
 
 With ``nbsphinx`` you can create thumbnail galleries in notebook files
-as described in :ref:`/subdir/gallery.ipynb`.
-
+as described in :ref:`/gallery/gallery-with-nested-documents.ipynb`.
 If you like, you can also create such galleries in reST files
 using the ``nbgallery`` directive.
-
 It takes the same parameters as the `toctree`__ directive.
 
 __ https://www.sphinx-doc.org/en/master/usage/restructuredtext/
@@ -305,25 +338,3 @@ The following example gallery was created using:
     :reversed:
 
     gallery/*-rst
-
-
-Thumbnail Links Galleries (HTML only)
--------------------------------------
-
-In some case it is desired to just create thumbnail links to existing notebooks,
-already included in a ``toctree``. This can be used e.g. to link to a subset
-of notebooks from API documentation to highlight the use of some functionality.
-For this there is a dedicated ``nblinkgallery`` directive.
-
-The following example gallery was created using:
-
-.. code-block:: rest
-
-    .. nblinkgallery::
-        gallery/multiple-outputs
-        gallery/no-thumbnail
-
-.. nblinkgallery::
-    gallery/multiple-outputs
-    gallery/no-thumbnail
-
