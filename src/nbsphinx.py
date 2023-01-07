@@ -1598,8 +1598,7 @@ def _extract_gallery_or_toctree(cell):
             break
     lines.append('')  # empty line
     for ref in node.traverse(docutils.nodes.reference):
-        lines.append(ref.astext().replace('\n', '') +
-                     ' <' + unquote(ref.get('refuri')) + '>')
+        lines.append(ref['name'] + ' <' + unquote(ref.get('refuri')) + '>')
     return '\n    '.join(lines)
 
 
