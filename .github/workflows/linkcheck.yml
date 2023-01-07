@@ -5,14 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clone repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Install pandoc
       run: |
         sudo apt-get install -y --no-install-recommends pandoc
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Double-check Python version
@@ -28,7 +28,7 @@ jobs:
       run: |
         python -m sphinx -W --keep-going --color -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck
     - name: Upload results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: ${{ success() || failure() }}
       with:
         name: linkcheck
