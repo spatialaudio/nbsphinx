@@ -1,5 +1,8 @@
 name: Build HTML on macOS
 on: [push, pull_request]
+env:
+  PIP: python -m pip
+  SPHINX: python -m sphinx -W --keep-going --color
 jobs:
   html-macos:
     runs-on: macos-latest
@@ -20,10 +23,10 @@ jobs:
         python --version
     - name: Install Python package
       run: |
-        python -m pip install .
+        $PIP install .
     - name: Install docs dependencies
       run: |
-        python -m pip install -r doc/requirements.txt
+        $PIP install -r doc/requirements.txt
     - name: Build HTML
       run: |
-        python -m sphinx -W --keep-going --color doc/ _build/html/
+        $SPHINX doc/ _build/html/
