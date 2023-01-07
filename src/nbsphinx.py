@@ -251,7 +251,9 @@ RST_TEMPLATE = """
 {%- if 'nbsphinx-gallery' in cell.metadata
     or 'nbsphinx-gallery' in cell.metadata.get('tags', [])
     or 'nbsphinx-toctree' in cell.metadata
-    or 'nbsphinx-toctree' in cell.metadata.get('tags', []) %}
+    or 'nbsphinx-toctree' in cell.metadata.get('tags', [])
+    or 'nbsphinx-link-gallery' in cell.metadata
+    or 'nbsphinx-link-gallery' in cell.metadata.get('tags', []) %}
 {{ cell | extract_gallery_or_toctree }}
 {%- else %}
 {{ cell | save_attachments or super() | replace_attachments }}
@@ -1546,7 +1548,7 @@ def pandoc(source, fmt, to, filter_func=None):
 
 def _extract_gallery_or_toctree(cell):
     """Extract links from Markdown cell and create gallery/toctree."""
-    # If both are available, "gallery" takes precedent
+    # If more than one is available, "gallery" takes precedence, then "toctree"
     if 'nbsphinx-gallery' in cell.metadata:
         lines = ['.. nbgallery::']
         options = cell.metadata['nbsphinx-gallery']
@@ -1558,6 +1560,12 @@ def _extract_gallery_or_toctree(cell):
         options = cell.metadata['nbsphinx-toctree']
     elif 'nbsphinx-toctree' in cell.metadata.get('tags', []):
         lines = ['.. toctree::']
+        options = {}
+    elif 'nbsphinx-link-gallery' in cell.metadata:
+        lines = ['.. nblinkgallery::']
+        options = cell.metadata['nbsphinx-link-gallery']
+    elif 'nbsphinx-link-gallery' in cell.metadata.get('tags', []):
+        lines = ['.. nblinkgallery::']
         options = {}
     else:
         assert False
@@ -1571,7 +1579,7 @@ def _extract_gallery_or_toctree(cell):
                 lines.append(':{}: {}'.format(option, value))
     except AttributeError:
         raise ValueError(
-            'invalid nbsphinx-gallery/nbsphinx-toctree option: {!r}'
+            'invalid nbsphinx-[link-]gallery/nbsphinx-toctree option: {!r}'
             .format(options))
 
     text = nbconvert.filters.markdown2rst(cell.source)
@@ -2223,8 +2231,26 @@ def doctree_resolved(app, doctree, fromdocname):
         gallery = GalleryNode()
         gallery['entries'] = entries
         if isinstance(toctree, DummyTocTree):
-            # NbLinkGallery, no toctree needed
-            node.replace_self(gallery)
+            # NbLinkGallery, toctree is only used to get optional caption.
+
+            # Copied from sphinx/environment/adapters/toctree.py:
+            newnode = sphinx.addnodes.compact_paragraph('', '')
+            caption = toctree.attributes.get('caption')
+            if caption:
+                caption_node = docutils.nodes.title(
+                    caption, '', *[docutils.nodes.Text(caption)])
+                caption_node.line = toctree.line
+                caption_node.source = toctree.source
+                #caption_node.rawsource = toctree['rawcaption']
+                if hasattr(toctree, 'uid'):
+                    # move uid to caption_node to translate it
+                    caption_node.uid = toctree.uid  # type: ignore
+                    del toctree.uid
+                newnode += caption_node
+            newnode['toctree'] = True
+
+            toctree_wrapper[0] = newnode
+            node.replace_self([toctree_wrapper, gallery])
         else:
             # NbGallery
             toctree['nbsphinx_gallery'] = True
