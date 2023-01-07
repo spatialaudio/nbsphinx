@@ -1,5 +1,9 @@
 name: Check links in documentation
 on: [push, pull_request]
+env:
+  APT_INSTALL: sudo apt-get install -y --no-install-recommends
+  PIP: python -m pip
+  SPHINX: python -m sphinx -W --keep-going --color
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
@@ -10,7 +14,7 @@ jobs:
         fetch-depth: 0
     - name: Install pandoc
       run: |
-        sudo apt-get install -y --no-install-recommends pandoc
+        $APT_INSTALL pandoc
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -20,13 +24,13 @@ jobs:
         python --version
     - name: Install Python package
       run: |
-        python -m pip install .
+        $PIP install .
     - name: Install docs dependencies
       run: |
-        python -m pip install -r doc/requirements.txt
+        $PIP install -r doc/requirements.txt
     - name: Check links
       run: |
-        python -m sphinx -W --keep-going --color -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck
+        $SPHINX -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck
     - name: Upload results
       uses: actions/upload-artifact@v3
       if: ${{ success() || failure() }}
