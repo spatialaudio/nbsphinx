@@ -1,11 +1,14 @@
+from pathlib import Path
+
 from setuptools import setup
 
 # "import" __version__
 __version__ = 'unknown'
-for line in open('src/nbsphinx.py'):
-    if line.startswith('__version__'):
-        exec(line)
-        break
+with Path('src/nbsphinx.py').open() as f:
+    for line in f:
+        if line.startswith('__version__'):
+            exec(line)
+            break
 
 setup(
     name='nbsphinx',
@@ -24,7 +27,7 @@ setup(
     author='Matthias Geier',
     author_email='Matthias.Geier@gmail.com',
     description='Jupyter Notebook Tools for Sphinx',
-    long_description=open('README.rst').read(),
+    long_description=Path('README.rst').read_text(),
     license='MIT',
     keywords='Sphinx Jupyter notebook'.split(),
     url='https://nbsphinx.readthedocs.io/',
