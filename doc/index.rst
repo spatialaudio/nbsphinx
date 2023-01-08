@@ -1,6 +1,6 @@
 .. include:: ../README.rst
 
-All content shown below
+All of the following content
 was generated from Jupyter notebooks,
 except for the sections :doc:`a-normal-rst-file`,
 :doc:`contributing` and :doc:`version-history`,
@@ -17,9 +17,11 @@ __ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. toctree::
     :maxdepth: 4
     :glob:
+    :hidden:
 
     installation
     usage
+    configuration
     markdown-cells
     code-cells
     raw-cells
