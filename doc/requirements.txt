@@ -10,3 +10,5 @@ sphinx-gallery<0.11  # https://github.com/spatialaudio/nbsphinx/issues/655
 jupytext
 sphinx-last-updated-by-git
 sphinx-codeautolink
+# docutils is an automatic dependency of Sphinx. This is only necessary until docutils > 0.19.0 is released:
+-e svn+https://svn.code.sf.net/p/docutils/code/trunk/docutils@9126#egg=docutils
