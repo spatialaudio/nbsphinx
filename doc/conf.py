@@ -187,3 +187,7 @@ if 'html_theme' not in globals():
         html_theme = 'insipid'
         html_copy_source = False
         html_permalinks_icon = '#'
+
+if globals().get('html_theme') == 'insipid':
+    # This controls optional content in index.rst:
+    tags.add('insipid')
