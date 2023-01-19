@@ -1,3 +1,9 @@
+Version 0.8.12 -- 2023-01-19 -- PyPI__ -- diff__
+ * Implement "link" galleries (without nested sub-documents)
+
+__ https://pypi.org/project/nbsphinx/0.8.12/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.11...0.8.12
+
 Version 0.8.11 -- 2022-12-29 -- PyPI__ -- diff__
  * LaTeX: apply code cell border style to all code blocks
 
