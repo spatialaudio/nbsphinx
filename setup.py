@@ -15,6 +15,7 @@ setup(
     version=__version__,
     package_dir={'': 'src'},
     packages=['nbsphinx'],
+    package_data={'nbsphinx': ['_static/nbsphinx-code-cells.css_t']},
     python_requires='>=3.6',
     install_requires=[
         'docutils',
