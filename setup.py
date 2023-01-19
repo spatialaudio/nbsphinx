@@ -4,7 +4,7 @@ from setuptools import setup
 
 # "import" __version__
 __version__ = 'unknown'
-with Path('src/nbsphinx.py').open() as f:
+with Path('src/nbsphinx/__init__.py').open() as f:
     for line in f:
         if line.startswith('__version__'):
             exec(line)
@@ -14,7 +14,7 @@ setup(
     name='nbsphinx',
     version=__version__,
     package_dir={'': 'src'},
-    py_modules=['nbsphinx'],
+    packages=['nbsphinx'],
     python_requires='>=3.6',
     install_requires=[
         'docutils',
