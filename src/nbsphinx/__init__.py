@@ -1929,12 +1929,12 @@ def doctree_resolved(app, doctree, fromdocname):
             newnode['toctree'] = True
 
             toctree_wrapper[0] = newnode
-            node.replace_self([toctree_wrapper, gallery])
         else:
             # NbGallery
             toctree['nbsphinx_gallery'] = True
-            node.replace_self([toctree_wrapper, gallery])
             # NB: Further processing happens in patched_toctree_resolve()
+        toctree_wrapper += gallery
+        node.replace_self(toctree_wrapper)
         doctree['nbsphinx_gallery_css'] = True
 
 
