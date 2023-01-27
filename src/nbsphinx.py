@@ -806,6 +806,13 @@ div.admonition.inline-title p.admonition-title {
 """
 
 
+class Writer(nbconvert.preprocessors.Preprocessor):
+    def preprocess(self, nb, resources):
+        if 'nbsphinx_save_notebook' in resources:
+            # Save *executed* notebook *before* the Exporter can change it:
+            nbformat.write(nb, resources['nbsphinx_save_notebook'])
+        return nb, resources
+
 class Exporter(nbconvert.RSTExporter):
     """Convert Jupyter notebooks to reStructuredText.
 
@@ -818,7 +825,8 @@ class Exporter(nbconvert.RSTExporter):
     """
 
     def __init__(self, execute='auto', kernel_name='', execute_arguments=[],
-                 allow_errors=False, timeout=None, codecell_lexer='none'):
+                 allow_errors=False, timeout=None, codecell_lexer='none',
+                 nbconvert_config=None):
         """Initialize the Exporter."""
 
         # NB: The following stateful Jinja filters are a hack until
@@ -852,13 +860,15 @@ class Exporter(nbconvert.RSTExporter):
         self._timeout = timeout
         self._codecell_lexer = codecell_lexer
         loader = jinja2.DictLoader({'nbsphinx-rst.tpl': RST_TEMPLATE})
-        super(Exporter, self).__init__(
-            template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
-            config=traitlets.config.Config({
+        if nbconvert_config is None:
+            nbconvert_config = {
                 'HighlightMagicsPreprocessor': {'enabled': True},
                 # Work around https://github.com/jupyter/nbconvert/issues/720:
                 'RegexRemovePreprocessor': {'enabled': False},
-            }),
+            }
+        super(Exporter, self).__init__(
+            template_file='nbsphinx-rst.tpl', extra_loaders=[loader],
+            config=traitlets.config.Config(nbconvert_config),
             filters={
                 'convert_pandoc': convert_pandoc,
                 'markdown2rst': markdown2rst,
@@ -899,19 +909,31 @@ class Exporter(nbconvert.RSTExporter):
             not any(c.get('outputs') or c.get('execution_count')
                     for c in nb.cells if c.cell_type == 'code')
         )
+        preprocessors = []
         if auto_execute or execute == 'always':
             allow_errors = nbsphinx_metadata.get(
                 'allow_errors', self._allow_errors)
             timeout = nbsphinx_metadata.get('timeout', self._timeout)
-            pp = nbconvert.preprocessors.ExecutePreprocessor(
+            preprocessors.append(nbconvert.preprocessors.ExecutePreprocessor(
                 kernel_name=self._kernel_name,
                 extra_arguments=self._execute_arguments,
-                allow_errors=allow_errors, timeout=timeout)
-            nb, resources = pp.preprocess(nb, resources)
+                allow_errors=allow_errors, timeout=timeout))
+            # pp = nbconvert.preprocessors.ExecutePreprocessor(
+            #     kernel_name=self._kernel_name,
+            #     extra_arguments=self._execute_arguments,
+            #     allow_errors=allow_errors, timeout=timeout)
+            # nb, resources = pp.preprocess(nb, resources)
 
-        if 'nbsphinx_save_notebook' in resources:
-            # Save *executed* notebook *before* the Exporter can change it:
-            nbformat.write(nb, resources['nbsphinx_save_notebook'])
+        # if 'nbsphinx_save_notebook' in resources:
+        #     # Save *executed* notebook *before* the Exporter can change it:
+        #     nbformat.write(nb, resources['nbsphinx_save_notebook'])
+
+        preprocessors.append(Writer())
+        # Find the existing execute preprocessor and replace it
+        i = next((i for i, p in enumerate(self._preprocessors)
+            if isinstance(p, nbconvert.preprocessors.ExecutePreprocessor)),
+                len(self._preprocessors))
+        self._preprocessors[i:i+1] = preprocessors
 
         # Call into RSTExporter
         rststr, resources = super(Exporter, self).from_notebook_node(
@@ -1094,6 +1116,7 @@ class NotebookParser(rst.Parser):
             allow_errors=env.config.nbsphinx_allow_errors,
             timeout=env.config.nbsphinx_timeout,
             codecell_lexer=env.config.nbsphinx_codecell_lexer,
+            nbconvert_config=env.config.nbsphinx_nbconvert_config
         )
 
         try:
@@ -2423,6 +2446,7 @@ def setup(app):
     app.add_config_value('nbsphinx_execute', 'auto', rebuild='env')
     app.add_config_value('nbsphinx_kernel_name', '', rebuild='env')
     app.add_config_value('nbsphinx_execute_arguments', [], rebuild='env')
+    app.add_config_value('nbsphinx_nbconvert_config', None, rebuild='env')
     app.add_config_value('nbsphinx_allow_errors', False, rebuild='')
     app.add_config_value('nbsphinx_timeout', None, rebuild='')
     app.add_config_value('nbsphinx_codecell_lexer', 'none', rebuild='env')
