@@ -496,6 +496,7 @@ class Exporter(nbconvert.RSTExporter):
 
             if thumbnail_cell:
                 thumbnail['filename'] = thumbnail_filename
+                thumbnail['implicit'] = False
                 if tooltip:
                     thumbnail['tooltip'] = tooltip
 
@@ -505,6 +506,7 @@ class Exporter(nbconvert.RSTExporter):
             # default to the last figure in the notebook, if it's a valid thumbnail
             if thumbnail_filename:
                 thumbnail['filename'] = thumbnail_filename
+                thumbnail['implicit'] = True
 
         resources['nbsphinx_thumbnail'] = thumbnail
         return rststr, resources
@@ -1735,15 +1737,24 @@ def doctree_resolved(app, doctree, fromdocname):
                 thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
                 tooltip = thumbnail.get('tooltip', '')
                 filename = thumbnail.get('filename', '')
+                was_implicit_thumbnail = thumbnail.get('implicit', True)
+
+                # thumbnail priority: broken, explicit in notebook, from conf.py
+                #                     implicit in notebook, default
                 if filename is _BROKEN_THUMBNAIL:
                     filename = os.path.join(
                         base, '_static', 'nbsphinx-broken-thumbnail.svg')
-                elif filename:
+                elif filename and not was_implicit_thumbnail:
+                    # thumbnail from tagged cell or metadata
                     filename = os.path.join(
                         base, app.builder.imagedir, filename)
                 elif conf_py_thumbnail:
                     # NB: Settings from conf.py can be overwritten in notebook
                     filename = os.path.join(base, conf_py_thumbnail)
+                elif filename:
+                    # implicit thumbnail from an image in the notebook
+                    filename = os.path.join(
+                        base, app.builder.imagedir, filename)
                 else:
                     filename = os.path.join(
                         base, '_static', 'nbsphinx-no-thumbnail.svg')
