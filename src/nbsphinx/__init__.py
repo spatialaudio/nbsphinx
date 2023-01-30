@@ -68,6 +68,12 @@ DISPLAY_DATA_PRIORITY_LATEX = (
     'text/plain',
 )
 
+MIME_TYPE_SUFFIXES = {
+    'image/svg+xml': '.svg',
+    'image/png': '.png',
+    'image/jpeg': '.jpg',
+}
+
 # The default rst template name is changing in nbconvert 6, so we substitute
 # it in to the *extends* directive.
 RST_TEMPLATE = """
@@ -404,6 +410,7 @@ class Exporter(nbconvert.RSTExporter):
             resources['nbsphinx_widgets'] = True
 
         thumbnail = {}
+        thumbnail_filename = None
 
         def warning(msg, *args):
             logger.warning(
@@ -413,64 +420,92 @@ class Exporter(nbconvert.RSTExporter):
             thumbnail['filename'] = _BROKEN_THUMBNAIL
 
         for cell_index, cell in enumerate(nb.cells):
-            if 'nbsphinx-thumbnail' in cell.metadata:
+            # figure out if this cell is explicitly tagged
+            # but if it's not, we'll default to the last figure in the notebook
+            # if one exists
+            metadata_cell = 'nbsphinx-thumbnail' in cell.metadata
+            tagged_cell = 'nbsphinx_thubnail' in cell.metadata.get('tags',[])
+            thumbnail_cell = metadata_cell or tagged_cell
+
+            if metadata_cell:
                 data = cell.metadata['nbsphinx-thumbnail'].copy()
                 output_index = data.pop('output-index', -1)
                 tooltip = data.pop('tooltip', '')
+
                 if data:
                     warning('Invalid key(s): %s', set(data))
                     break
-            elif 'nbsphinx-thumbnail' in cell.metadata.get('tags', []):
+            else:
                 output_index = -1
                 tooltip = ''
-            else:
-                continue
+
             if cell.cell_type != 'code':
-                warning('Only allowed in code cells; cell %s has type "%s"',
+                if thumbnail_cell:
+                    warning('Only allowed in code cells; cell %s has type "%s"',
                         cell_index, cell.cell_type)
+                    break
+
+                continue
+
+            if thumbnail and thumbnail_cell:
+                warning('Only allowed onced per notebook')
                 break
-            if thumbnail:
-                warning('Only allowed once per notebook')
-                break
+
             if not cell.outputs:
-                warning('No outputs in cell %s', cell_index)
-                break
-            if tooltip:
-                thumbnail['tooltip'] = tooltip
+                if thumbnail_cell:
+                    warning('No outputs in cell %s', cell_index)
+                    break
+
+                continue
+
             if output_index == -1:
                 output_index = len(cell.outputs) - 1
             elif output_index >= len(cell.outputs):
                 warning('Invalid "output-index" in cell %s: %s',
-                        cell_index, output_index)
-                break
-            out = cell.outputs[output_index]
-            if out.output_type not in {'display_data', 'execute_result'}:
-                warning('Unsupported output type in cell %s/output %s: "%s"',
-                        cell_index, output_index, out.output_type)
+                    cell_index, output_index)
                 break
 
+            out = cell.outputs[output_index]
+
+            if out.output_type not in {'display_data', 'execute_result'}:
+                if thumbnail_cell:
+                    warning('Unsupported output type in cell %s/output %s: "%s"',
+                        cell_index, output_index, out.output_type)
+                    break
+
+                continue
+
             for mime_type in DISPLAY_DATA_PRIORITY_HTML:
-                if mime_type not in out.data:
+                if mime_type not in out.data or mime_type not in MIME_TYPE_SUFFIXES:
                     continue
-                if mime_type == 'image/svg+xml':
-                    suffix = '.svg'
-                elif mime_type == 'image/png':
-                    suffix = '.png'
-                elif mime_type == 'image/jpeg':
-                    suffix = '.jpg'
-                else:
-                    continue
-                thumbnail['filename'] = '{}_{}_{}{}'.format(
+
+                thumbnail_filename = '{}_{}_{}{}'.format(
                     resources['unique_key'],
                     cell_index,
                     output_index,
-                    suffix,
+                    MIME_TYPE_SUFFIXES[mime_type],
                 )
                 break
             else:
-                warning('Unsupported MIME type(s) in cell %s/output %s: %s',
+                if thumbnail_cell:
+                    warning('Unsupported MIME type(s) in cell %s/output %s: %s',
                         cell_index, output_index, set(out.data))
+                    break
+
+                continue
+
+            if thumbnail_cell:
+                thumbnail['filename'] = thumbnail_filename
+                if tooltip:
+                    thumbnail['tooltip'] = tooltip
+
                 break
+
+        else:
+            # default to the last figure in the notebook, if it's a valid thumbnail
+            if thumbnail_filename:
+                thumbnail['filename'] = thumbnail_filename
+
         resources['nbsphinx_thumbnail'] = thumbnail
         return rststr, resources
 
