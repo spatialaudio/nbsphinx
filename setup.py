@@ -56,5 +56,4 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Documentation :: Sphinx',
     ],
-    zip_safe=True,
 )
