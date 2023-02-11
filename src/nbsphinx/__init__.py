@@ -282,202 +282,6 @@ RST_TEMPLATE = """
 """.replace('__RST_DEFAULT_TEMPLATE__', nbconvert.RSTExporter().template_file)
 
 
-# MEMO: the nbsphinxfancyoutput environment recycles some internal Sphinx
-# LaTeX macros, as testify the @ in their names.  At 5.1.0 these macros
-# got modified so we now have two cases for the nbsphinxfancyoutput
-# definition: Sphinx >= 5.1.0 or Sphinx < 5.1.0 (and >= 1.7.0 at least).
-
-# MEMO: since Sphinx 2.0 the upstream \sphinxincludegraphics is similar and
-# slightly better than the \nbsphinxincludegraphics defined here.  So for the
-# >= 5.1.0 branch of nbsphinxfancyoutput, the code does no replacement of
-# \sphinxincludegraphics by \nbsphinxincludegraphics anymore.
-LATEX_PREAMBLE = r"""
-% Jupyter Notebook code cell colors
-\definecolor{nbsphinxin}{HTML}{307FC1}
-\definecolor{nbsphinxout}{HTML}{BF5B3D}
-\definecolor{nbsphinx-code-bg}{HTML}{F5F5F5}
-\definecolor{nbsphinx-code-border}{HTML}{E0E0E0}
-\definecolor{nbsphinx-stderr}{HTML}{FFDDDD}
-% ANSI colors for output streams and traceback highlighting
-\definecolor{ansi-black}{HTML}{3E424D}
-\definecolor{ansi-black-intense}{HTML}{282C36}
-\definecolor{ansi-red}{HTML}{E75C58}
-\definecolor{ansi-red-intense}{HTML}{B22B31}
-\definecolor{ansi-green}{HTML}{00A250}
-\definecolor{ansi-green-intense}{HTML}{007427}
-\definecolor{ansi-yellow}{HTML}{DDB62B}
-\definecolor{ansi-yellow-intense}{HTML}{B27D12}
-\definecolor{ansi-blue}{HTML}{208FFB}
-\definecolor{ansi-blue-intense}{HTML}{0065CA}
-\definecolor{ansi-magenta}{HTML}{D160C4}
-\definecolor{ansi-magenta-intense}{HTML}{A03196}
-\definecolor{ansi-cyan}{HTML}{60C6C8}
-\definecolor{ansi-cyan-intense}{HTML}{258F8F}
-\definecolor{ansi-white}{HTML}{C5C1B4}
-\definecolor{ansi-white-intense}{HTML}{A1A6B2}
-\definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
-\definecolor{ansi-default-inverse-bg}{HTML}{000000}
-
-% Defaults for all code blocks, including, but not limited to code cells:
-\sphinxsetup{VerbatimColor={named}{nbsphinx-code-bg}}
-\sphinxsetup{VerbatimBorderColor={named}{nbsphinx-code-border}}
-\makeatletter
-\@ifpackagelater{sphinx}{2022/06/30}{% Sphinx >= 5.1.0
-% Restore settings from Sphinx < 5.1.0:
-\sphinxsetup{pre_border-radius=0pt}
-\sphinxsetup{pre_box-decoration-break=clone}
-}{}
-\makeatother
-
-% Define an environment for non-plain-text code cell outputs (e.g. images)
-\newbox\nbsphinxpromptbox
-\makeatletter
-\@ifpackagelater{sphinx}{2022/06/30}{% "later" means here "at least"
-% In this branch Sphinx is at least at 5.1.0
-\newenvironment{nbsphinxfancyoutput}{%
-\sphinxcolorlet{VerbatimColor}{white}%
-\spx@verb@boxes@fcolorbox@setup
-    % for \sphinxincludegraphics check of maximal height
-    \spx@image@maxheight         \textheight
-    \advance\spx@image@maxheight -\spx@boxes@border@top
-    \advance\spx@image@maxheight -\spx@boxes@padding@top
-    \advance\spx@image@maxheight -\spx@boxes@padding@bottom
-    \advance\spx@image@maxheight -\spx@boxes@border@bottom
-    \advance\spx@image@maxheight -\baselineskip
-\def\sphinxVerbatim@Before{\nbsphinxfancyaddprompt}%
-\def\sphinxVerbatim@After {\@empty}%
-\def\FrameCommand     {\sphinxVerbatim@FrameCommand}%
-\def\FirstFrameCommand{\sphinxVerbatim@FirstFrameCommand}%
-\def\MidFrameCommand  {\sphinxVerbatim@MidFrameCommand}%
-\def\LastFrameCommand {\sphinxVerbatim@LastFrameCommand}%
-\MakeFramed{\advance\hsize-\width\@totalleftmargin\z@\linewidth\hsize\@setminipage}%
-\lineskip=1ex\lineskiplimit=1ex\raggedright%
-}{\par\unskip\@minipagefalse\endMakeFramed}
-\def\nbsphinxfancyaddprompt{\ifvoid\nbsphinxpromptbox\else
-    \kern\spx@boxes@border@top\kern\spx@boxes@padding@top
-    \copy\nbsphinxpromptbox
-    \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
-    \kern-\spx@boxes@padding@top\kern-\spx@boxes@border@top
-    \nointerlineskip
-    \fi}
-}% End of Sphinx >= 5.1.0 branch
-{% This branch for Sphinx < 5.1.0
-\newenvironment{nbsphinxfancyoutput}{%
-    % Avoid fatal error with framed.sty if graphics too long to fit on one page
-    \let\sphinxincludegraphics\nbsphinxincludegraphics
-    \nbsphinx@image@maxheight\textheight
-    \advance\nbsphinx@image@maxheight -2\fboxsep   % default \fboxsep 3pt
-    \advance\nbsphinx@image@maxheight -2\fboxrule  % default \fboxrule 0.4pt
-    \advance\nbsphinx@image@maxheight -\baselineskip
-\def\nbsphinxfcolorbox{\spx@fcolorbox{nbsphinx-code-border}{white}}%
-\def\FrameCommand{\nbsphinxfcolorbox\nbsphinxfancyaddprompt\@empty}%
-\def\FirstFrameCommand{\nbsphinxfcolorbox\nbsphinxfancyaddprompt\sphinxVerbatim@Continues}%
-\def\MidFrameCommand{\nbsphinxfcolorbox\sphinxVerbatim@Continued\sphinxVerbatim@Continues}%
-\def\LastFrameCommand{\nbsphinxfcolorbox\sphinxVerbatim@Continued\@empty}%
-\MakeFramed{\advance\hsize-\width\@totalleftmargin\z@\linewidth\hsize\@setminipage}%
-\lineskip=1ex\lineskiplimit=1ex\raggedright%
-}{\par\unskip\@minipagefalse\endMakeFramed}
-\def\nbsphinxfancyaddprompt{\ifvoid\nbsphinxpromptbox\else
-    \kern\fboxrule\kern\fboxsep
-    \copy\nbsphinxpromptbox
-    \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
-    \kern-\fboxsep\kern-\fboxrule\nointerlineskip
-    \fi}
-}% end of Sphinx < 5.1.0 branch
-\makeatother
-\newlength\nbsphinxcodecellspacing
-\setlength{\nbsphinxcodecellspacing}{0pt}
-
-% Define support macros for attaching opening and closing lines to notebooks
-\newsavebox\nbsphinxbox
-\makeatletter
-\newcommand{\nbsphinxstartnotebook}[1]{%
-    \par
-    % measure needed space
-    \setbox\nbsphinxbox\vtop{{#1\par}}
-    % reserve some space at bottom of page, else start new page
-    \needspace{\dimexpr2.5\baselineskip+\ht\nbsphinxbox+\dp\nbsphinxbox}
-    % mimic vertical spacing from \section command
-      \addpenalty\@secpenalty
-      \@tempskipa 3.5ex \@plus 1ex \@minus .2ex\relax
-      \addvspace\@tempskipa
-      {\Large\@tempskipa\baselineskip
-             \advance\@tempskipa-\prevdepth
-             \advance\@tempskipa-\ht\nbsphinxbox
-             \ifdim\@tempskipa>\z@
-               \vskip \@tempskipa
-             \fi}
-    \unvbox\nbsphinxbox
-    % if notebook starts with a \section, prevent it from adding extra space
-    \@nobreaktrue\everypar{\@nobreakfalse\everypar{}}%
-    % compensate the parskip which will get inserted by next paragraph
-    \nobreak\vskip-\parskip
-    % do not break here
-    \nobreak
-}% end of \nbsphinxstartnotebook
-
-\newcommand{\nbsphinxstopnotebook}[1]{%
-    \par
-    % measure needed space
-    \setbox\nbsphinxbox\vbox{{#1\par}}
-    \nobreak % it updates page totals
-    \dimen@\pagegoal
-    \advance\dimen@-\pagetotal \advance\dimen@-\pagedepth
-    \advance\dimen@-\ht\nbsphinxbox \advance\dimen@-\dp\nbsphinxbox
-    \ifdim\dimen@<\z@
-      % little space left
-      \unvbox\nbsphinxbox
-      \kern-.8\baselineskip
-      \nobreak\vskip\z@\@plus1fil
-      \penalty100
-      \vskip\z@\@plus-1fil
-      \kern.8\baselineskip
-    \else
-      \unvbox\nbsphinxbox
-    \fi
-}% end of \nbsphinxstopnotebook
-
-% Ensure height of an included graphics fits in nbsphinxfancyoutput frame
-% The Sphinx >= 5.1.0 version of nbsphinxfancyoutput does not use this macro
-% as \sphinxincludegraphics is since Sphinx 2.0 similar and slightly better.
-\newdimen\nbsphinx@image@maxheight % set in nbsphinxfancyoutput environment
-\newcommand*{\nbsphinxincludegraphics}[2][]{%
-    \gdef\spx@includegraphics@options{#1}%
-    \setbox\spx@image@box\hbox{\includegraphics[#1,draft]{#2}}%
-    \in@false
-    \ifdim \wd\spx@image@box>\linewidth
-      \g@addto@macro\spx@includegraphics@options{,width=\linewidth}%
-      \in@true
-    \fi
-    % no rotation, no need to worry about depth
-    \ifdim \ht\spx@image@box>\nbsphinx@image@maxheight
-      \g@addto@macro\spx@includegraphics@options{,height=\nbsphinx@image@maxheight}%
-      \in@true
-    \fi
-    \ifin@
-      \g@addto@macro\spx@includegraphics@options{,keepaspectratio}%
-    \fi
-    \setbox\spx@image@box\box\voidb@x % clear memory
-    \expandafter\includegraphics\expandafter[\spx@includegraphics@options]{#2}%
-}% end of "\MakeFrame"-safe variant of \sphinxincludegraphics
-\makeatother
-
-\makeatletter
-\renewcommand*\sphinx@verbatim@nolig@list{\do\'\do\`}
-\begingroup
-\catcode`'=\active
-\let\nbsphinx@noligs\@noligs
-\g@addto@macro\nbsphinx@noligs{\let'\PYGZsq}
-\endgroup
-\makeatother
-\renewcommand*\sphinxbreaksbeforeactivelist{\do\<\do\"\do\'}
-\renewcommand*\sphinxbreaksafteractivelist{\do\.\do\,\do\:\do\;\do\?\do\!\do\/\do\>\do\-}
-\makeatletter
-\fvset{codes*=\sphinxbreaksattexescapedchars\do\^\^\let\@noligs\nbsphinx@noligs}
-\makeatother
-"""
-
-
 class Exporter(nbconvert.RSTExporter):
     """Convert Jupyter notebooks to reStructuredText.
 
@@ -1744,6 +1548,11 @@ def builder_inited(app):
     env.nbsphinx_auxdir = os.path.join(env.doctreedir, 'nbsphinx')
     sphinx.util.ensuredir(env.nbsphinx_auxdir)
 
+    if app.builder.format == 'latex':
+        sphinx.util.fileutil.copy_asset(
+            os.path.join(os.path.dirname(__file__), '_texinputs'),
+            os.path.join(app.builder.outdir))
+
 
 def env_merge_info(app, env, docnames, other):
     env.nbsphinx_notebooks.update(other.nbsphinx_notebooks)
@@ -2151,18 +1960,12 @@ def setup(app):
     app.add_transform(CreateDomainObjectLabels)
     app.add_transform(RewriteLocalLinks)
     app.add_post_transform(GetSizeFromImages)
+    app.add_latex_package('nbsphinx')
 
     # Make docutils' "code" directive (generated by markdown2rst/pandoc)
     # behave like Sphinx's "code-block",
     # see https://github.com/sphinx-doc/sphinx/issues/2155:
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
-
-    # Add LaTeX definitions to preamble
-    latex_elements = app.config._raw_config.setdefault('latex_elements', {})
-    latex_elements['preamble'] = '\n'.join([
-        LATEX_PREAMBLE,
-        latex_elements.get('preamble', ''),
-    ])
 
     # Monkey-patch Sphinx TocTree adapter
     sphinx.environment.adapters.toctree.TocTree.resolve = \

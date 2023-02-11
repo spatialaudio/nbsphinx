@@ -20,6 +20,7 @@ setup(
         '_static/nbsphinx-gallery.css',
         '_static/nbsphinx-no-thumbnail.svg',
         '_static/nbsphinx-broken-thumbnail.svg',
+        '_texinputs/nbsphinx.sty',
     ]},
     python_requires='>=3.6',
     install_requires=[
