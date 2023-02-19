@@ -162,6 +162,7 @@ warningBgColor={HTML}{FBFBFB},
 }
 
 latex_engine = 'lualatex'
+latex_use_xindy = False
 
 latex_table_style = ['booktabs']
 
