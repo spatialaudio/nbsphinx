@@ -140,26 +140,28 @@ latex_elements = {
     'papersize': 'a4paper',
     'printindex': '',
     'sphinxsetup': r"""
-        %verbatimwithframe=false,
-        %verbatimwrapslines=false,
-        %verbatimhintsturnover=false,
-        noteBorderColor={HTML}{E0E0E0},
-        noteborder=1.5pt,
-        warningBorderColor={HTML}{E0E0E0},
-        warningborder=1.5pt,
-        warningBgColor={HTML}{FBFBFB},
-    """,
-    'preamble': r"""
-\usepackage[sc,osf]{mathpazo}
+HeaderFamily=\rmfamily\bfseries,
+%verbatimwithframe=false,
+%verbatimwrapslines=false,
+%verbatimhintsturnover=false,
+noteBorderColor={HTML}{E0E0E0},
+noteborder=1.5pt,
+warningBorderColor={HTML}{E0E0E0},
+warningborder=1.5pt,
+warningBgColor={HTML}{FBFBFB},
+""",
+    'fontpkg': r"""
+\usepackage{mathpazo}
 \linespread{1.05}  % see http://www.tug.dk/FontCatalogue/urwpalladio/
-\renewcommand{\sfdefault}{pplj}  % Palatino instead of sans serif
-\IfFileExists{zlmtt.sty}{
-    \usepackage[light,scaled=1.05]{zlmtt}  % light typewriter font from lmodern
-}{
-    \renewcommand{\ttdefault}{lmtt}  % typewriter font from lmodern
-}
+\setmainfont{TeX Gyre Pagella}[Numbers=OldStyle]
+\setmonofont{Latin Modern Mono Light}[Numbers=Lining]
+""",
+    'preamble': r"""
+\urlstyle{tt}
 """,
 }
+
+latex_engine = 'lualatex'
 
 latex_table_style = ['booktabs']
 
