@@ -3,7 +3,7 @@
 All of the following content
 was generated from Jupyter notebooks,
 except for the sections :doc:`a-normal-rst-file`,
-:doc:`contributing` and :doc:`version-history`,
+:doc:`contributing`, :doc:`references` and :doc:`version-history`,
 which were generated from Sphinx's built-in `reStructuredText`__ format.
 The sections
 :doc:`custom-formats`,
@@ -39,6 +39,7 @@ __ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
     a-markdown-file
     links
     contributing
+    references
     version-history
 
 .. only:: html

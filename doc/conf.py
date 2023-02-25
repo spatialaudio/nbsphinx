@@ -173,6 +173,19 @@ latex_documents = [
 latex_show_urls = 'footnote'
 latex_show_pagerefs = True
 
+# -- Work-around to get LaTeX References at the same place as HTML --------
+
+# See https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156
+
+import sphinx.builders.latex.transforms
+
+class DummyTransform(sphinx.builders.latex.transforms.BibliographyTransform):
+
+    def run(self, **kwargs):
+        pass
+
+sphinx.builders.latex.transforms.BibliographyTransform = DummyTransform
+
 # -- Options for EPUB output ----------------------------------------------
 
 # These are just defined to avoid Sphinx warnings related to EPUB:

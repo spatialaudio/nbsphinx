@@ -215,25 +215,7 @@ You can create a list of references in any reStructuredText file
 
     .. bibliography::
 
-Have a look at the documentation for all the available options.
-
-The list of references may look something like this (in HTML output):
-
-.. bibliography::
-    :style: alpha
-
-However, in the LaTeX/PDF output the list of references will not appear here,
-but at the end of the document.
-For a possible work-around,
-see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/156.
-
-.. warning::
-
-    With ``docutils`` versions 0.18 and 0.19,
-    the HTML output after the bibliography is broken,
-    see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/309.
-    This problem will be fixed in the next ``docutils`` version
-    (either 0.19.1 or 0.20).
+For an example, see the file ``doc/references.rst``.
 
 
 Footnote citations
