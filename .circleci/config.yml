@@ -76,7 +76,7 @@ jobs:
           name: Building PDF
           command: |
             cd build/sphinx/latex
-            latexmk -pdf
+            latexmk -pdflua
 
       - store_artifacts:
           name: Uploading PDF file
