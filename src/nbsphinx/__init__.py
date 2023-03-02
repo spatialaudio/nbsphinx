@@ -973,6 +973,7 @@ def markdown2rst(text):
 
     input_format = 'markdown'
     input_format += '-implicit_figures'
+    input_format += '-smart'  # Smart quotes etc. are handled by Sphinx
     v = nbconvert.utils.pandoc.get_pandoc_version()
     if nbconvert.utils.version.check_version(v, '1.13'):
         input_format += '-native_divs+raw_html'
@@ -1223,8 +1224,8 @@ class CreateNotebookSectionAnchors(docutils.transforms.Transform):
     def apply(self):
         all_ids = set()
         for section in self.document.traverse(docutils.nodes.section):
-            title = section.children[0].astext()
-            link_id = title.replace(' ', '-')
+            title = section[0].astext()
+            link_id = title.replace(' ', '-').replace('"', '%22')
             if link_id in all_ids:
                 # Avoid duplicated anchors on the same page
                 continue
