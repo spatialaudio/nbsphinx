@@ -68,7 +68,7 @@ DISPLAY_DATA_PRIORITY_LATEX = (
     'text/plain',
 )
 
-MIME_TYPE_SUFFIXES = {
+THUMBNAIL_MIME_TYPES = {
     'image/svg+xml': '.svg',
     'image/png': '.png',
     'image/jpeg': '.jpg',
@@ -410,106 +410,106 @@ class Exporter(nbconvert.RSTExporter):
             resources['nbsphinx_widgets'] = True
 
         thumbnail = {}
-        thumbnail_filename = None
 
         def warning(msg, *args):
             logger.warning(
-                '"nbsphinx-thumbnail": ' + msg, *args,
+                '"nbsphinx-thumbnail" in cell %s: ' + msg, cell_index, *args,
                 location=resources.get('nbsphinx_docname'),
                 type='nbsphinx', subtype='thumbnail')
             thumbnail['filename'] = _BROKEN_THUMBNAIL
 
         for cell_index, cell in enumerate(nb.cells):
-            # figure out if this cell is explicitly tagged
-            # but if it's not, we'll default to the last figure in the notebook
-            # if one exists
-            metadata_cell = 'nbsphinx-thumbnail' in cell.metadata
-            tagged_cell = 'nbsphinx_thubnail' in cell.metadata.get('tags',[])
-            thumbnail_cell = metadata_cell or tagged_cell
-
-            if metadata_cell:
+            if 'nbsphinx-thumbnail' in cell.metadata:
                 data = cell.metadata['nbsphinx-thumbnail'].copy()
-                output_index = data.pop('output-index', -1)
+                output_index = data.pop('output-index', None)
                 tooltip = data.pop('tooltip', '')
-
                 if data:
                     warning('Invalid key(s): %s', set(data))
                     break
-            else:
-                output_index = -1
+            elif 'nbsphinx-thumbnail' in cell.metadata.get('tags', []):
+                output_index = None
                 tooltip = ''
+            else:
+                continue
 
             if cell.cell_type != 'code':
-                if thumbnail_cell:
-                    warning('Only allowed in code cells; cell %s has type "%s"',
-                        cell_index, cell.cell_type)
-                    break
-
-                continue
-
-            if thumbnail and thumbnail_cell:
-                warning('Only allowed onced per notebook')
+                warning(
+                    'Only allowed in code cells; wrong cell type: "%s"',
+                    cell.cell_type)
                 break
 
-            if not cell.outputs:
-                if thumbnail_cell:
-                    warning('No outputs in cell %s', cell_index)
-                    break
+            if thumbnail:
+                warning('Only allowed once per notebook')
+                break
 
-                continue
-
-            if output_index == -1:
+            if output_index is None:
                 output_index = len(cell.outputs) - 1
-            elif output_index >= len(cell.outputs):
-                warning('Invalid "output-index" in cell %s: %s',
-                    cell_index, output_index)
+            try:
+                suffix = _extract_thumbnail(cell, output_index)
+            except _ExtractThumbnailException as e:
+                warning(*e.args)
                 break
 
-            out = cell.outputs[output_index]
+            thumbnail['filename'] = '{}_{}_{}{}'.format(
+                resources['unique_key'],
+                cell_index,
+                output_index,
+                suffix,
+            )
+            if tooltip:
+                thumbnail['tooltip'] = tooltip
 
-            if out.output_type not in {'display_data', 'execute_result'}:
-                if thumbnail_cell:
-                    warning('Unsupported output type in cell %s/output %s: "%s"',
-                        cell_index, output_index, out.output_type)
+        if not thumbnail:
+            # No explicit thumbnails were specified in the notebook.
+            # Now we are looking for the last output image in the notebook.
+            for cell_index, cell in reversed(list(enumerate(nb.cells))):
+                if cell.cell_type == 'code':
+                    for output_index in reversed(range(len(cell.outputs))):
+                        try:
+                            suffix = _extract_thumbnail(cell, output_index)
+                        except _ExtractThumbnailException:
+                            continue
+                        thumbnail['filename'] = '{}_{}_{}{}'.format(
+                            resources['unique_key'],
+                            cell_index,
+                            output_index,
+                            suffix,
+                        )
+                        # NB: we use this as marker for implicit thumbnail:
+                        thumbnail['tooltip'] = None
+                        break
+                    else:
+                        continue
                     break
 
-                continue
-
-            for mime_type in DISPLAY_DATA_PRIORITY_HTML:
-                if mime_type not in out.data or mime_type not in MIME_TYPE_SUFFIXES:
-                    continue
-
-                thumbnail_filename = '{}_{}_{}{}'.format(
-                    resources['unique_key'],
-                    cell_index,
-                    output_index,
-                    MIME_TYPE_SUFFIXES[mime_type],
-                )
-                break
-            else:
-                if thumbnail_cell:
-                    warning('Unsupported MIME type(s) in cell %s/output %s: %s',
-                        cell_index, output_index, set(out.data))
-                    break
-
-                continue
-
-            if thumbnail_cell:
-                thumbnail['filename'] = thumbnail_filename
-                thumbnail['implicit'] = False
-                if tooltip:
-                    thumbnail['tooltip'] = tooltip
-
-                break
-
-        else:
-            # default to the last figure in the notebook, if it's a valid thumbnail
-            if thumbnail_filename:
-                thumbnail['filename'] = thumbnail_filename
-                thumbnail['implicit'] = True
-
-        resources['nbsphinx_thumbnail'] = thumbnail
+        if thumbnail:
+            resources['nbsphinx_thumbnail'] = thumbnail
         return rststr, resources
+
+
+class _ExtractThumbnailException(Exception):
+    """Internal exception thrown by _extract_thumbnail()."""
+
+
+def _extract_thumbnail(cell, output_index):
+    if not cell.outputs:
+        raise _ExtractThumbnailException('No outputs')
+    if output_index not in range(len(cell.outputs)):
+        raise _ExtractThumbnailException(
+            'Invalid "output-index": %s', output_index)
+    out = cell.outputs[output_index]
+    if out.output_type not in {'display_data', 'execute_result'}:
+        raise _ExtractThumbnailException(
+            'Unsupported output type in output %s: "%s"',
+            output_index, out.output_type)
+    for mime_type in DISPLAY_DATA_PRIORITY_HTML:
+        if mime_type not in out.data or mime_type not in THUMBNAIL_MIME_TYPES:
+            continue
+        return THUMBNAIL_MIME_TYPES[mime_type]
+    else:
+        raise _ExtractThumbnailException(
+            'Unsupported MIME type(s) in output %s: %s',
+            output_index, set(out.data))
 
 
 class NotebookParser(rst.Parser):
@@ -1735,16 +1735,16 @@ def doctree_resolved(app, doctree, fromdocname):
                         conf_py_thumbnail = candidate
 
                 thumbnail = app.env.nbsphinx_thumbnails.get(doc, {})
+                # NB: "None" is used as marker for implicit thumbnail:
                 tooltip = thumbnail.get('tooltip', '')
                 filename = thumbnail.get('filename', '')
-                was_implicit_thumbnail = thumbnail.get('implicit', True)
 
-                # thumbnail priority: broken, explicit in notebook, from conf.py
-                #                     implicit in notebook, default
+                # thumbnail priority: broken, explicit in notebook,
+                #     from conf.py, implicit in notebook, default
                 if filename is _BROKEN_THUMBNAIL:
                     filename = os.path.join(
                         base, '_static', 'nbsphinx-broken-thumbnail.svg')
-                elif filename and not was_implicit_thumbnail:
+                elif filename and tooltip is not None:
                     # thumbnail from tagged cell or metadata
                     filename = os.path.join(
                         base, app.builder.imagedir, filename)
@@ -1752,7 +1752,9 @@ def doctree_resolved(app, doctree, fromdocname):
                     # NB: Settings from conf.py can be overwritten in notebook
                     filename = os.path.join(base, conf_py_thumbnail)
                 elif filename:
-                    # implicit thumbnail from an image in the notebook
+                    # implicit thumbnail from the last image in the notebook
+                    assert tooltip is None
+                    tooltip = ''
                     filename = os.path.join(
                         base, app.builder.imagedir, filename)
                 else:
