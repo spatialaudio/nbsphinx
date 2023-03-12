@@ -1,3 +1,21 @@
+Version 0.9.0 -- 2023-03-12 -- PyPI__ -- diff__
+ * Split ``nbsphinx.py`` (a Python *module*) into:
+
+   * ``nbsphinx/__init__.py`` (a Python *package*)
+   * A standalone CSS file ``nbsphinx-code-cells.css_t``
+   * LaTeX style file ``nbsphinx.sty``
+
+ * Add custom HTML/CSS for thumbnail galleries
+
+   * Separate CSS file ``nbsphinx-gallery.css``
+   * The CSS from Sphinx Gallery (``'sphinx_gallery.load_style'``)
+     cannot be used anymore
+
+ * Use the last image in a notebook as the default thumbnail
+
+__ https://pypi.org/project/nbsphinx/0.9.0/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.8.12...0.9.0
+
 Version 0.8.12 -- 2023-01-19 -- PyPI__ -- diff__
  * Implement "link" galleries (without nested sub-documents)
 
