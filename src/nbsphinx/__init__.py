@@ -1010,10 +1010,11 @@ def markdown2rst(text):
 
     input_format = 'markdown'
     input_format += '-implicit_figures'
-    input_format += '-smart'  # Smart quotes etc. are handled by Sphinx
     v = nbconvert.utils.pandoc.get_pandoc_version()
     if nbconvert.utils.version.check_version(v, '1.13'):
         input_format += '-native_divs+raw_html'
+    if nbconvert.utils.version.check_version(v, '2.0'):
+        input_format += '-smart'  # Smart quotes etc. are handled by Sphinx
 
     rststring = pandoc(text, input_format, 'rst', filter_func=filter_func)
     rststring = re.sub(
