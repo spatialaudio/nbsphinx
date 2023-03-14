@@ -1,3 +1,9 @@
+Version 0.9.1 -- 2023-03-14 -- PyPI__ -- diff__
+ * pandoc: disable "smart" option only for version 2.0+
+
+__ https://pypi.org/project/nbsphinx/0.9.1/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.0...0.9.1
+
 Version 0.9.0 -- 2023-03-12 -- PyPI__ -- diff__
  * Split ``nbsphinx.py`` (a Python *module*) into:
 
