@@ -112,6 +112,8 @@ html_show_copyright = False
 linkcheck_ignore = [
     r'http://localhost:\d+/',
     'https://github.com/spatialaudio/nbsphinx/compare/',
+    # 418 Client Error: Unknown for url: https://ieeexplore.ieee.org/document/5582063/
+    'https://doi.org/10.1109/MCSE.2010.119',
 ]
 
 nitpicky = True
