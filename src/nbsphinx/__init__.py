@@ -1183,12 +1183,12 @@ def _local_file_from_reference(node, document):
         if not refuri:
             # Target doesn't have URI
             return '', ''
-    if '://' in refuri:
+    if '://' in refuri or refuri.startswith('mailto:'):
         # Not a local link
         return '', ''
-    elif refuri.startswith('#') or refuri.startswith('mailto:'):
-        # Not a local link
-        return '', ''
+    elif refuri.startswith('#'):
+        # Kinda not a local link
+        return '', refuri
 
     # NB: We look for "fragment identifier" before unquoting
     match = re.match(r'^([^#]*)(#.*)$', refuri)
@@ -1229,7 +1229,13 @@ class RewriteLocalLinks(docutils.transforms.Transform):
             filename, fragment = _local_file_from_reference(
                 node, self.document)
             if not filename:
-                continue
+                if fragment == '#':
+                    # This would work automagically in the HTML builder,
+                    # but it is needed for LaTeX.
+                    filename = os.path.basename(env.doc2path(env.docname))
+                    fragment = ''
+                else:
+                    continue
 
             for s in env.config.source_suffix:
                 if filename.lower().endswith(s.lower()):
