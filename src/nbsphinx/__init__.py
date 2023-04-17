@@ -1229,11 +1229,13 @@ class RewriteLocalLinks(docutils.transforms.Transform):
             filename, fragment = _local_file_from_reference(
                 node, self.document)
             if not filename:
-                if fragment == '#':
-                    # This would work automagically in the HTML builder,
-                    # but it is needed for LaTeX.
+                if fragment:
+                    # This should not be needed if it weren't for
+                    # https://github.com/sphinx-doc/sphinx/issues/11336 and
+                    # https://github.com/sphinx-doc/sphinx/issues/11335
                     filename = os.path.basename(env.doc2path(env.docname))
-                    fragment = ''
+                    if fragment == '#':
+                        fragment = ''
                 else:
                     continue
 
