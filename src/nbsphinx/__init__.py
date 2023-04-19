@@ -1909,9 +1909,17 @@ def depart_admonition_html(self, node):
 
 
 def visit_admonition_latex(self, node):
-    # See http://tex.stackexchange.com/q/305898/:
-    self.body.append(
-        '\n\\begin{sphinxadmonition}{' + node['classes'][1] + '}{}\\unskip')
+    kind = node['classes'][1]
+    if len(node.children) >= 2 and isinstance(
+            node.children[0], docutils.nodes.paragraph):
+        title = node.children[0].astext()
+        del node.children[0]
+        self.body.append(
+            '\n\\begin{sphinxadmonition}{' + kind + '}{' + title + '}\\par')
+    else:
+        # See http://tex.stackexchange.com/q/305898/:
+        self.body.append(
+            '\n\\begin{sphinxadmonition}{' + kind + '}{}\\unskip')
 
 
 def depart_admonition_latex(self, node):
