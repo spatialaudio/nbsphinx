@@ -88,7 +88,9 @@ mathjax3_config = {
     'tex': {'tags': 'ams', 'useLabelIds': True},
 }
 
+# https://sphinxcontrib-bibtex.readthedocs.io/en/latest/usage.html
 bibtex_bibfiles = ['references.bib']
+bibtex_reference_style = 'author_year'
 
 # Support for notebook formats other than .ipynb
 nbsphinx_custom_formats = {

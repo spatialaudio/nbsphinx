@@ -865,6 +865,17 @@ def convert_pandoc(text, from_format, to_format):
     return markdown2rst(text)
 
 
+_CITE_ROLES = {
+    'data-cite': 'cite',
+    'data-footcite': 'footcite',
+}
+_CITE_ROLES.update({
+    f'{k}-{suffix}': f'{v}:{suffix}'
+    for k, v in _CITE_ROLES.items()
+    for suffix in ('p', 'ps', 't', 'ts', 'ct', 'cts')
+})
+
+
 class CitationParser(html.parser.HTMLParser):
 
     def handle_starttag(self, tag, attrs):
@@ -879,12 +890,11 @@ class CitationParser(html.parser.HTMLParser):
 
     def _check_cite(self, attrs):
         for name, value in attrs:
-            if name == 'data-cite':
-                self.cite = ':cite:`' + value + '`'
-                return True
-            elif name == 'data-footcite':
-                self.cite = ':footcite:`' + value + '`'
-                return True
+            try:
+                self.cite = f':{_CITE_ROLES[name]}:`{value}`'
+            except KeyError:
+                continue
+            return True
         return False
 
     def reset(self):

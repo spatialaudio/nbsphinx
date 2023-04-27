@@ -187,6 +187,7 @@ your ``conf.py`` and select the BibTeX file(s) you want to use:
     ]
 
     bibtex_bibfiles = ['my-references.bib']
+    bibtex_reference_style = 'author_year'
 
 Afterwards all the references defined in the bibliography file(s) can be used
 throughout the Jupyter notebooks and other source files as detailed in the following.
@@ -203,6 +204,14 @@ You can create citations like :cite:`perez2011python`:
 .. code-block:: rst
 
     :cite:`perez2011python`
+
+You can also create so-called in-text citations,
+where the names of the authors, for example :cite:t:`perez2011python`,
+are part of the sentence:
+
+.. code-block:: rst
+
+    :cite:t:`perez2011python`
 
 You can create similar citations in Jupyter notebooks with a special HTML
 syntax, see the section about
@@ -228,6 +237,12 @@ citations like :footcite:`perez2011python`.
 .. code-block:: rst
 
     :footcite:`perez2011python`
+
+In-text citations like :footcite:t:`kluyver2016jupyter` can be created like this:
+
+.. code-block:: rst
+
+    :footcite:t:`kluyver2016jupyter`
 
 Also footnote citations can be used within Jupyter notebooks with a special HTML syntax,
 see the section about
