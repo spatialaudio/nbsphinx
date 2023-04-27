@@ -6,13 +6,12 @@ version: 2
 jobs:
   build_docs:
     docker:
-      # https://github.com/dante-ev/docker-texlive
-      - image: danteev/texlive
+      - image: texlive/texlive
 
     working_directory: ~/checkout
 
     environment:
-      PIP_INSTALL: python3 -m pip install --user --progress-bar off --upgrade
+      PIP_INSTALL: python -m pip install --progress-bar off --upgrade
 
     steps:
       - checkout
@@ -26,7 +25,7 @@ jobs:
           name: Installing apt Packages
           command: |
             apt-get -y update
-            apt-get install -y --no-install-recommends python3-pip librsvg2-bin binutils
+            apt-get install -y --no-install-recommends python3-venv librsvg2-bin binutils pandoc
             # temporary, until docutils > 0.19.0 is released (see doc/requirements.txt):
             apt-get install -y --no-install-recommends subversion
 
@@ -36,6 +35,12 @@ jobs:
             # fallbacks
             - v1-deps-{{ .Branch }}-
             - v1-deps-
+
+      - run:
+          name: Set up venv
+          command: |
+            python3 -m venv .venv
+            echo "source .venv/bin/activate" >> $BASH_ENV
 
       - run:
           name: Installing nbsphinx
