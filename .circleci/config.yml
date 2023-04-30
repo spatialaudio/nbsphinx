@@ -12,6 +12,7 @@ jobs:
 
     environment:
       PIP_INSTALL: python -m pip install --progress-bar off --upgrade
+      SPHINX: python -m sphinx -W --keep-going --color
 
     steps:
       - checkout
@@ -65,27 +66,27 @@ jobs:
       - run:
           name: Building HTML
           command: |
-            python3 setup.py build_sphinx -W -b html
+            $SPHINX -d build/doctrees doc build/html -b html
 
       - store_artifacts:
           name: Uploading HTML files
-          path: build/sphinx/html
+          path: build/html
           destination: html
 
       - run:
           name: Building LaTeX
           command: |
-            python3 setup.py build_sphinx -W -b latex
+            $SPHINX -d build/doctrees doc build/latex -b latex
 
       - run:
           name: Building PDF
           command: |
-            cd build/sphinx/latex
+            cd build/latex
             latexmk -pdflua
 
       - store_artifacts:
           name: Uploading PDF file
-          path: build/sphinx/latex/nbsphinx.pdf
+          path: build/latex/nbsphinx.pdf
           destination: nbsphinx.pdf
 
 workflows:
