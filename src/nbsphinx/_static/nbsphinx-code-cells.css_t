@@ -204,8 +204,9 @@ div.nboutput.container div.output_area > div[class^='highlight']{
     overflow-y: hidden;
 }
 
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton' ext and `sphinx_immaterial` theme) */
+.prompt .copybtn,
+.prompt .md-clipboard.md-icon {
     display: none;
 }
 
