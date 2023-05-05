@@ -62,12 +62,14 @@ div.nblast.container {
 }
 
 /* input prompt */
-div.nbinput.container div.prompt pre {
+div.nbinput.container div.prompt pre,
+div.nbinput.container div.prompt pre > code {
     color: #307FC1;
 }
 
 /* output prompt */
-div.nboutput.container div.prompt pre {
+div.nboutput.container div.prompt pre,
+div.nboutput.container div.prompt pre > code {
     color: #BF5B3D;
 }
 
