@@ -29,6 +29,11 @@ import sphinx.environment
 import sphinx.errors
 import sphinx.transforms.post_transforms.images
 from sphinx.util.matching import patmatch
+try:
+    from sphinx.util.display import status_iterator
+except ImportError:
+    # This will be removed in Sphinx 8:
+    from sphinx.util import status_iterator
 import traitlets
 
 
@@ -1641,7 +1646,6 @@ def html_collect_pages(app):
     files = set()
     for file_list in app.env.nbsphinx_files.values():
         files.update(file_list)
-    status_iterator = sphinx.util.status_iterator
     for file in status_iterator(files, 'copying linked files... ',
                                 sphinx.util.console.brown, len(files)):
         target = os.path.join(app.builder.outdir, file)
