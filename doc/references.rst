@@ -28,5 +28,4 @@ The list of references may look something like this:
     With ``docutils`` versions 0.18 and 0.19,
     the HTML output after the bibliography is broken,
     see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/309.
-    This problem will be fixed in the next ``docutils`` version
-    (either 0.19.1 or 0.20).
+    This problem has been fixed in ``docutils`` version 0.20.
