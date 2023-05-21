@@ -145,14 +145,17 @@ latex_elements = {
     'printindex': '',
     'sphinxsetup': r"""
 HeaderFamily=\rmfamily\bfseries,
-%verbatimwithframe=false,
-%verbatimwrapslines=false,
-%verbatimhintsturnover=false,
-noteBorderColor={HTML}{E0E0E0},
-noteborder=0.5pt,
-warningBorderColor={HTML}{E0E0E0},
-warningborder=1.5pt,
-warningBgColor={HTML}{FBFBFB},
+div.note_border-TeXcolor={HTML}{E0E0E0},
+div.note_border-width=0.5pt,
+div.note_box-decoration-break=slice,
+div.warning_border-TeXcolor={HTML}{E0E0E0},
+div.warning_border-width=1.5pt,
+div.warning_background-TeXcolor={HTML}{FBFBFB},
+div.warning_box-decoration-break=slice,
+div.topic_box-shadow=none,
+div.topic_border-TeXcolor={HTML}{E0E0E0},
+div.topic_border-width=0.5pt,
+div.topic_box-decoration-break=slice,
 """,
     'fontpkg': r"""
 \usepackage{mathpazo}
@@ -162,8 +165,6 @@ warningBgColor={HTML}{FBFBFB},
 """,
     'preamble': r"""
 \urlstyle{tt}
-\renewenvironment{sphinxnote}[1]
-  {\begin{sphinxheavybox}\sphinxstrong{#1} }{\end{sphinxheavybox}}
 """,
 }
 
