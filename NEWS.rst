@@ -1,3 +1,12 @@
+Version 0.9.2 -- 2023-05-24 -- PyPI__ -- diff__
+ * Improve support for ``sphinx_immaterial`` theme
+ * Improve support for links starting with ``#``
+ * Add support for in-text citations
+ * LaTeX: Add support for admonition titles
+
+__ https://pypi.org/project/nbsphinx/0.9.2/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.1...0.9.2
+
 Version 0.9.1 -- 2023-03-14 -- PyPI__ -- diff__
  * pandoc: disable "smart" option only for version 2.0+
 
