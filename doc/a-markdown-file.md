@@ -11,7 +11,7 @@ files via [custom notebook formats](custom-formats.pct.py).
 You only need to install the [jupytext](https://jupytext.readthedocs.io/)
 package and add a configuration setting to `conf.py`,
 which can be used to select one of
-[several Markdown flavors supported by jupytext](https://jupytext.readthedocs.io/en/latest/formats.html#markdown-formats)
+[several Markdown flavors supported by jupytext](https://jupytext.readthedocs.io/en/latest/formats-markdown.html)
 (here we are using R Markdown):
 
 ```python

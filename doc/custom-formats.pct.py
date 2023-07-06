@@ -56,7 +56,7 @@
 # %% [markdown]
 # This very page is an example of a notebook stored in the
 # `py:percent` format
-# (see [docs](https://jupytext.readthedocs.io/en/latest/formats.html#the-percent-format)):
+# (see [docs](https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-percent-format)):
 
 # %%
 # !head -20 custom-formats.pct.py
