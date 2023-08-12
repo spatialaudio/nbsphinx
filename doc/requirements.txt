@@ -8,3 +8,4 @@ ipywidgets
 jupytext
 sphinx-last-updated-by-git
 sphinx-codeautolink
+git+https://github.com/sphinx-doc/sphinx.git@master
