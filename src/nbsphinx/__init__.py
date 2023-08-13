@@ -1479,7 +1479,13 @@ class GetSizeFromImages(
                 node['width'], node['height'] = map(str, size)
 
 
-original_toctree_resolve = sphinx.environment.adapters.toctree.TocTree.resolve
+if hasattr(sphinx.environment.adapters.toctree, '_resolve_toctree'):
+    # Since Sphinx 7.2.0
+    original_toctree_resolve = \
+        sphinx.environment.adapters.toctree._resolve_toctree
+else:
+    original_toctree_resolve = \
+        sphinx.environment.adapters.toctree.TocTree.resolve
 
 
 def patched_toctree_resolve(self, docname, builder, toctree, *args, **kwargs):
@@ -2048,8 +2054,13 @@ def setup(app):
     rst.directives.register_directive('code', sphinx.directives.code.CodeBlock)
 
     # Monkey-patch Sphinx TocTree adapter
-    sphinx.environment.adapters.toctree.TocTree.resolve = \
-        patched_toctree_resolve
+    if hasattr(sphinx.environment.adapters.toctree, '_resolve_toctree'):
+        # Since Sphinx 7.2.0
+        sphinx.environment.adapters.toctree._resolve_toctree = \
+            patched_toctree_resolve
+    else:
+        sphinx.environment.adapters.toctree.TocTree.resolve = \
+            patched_toctree_resolve
 
     return {
         'version': __version__,
