@@ -1264,7 +1264,7 @@ class RewriteLocalLinks(docutils.transforms.Transform):
                 xref = sphinx.addnodes.pending_xref(
                     reftype=reftype, reftarget=reftarget, refdomain='std',
                     refwarn=True, refexplicit=True, refdoc=env.docname)
-                xref += docutils.nodes.Text(linktext, linktext)
+                xref += docutils.nodes.Text(linktext)
                 node.replace_self(xref)
             else:
                 # NB: This is a link to an ignored (via exclude_patterns)
