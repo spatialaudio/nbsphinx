@@ -1120,14 +1120,14 @@ def _extract_gallery_or_toctree(cell):
     parser.parse(text, node)
 
     if 'caption' not in options:
-        for sec in node.traverse(docutils.nodes.section):
+        for sec in node.findall(docutils.nodes.section):
             assert sec.children
             assert isinstance(sec.children[0], docutils.nodes.title)
             title = sec.children[0].astext()
             lines.append(':caption: ' + title)
             break
     lines.append('')  # empty line
-    for ref in node.traverse(docutils.nodes.reference):
+    for ref in node.findall(docutils.nodes.reference):
         lines.append(ref['name'] + ' <' + unquote(ref.get('refuri')) + '>')
     return '\n    '.join(lines)
 
@@ -1225,7 +1225,7 @@ class RewriteLocalLinks(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
-        for node in self.document.traverse(docutils.nodes.reference):
+        for node in self.document.findall(docutils.nodes.reference):
             filename, fragment = _local_file_from_reference(
                 node, self.document)
             if not filename:
@@ -1284,7 +1284,7 @@ class CreateNotebookSectionAnchors(docutils.transforms.Transform):
 
     def apply(self):
         all_ids = set()
-        for section in self.document.traverse(docutils.nodes.section):
+        for section in self.document.findall(docutils.nodes.section):
             title = section[0].astext()
             link_id = title.replace(' ', '-').replace('"', '%22')
             if link_id in all_ids:
@@ -1313,7 +1313,7 @@ class CreateSectionLabels(docutils.transforms.Transform):
         env = self.document.settings.env
         file_ext = env.doc2path(env.docname, base=None)[len(env.docname):]
         i_still_have_to_create_the_document_label = True
-        for section in self.document.traverse(docutils.nodes.section):
+        for section in self.document.findall(docutils.nodes.section):
             assert section.children
             assert isinstance(section.children[0], docutils.nodes.title)
             title = section.children[0].astext()
@@ -1343,7 +1343,7 @@ class CreateDomainObjectLabels(docutils.transforms.Transform):
     def apply(self):
         env = self.document.settings.env
         file_ext = env.doc2path(env.docname, base=None)[len(env.docname):]
-        for sig in self.document.traverse(sphinx.addnodes.desc_signature):
+        for sig in self.document.findall(sphinx.addnodes.desc_signature):
             try:
                 title = sig['ids'][0]
             except IndexError:
@@ -1377,7 +1377,7 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
 
     def apply(self):
         start_tags = []
-        for node in self.document.traverse(docutils.nodes.raw):
+        for node in self.document.findall(docutils.nodes.raw):
             if node['format'] != 'html':
                 continue
             start_match = self._start_re.match(node.astext())
@@ -1394,7 +1394,7 @@ class ReplaceAlertDivs(docutils.transforms.Transform):
         # Reversed order to allow nested <div> elements:
         for node, admonition_class in reversed(start_tags):
             content = []
-            for sibling in node.traverse(include_self=False, descend=False,
+            for sibling in node.findall(include_self=False, descend=False,
                                          siblings=True, ascend=False):
                 end_tag = (isinstance(sibling, docutils.nodes.raw) and
                            sibling['format'] == 'html' and
@@ -1420,7 +1420,7 @@ class CopyLinkedFiles(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
-        for node in self.document.traverse(docutils.nodes.reference):
+        for node in self.document.findall(docutils.nodes.reference):
             filename, fragment = _local_file_from_reference(
                 node, self.document)
             if not filename:
@@ -1720,7 +1720,7 @@ def doctree_resolved(app, doctree, fromdocname):
         app.builder.get_target_uri(fromdocname), '')
 
     # Replace GalleryToc with toctree + GalleryNode
-    for node in doctree.traverse(GalleryToc):
+    for node in doctree.findall(GalleryToc):
         toctree_wrapper, = node
         if (len(toctree_wrapper) != 1 or not isinstance(
                 toctree_wrapper[0],
