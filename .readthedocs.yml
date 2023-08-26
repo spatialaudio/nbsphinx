@@ -8,6 +8,9 @@ build:
     # using Sphinx extension sphinxcontrib.rsvgconverter, see
     # https://github.com/missinglinkelectronics/sphinxcontrib-svg2pdfconverter
     - librsvg2-bin
+  jobs:
+    post_checkout:
+      - git fetch --unshallow || true
 python:
   install:
     - requirements: doc/requirements.txt
