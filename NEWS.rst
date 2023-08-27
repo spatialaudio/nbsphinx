@@ -1,3 +1,9 @@
+Version 0.9.3 -- 2023-08-27 -- PyPI__ -- diff__
+ * Fix gallery regression in Sphinx 7.2
+
+__ https://pypi.org/project/nbsphinx/0.9.3/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.2...0.9.3
+
 Version 0.9.2 -- 2023-05-24 -- PyPI__ -- diff__
  * Improve support for ``sphinx_immaterial`` theme
  * Improve support for links starting with ``#``
