@@ -80,7 +80,7 @@ Links to Notebooks, Ye Olde Way
 
 In addition to the way shown above, you can also create links to notebooks (and
 other Sphinx source files) with
-`:ref: <https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#role-ref>`_.
+`:ref: <https://www.sphinx-doc.org/en/master/usage/referencing.html#role-ref>`_.
 This has some disadvantages:
 
 * It is arguably a bit more clunky.
