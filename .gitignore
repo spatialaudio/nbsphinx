@@ -9,3 +9,6 @@ nbsphinx.egg-info/
 doc/_build
 doc/gallery/a-local-file.png
 /theme_comparison/
+/include-in-latex/_build/
+/include-in-latex/pygmentize.py.tex
+/include-in-latex/latexmkrc.tex

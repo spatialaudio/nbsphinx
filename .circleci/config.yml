@@ -87,6 +87,24 @@ jobs:
           path: build/latex/nbsphinx.pdf
           destination: nbsphinx.pdf
 
+      - run:
+          name: Building LaTeX document with nbsphinx docs as chapter
+          # NB: There is a warning about :footcite:, so we are not using "-W"
+          command: |
+            cd include-in-latex
+            python -m sphinx --color ../doc _build -c . -b latex
+
+      - run:
+          name: Building PDF of above
+          command: |
+            cd include-in-latex
+            latexmk
+
+      - store_artifacts:
+          name: Uploading another PDF file
+          path: include-in-latex/my-latex-document.pdf
+          destination: my-latex-document.pdf
+
 workflows:
   version: 2
   build-me-my-docs:
