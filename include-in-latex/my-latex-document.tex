@@ -1,13 +1,9 @@
 \RequirePackage{luatex85}
 \documentclass[a4paper]{book}
 
-% NB: This contains the "pxunit" config value (".75bp" by default):
-\ifdefined\pdfpxdimen
-   \let\sphinxpxdimen\pdfpxdimen\else\newdimen\sphinxpxdimen
-\fi \sphinxpxdimen=.75bp\relax
-\ifdefined\pdfimageresolution
-    \pdfimageresolution= \numexpr \dimexpr1in\relax/\sphinxpxdimen\relax
-\fi
+\newdimen\sphinxpxdimen
+\sphinxpxdimen=.75bp
+\ifdefined\pdfimageresolution \pdfimageresolution= 96\relax\fi
 
 \catcode`^^^^00a0\active\protected\def^^^^00a0{\leavevmode\nobreak\ }
 
