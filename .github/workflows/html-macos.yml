@@ -1,6 +1,7 @@
 name: Build HTML on macOS
 on: [push, pull_request]
 env:
+  PYTHONWARNINGS: error
   PIP: python -m pip
   SPHINX: python -m sphinx -W --keep-going --color
 jobs:
