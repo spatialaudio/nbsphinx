@@ -1112,7 +1112,7 @@ def _extract_gallery_or_toctree(cell):
             'invalid nbsphinx-[link-]gallery/nbsphinx-toctree option: {!r}'
             .format(options))
 
-    text = nbconvert.filters.markdown2rst(cell.source)
+    text = markdown2rst(cell.source)
     settings = docutils.frontend.OptionParser(
         components=(rst.Parser,)).get_default_values()
     node = docutils.utils.new_document('gallery_or_toctree', settings)
