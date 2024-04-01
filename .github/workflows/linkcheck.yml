@@ -30,7 +30,7 @@ jobs:
         $PIP install -r doc/requirements.txt
     - name: Check links
       run: |
-        $SPHINX -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck
+        $SPHINX -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck -q
     - name: Upload results
       uses: actions/upload-artifact@v3
       if: ${{ success() || failure() }}
