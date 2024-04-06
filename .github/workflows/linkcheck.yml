@@ -40,7 +40,8 @@ jobs:
     - name: Check links
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
-        PYTHONWARNINGS: error,default::DeprecationWarning
+        # The other warning will be fixed with https://github.com/spatialaudio/nbsphinx/pull/758
+        PYTHONWARNINGS: error,default::DeprecationWarning,default:nodes.Node.traverse() is obsoleted by Node.findall():PendingDeprecationWarning
       run: |
         $SPHINX -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck -q
     - name: Upload results
