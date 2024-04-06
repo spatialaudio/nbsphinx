@@ -38,6 +38,9 @@ jobs:
       run: |
         $PIP install -r doc/requirements.txt
     - name: Check links
+      env:
+        # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
+        PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $SPHINX -d _doctrees/ doc/ _build/linkcheck/ -b linkcheck -q
     - name: Upload results
