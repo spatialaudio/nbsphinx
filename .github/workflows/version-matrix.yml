@@ -1,0 +1,86 @@
+name: Check different Sphinx and Python versions
+on: [push, pull_request]
+env:
+  PYTHONWARNINGS: error
+  APT_INSTALL: sudo apt-get install -y --no-install-recommends
+  PIP: python -m pip
+  SPHINX: python -m sphinx -W --keep-going --color
+  SPHINX_PACKAGE: "sphinx"
+  PYTHON_VERSION: "3"
+jobs:
+  version-matrix:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+
+          # default Python, latest Sphinx
+          - env: {}
+
+          # a few older Sphinx releases using default Python version
+          - env:
+              SPHINX_PACKAGE: "sphinx==5.0.0 sphinxcontrib-bibtex==2.5.0"
+          - env:
+              SPHINX_PACKAGE: "sphinx==5.3.0 sphinxcontrib-bibtex==2.5.0"
+          - env:
+              SPHINX_PACKAGE: "sphinx==6.2.1 sphinxcontrib-bibtex==2.5.0"
+          - env:
+              SPHINX_PACKAGE: "sphinx==7.0.1"
+          - env:
+              SPHINX_PACKAGE: "sphinx==7.1.2"
+
+          # a few Python versions using latest Sphinx release
+          - env:
+              PYTHON_VERSION: "3.8"
+          - env:
+              PYTHON_VERSION: "3.10"
+          #- env:
+          #    PYTHON_VERSION: "3.13-dev"
+          #    PYTHONWARNINGS: default
+          #- env:
+          #    PYTHON_VERSION: "pypy-3.10"
+
+    env: ${{ matrix.env || fromJSON('{}') }}
+    steps:
+    - name: Clone repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install pandoc
+      run: |
+        $APT_INSTALL pandoc
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Show Python version
+      run: |
+        python --version
+    - name: Install Sphinx
+      env:
+        # There is still a warning with pip version 24, even though this
+        # is supposed to be fixed: https://github.com/pypa/pip/issues/11975
+        PYTHONWARNINGS: error,default::DeprecationWarning
+      run: |
+        $PIP install $SPHINX_PACKAGE
+    - name: Install nbsphinx
+      env:
+        # There is still a warning with pip version 24, even though this
+        # is supposed to be fixed: https://github.com/pypa/pip/issues/11975
+        PYTHONWARNINGS: error,default::DeprecationWarning
+      run: |
+        $PIP install .
+    - name: Install docs dependencies
+      env:
+        # There is still a warning with pip version 24, even though this
+        # is supposed to be fixed: https://github.com/pypa/pip/issues/11975
+        PYTHONWARNINGS: error,default::DeprecationWarning
+      run: |
+        $PIP install -r doc/requirements.txt --upgrade-strategy only-if-needed
+    - name: Run Sphinx
+      env:
+        # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
+        # The other warning will be fixed with https://github.com/spatialaudio/nbsphinx/pull/758
+        PYTHONWARNINGS: error,default::DeprecationWarning,default:nodes.Node.traverse() is obsoleted by Node.findall():PendingDeprecationWarning
+      run: |
+        $SPHINX doc _build -b html
