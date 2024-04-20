@@ -1,10 +1,4 @@
 include LICENSE
 include *.rst
-include doc/requirements.txt
-include doc/conf.py
-include doc/*.rst
-include doc/*.ipynb
-include doc/subdir/*.ipynb
-include doc/images/*
-include doc/references.bib
-include doc/ipython_kernel_config.py
+include doc/requirements.txt doc/references.bib
+recursive-include doc *.ipynb matplotlibrc *.md *.rst *.py *.txt *.svg *.png
