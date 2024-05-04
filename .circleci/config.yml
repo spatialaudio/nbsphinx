@@ -42,6 +42,12 @@ jobs:
             echo "source .venv/bin/activate" >> $BASH_ENV
 
       - run:
+          name: Installing Sphinx
+          # See https://github.com/sphinx-doc/sphinx/issues/12331
+          command: |
+            $PIP_INSTALL "sphinx !=7.3.0, != 7.3.1, != 7.3.2, != 7.3.3, != 7.3.4, != 7.3.5, != 7.3.6, != 7.3.7"
+
+      - run:
           name: Installing nbsphinx
           command: |
             $PIP_INSTALL .
