@@ -24,7 +24,7 @@ setup(
     ]},
     python_requires='>=3.6',
     install_requires=[
-        'docutils',
+        'docutils>=0.18.1',
         'jinja2',
         'nbconvert>=5.3,!=5.4',
         'traitlets>=5',
