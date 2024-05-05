@@ -39,7 +39,6 @@ jobs:
     - name: Build HTML
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
-        # The other warning will be fixed with https://github.com/spatialaudio/nbsphinx/pull/758
-        PYTHONWARNINGS: error,default::DeprecationWarning,default:nodes.Node.traverse() is obsoleted by Node.findall():PendingDeprecationWarning
+        PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $SPHINX doc/ _build/html/
