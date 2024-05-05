@@ -1,6 +1,7 @@
 ipykernel
 numpy
 matplotlib
+ipympl
 pandas
 # setuptools seems to be needed for pybtex, see
 # https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/345:
