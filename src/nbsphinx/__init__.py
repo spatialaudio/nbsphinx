@@ -3,7 +3,7 @@
 https://nbsphinx.readthedocs.io/
 
 """
-__version__ = '0.9.3'
+__version__ = '0.9.4'
 
 import collections.abc
 import copy

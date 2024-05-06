@@ -1,3 +1,10 @@
+Version 0.9.4 -- 2024-05-06 -- PyPI__ -- diff__
+ * Require ``docutils >= 0.18.1``
+ * Minor fixes, documentation and CI updates
+
+__ https://pypi.org/project/nbsphinx/0.9.4/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.3...0.9.4
+
 Version 0.9.3 -- 2023-08-27 -- PyPI__ -- diff__
  * Fix gallery regression in Sphinx 7.2
 
