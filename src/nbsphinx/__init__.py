@@ -469,6 +469,22 @@ class Exporter(nbconvert.RSTExporter):
             # Now we are looking for the last output image in the notebook.
             for cell_index, cell in reversed(list(enumerate(nb.cells))):
                 if cell.cell_type == 'code':
+                    # The following can be quickly skipped if there is
+                    # less than 1 image output and 2 stream outputs:
+                    if len(cell.outputs) >= 3 and self.config.get(
+                            'CoalesceStreamsPreprocessor', {}).get(
+                                'enabled', False):
+                        # CoalesceStreamsPreprocessor was introduced in
+                        # nbconvert version 7.14 and enabled in 7.16.4,
+                        # see https://github.com/jupyter/nbconvert/pull/2142.
+                        from nbconvert.preprocessors \
+                            import CoalesceStreamsPreprocessor
+                        pp = CoalesceStreamsPreprocessor()
+                        # The CoalesceStreamsPreprocessor will be executed as
+                        # part of the RSTExporter, but we already have to call
+                        # it here to get the correct output indices:
+                        cell, _ = pp.preprocess_cell(cell, {}, cell_index)
+                        # NB: This correction doesn't happen for nbconvert<7.14
                     for output_index in reversed(range(len(cell.outputs))):
                         try:
                             suffix = _extract_thumbnail(cell, output_index)
