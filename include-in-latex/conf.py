@@ -1,9 +1,10 @@
+from pathlib import Path
+
 import docutils
 import sphinx
 
-original_conf_py = '../doc/conf.py'
-
-locals().update(sphinx.config.eval_config_file(original_conf_py, tags))
+original_conf_py = Path(__file__).resolve().parent.parent / 'doc' / 'conf.py'
+locals().update(sphinx.config.eval_config_file(str(original_conf_py), tags))
 
 templates_path = ['_templates']
 html_favicon = None
