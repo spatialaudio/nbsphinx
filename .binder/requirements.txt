@@ -1,4 +1,5 @@
 matplotlib
+ipympl
 pandas
 ipywidgets
 jupytext
