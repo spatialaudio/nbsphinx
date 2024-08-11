@@ -41,7 +41,7 @@ nbsphinx_thumbnails = {
 
 # This is processed by Jinja2 and inserted before each notebook
 nbsphinx_prolog = r"""
-{% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
+{% set docname = 'doc/' + env.doc2path(env.docname, base=None)|string %}
 
 .. raw:: html
 
@@ -77,7 +77,7 @@ nbsphinx_prolog = r"""
 
 # This is processed by Jinja2 and inserted after each notebook
 nbsphinx_epilog = r"""
-{% set docname = 'doc/' + env.doc2path(env.docname, base=None) %}
+{% set docname = 'doc/' + env.doc2path(env.docname, base=None)|string %}
 .. raw:: latex
 
     \nbsphinxstopnotebook{\scriptsize\noindent\strut
