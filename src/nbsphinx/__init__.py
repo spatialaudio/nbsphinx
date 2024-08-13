@@ -1637,6 +1637,23 @@ def builder_inited(app):
             os.path.join(os.path.dirname(__file__), '_texinputs'),
             os.path.join(app.builder.outdir))
 
+    if app.builder.format == 'html':
+        context = {
+            'nbsphinx_responsive_width': app.config.nbsphinx_responsive_width,
+            'nbsphinx_prompt_width': app.config.nbsphinx_prompt_width,
+        }
+        assets = (
+            'nbsphinx-code-cells.css_t',
+            'nbsphinx-gallery.css',
+            'nbsphinx-no-thumbnail.svg',
+            'nbsphinx-broken-thumbnail.svg',
+        )
+        for a in assets:
+            sphinx.util.fileutil.copy_asset(
+                os.path.join(os.path.dirname(__file__), '_static', a),
+                os.path.join(app.builder.outdir, '_static'),
+                context=context)
+
 
 def env_merge_info(app, env, docnames, other):
     env.nbsphinx_notebooks.update(other.nbsphinx_notebooks)
@@ -1693,22 +1710,6 @@ def html_collect_pages(app):
         sphinx.util.copyfile(
             os.path.join(app.env.nbsphinx_auxdir, notebook),
             os.path.join(app.builder.outdir, notebook))
-
-    context = {
-        'nbsphinx_responsive_width': app.config.nbsphinx_responsive_width,
-        'nbsphinx_prompt_width': app.config.nbsphinx_prompt_width,
-    }
-    assets = (
-        'nbsphinx-code-cells.css_t',
-        'nbsphinx-gallery.css',
-        'nbsphinx-no-thumbnail.svg',
-        'nbsphinx-broken-thumbnail.svg',
-    )
-    for a in assets:
-        sphinx.util.fileutil.copy_asset(
-            os.path.join(os.path.dirname(__file__), '_static', a),
-            os.path.join(app.builder.outdir, '_static'),
-            context=context)
     return []  # No new HTML pages are created
 
 def env_updated(app, env):
