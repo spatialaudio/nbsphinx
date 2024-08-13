@@ -1,3 +1,9 @@
+Version 0.9.5 -- 2024-08-13 -- PyPI__ -- diff__
+ * Miscellaneous fixes
+
+__ https://pypi.org/project/nbsphinx/0.9.5/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.4...0.9.5
+
 Version 0.9.4 -- 2024-05-06 -- PyPI__ -- diff__
  * Require ``docutils >= 0.18.1``
  * Minor fixes, documentation and CI updates
