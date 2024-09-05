@@ -1041,6 +1041,7 @@ def markdown2rst(text):
 
     input_format = 'markdown'
     input_format += '-implicit_figures'
+    input_format += '+lists_without_preceding_blankline'
     v = nbconvert.utils.pandoc.get_pandoc_version()
     if nbconvert.utils.version.check_version(v, '1.13'):
         input_format += '-native_divs+raw_html'
