@@ -1039,13 +1039,22 @@ def markdown2rst(text):
         json_data = json.loads(text, object_hook=object_hook)
         return json.dumps(json_data)
 
-    input_format = 'markdown'
-    input_format += '-implicit_figures'
     v = nbconvert.utils.pandoc.get_pandoc_version()
-    if nbconvert.utils.version.check_version(v, '1.13'):
-        input_format += '-native_divs+raw_html'
     if nbconvert.utils.version.check_version(v, '2.0'):
-        input_format += '-smart'  # Smart quotes etc. are handled by Sphinx
+        """Accodring to https://nbformat.readthedocs.io/en/latest/format_description.html#markdown-cells
+        the kind of markdown used by jupyter is github flavored markdown (gfm).
+
+        The gfm extension was added in 2.0
+        (https://pandoc.org/releases.html#pandoc-2.0-2017-10-29).
+        """
+        input_format = 'gfm-smart'
+    else:
+        input_format = 'markdown'
+        input_format += '-implicit_figures'
+        if nbconvert.utils.version.check_version(v, '1.13'):
+            input_format += '-native_divs+raw_html'
+        if nbconvert.utils.version.check_version(v, '2.0'):
+            input_format += '-smart'  # Smart quotes etc. are handled by Sphinx
 
     rststring = pandoc(text, input_format, 'rst', filter_func=filter_func)
     rststring = re.sub(
