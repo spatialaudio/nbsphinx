@@ -45,9 +45,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install pandoc
+    - name: Install apt packages
       run: |
-        $APT_INSTALL pandoc
+        $APT_INSTALL pandoc librsvg2-bin
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v5
       with:
