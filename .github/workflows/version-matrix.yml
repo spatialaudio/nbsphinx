@@ -59,22 +59,22 @@ jobs:
         python --version
     - name: Install Sphinx
       env:
-        # There is still a warning with pip version 24, even though this
-        # is supposed to be fixed: https://github.com/pypa/pip/issues/11975
+        # DeprecationWarning: Unimplemented abstract methods {'locate_file'}
+        # https://github.com/pypa/pip/issues/11684
         PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $PIP install $SPHINX_PACKAGE
     - name: Install nbsphinx
       env:
-        # There is still a warning with pip version 24, even though this
-        # is supposed to be fixed: https://github.com/pypa/pip/issues/11975
+        # DeprecationWarning: Unimplemented abstract methods {'locate_file'}
+        # https://github.com/pypa/pip/issues/11684
         PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $PIP install .
     - name: Install docs dependencies
       env:
-        # There is still a warning with pip version 24, even though this
-        # is supposed to be fixed: https://github.com/pypa/pip/issues/11975
+        # DeprecationWarning: Unimplemented abstract methods {'locate_file'}
+        # https://github.com/pypa/pip/issues/11684
         PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $PIP install -r doc/requirements.txt --upgrade-strategy only-if-needed
