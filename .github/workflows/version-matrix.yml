@@ -76,9 +76,21 @@ jobs:
         PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $PIP install -r doc/requirements.txt --upgrade-strategy only-if-needed
-    - name: Run Sphinx
+    - name: Run Sphinx (HTML)
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
         PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $SPHINX doc _build -b html
+    - name: Run Sphinx (LaTeX, but without running LaTeX)
+      env:
+        # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
+        PYTHONWARNINGS: error,default::DeprecationWarning
+      run: |
+        $SPHINX doc _build -b latex
+    - name: Run Sphinx (epub)
+      env:
+        # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
+        PYTHONWARNINGS: error,default::DeprecationWarning
+      run: |
+        $SPHINX doc _build -b epub
