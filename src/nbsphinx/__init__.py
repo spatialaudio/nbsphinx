@@ -1691,10 +1691,11 @@ def html_page_context(app, pagename, templatename, context, doctree):
 
 def html_collect_pages(app):
     """This event handler is abused to copy local files around."""
-    # From version 8 of Sphinx, we need to pass force=True to the copyfile function
-    # but not to older version of the same function.
-    import inspect
-    use_force = bool(inspect.signature(sphinx.util.copyfile).parameters.get('force'))
+    # From version 8 of Sphinx, we need to pass force=True to the copyfile
+    # function but not to older version of the same function.
+    from inspect import signature
+    use_force = bool(
+        signature(sphinx.util.copyfile).parameters.get('force'))
     files = set()
     for file_list in app.env.nbsphinx_files.values():
         files.update(file_list)
@@ -1704,7 +1705,10 @@ def html_collect_pages(app):
         sphinx.util.ensuredir(os.path.dirname(target))
         try:
             kwargs = {"force": True} if use_force else {}
-            sphinx.util.copyfile(os.path.join(app.env.srcdir, file), target, **kwargs)
+            sphinx.util.copyfile(
+                os.path.join(app.env.srcdir, file),
+                target,
+                **kwargs)
         except OSError as err:
             logger.warning(
                 'Cannot copy local file %r: %s', file, err,
