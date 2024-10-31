@@ -1699,7 +1699,6 @@ def backwards_compat_overwrite(copyfile=sphinx.util.copyfile):
     Ref: https://github.com/sphinx-doc/sphinx/pull/12647
     """
     from inspect import signature
-    print("nbsphinx version", __version__)
     if "force" in signature(copyfile).parameters:
         return {"force": True}
     else:
