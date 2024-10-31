@@ -1689,26 +1689,38 @@ def html_page_context(app, pagename, templatename, context, doctree):
         app.add_css_file('nbsphinx-gallery.css')
 
 
+def backwards_compat_overwrite(copyfile=sphinx.util.copyfile):
+    """Return kwargs dictionary to pass to copyfile() for consistent behavior
+
+    Before version 8 of Sphinx, the default behavior of the copyfile function
+    was to overwrite the file at the target path if it already existed.
+    Version 8 requires passing force=True.
+
+    Ref: https://github.com/sphinx-doc/sphinx/pull/12647
+    """
+    from inspect import signature
+    print("nbsphinx version", __version__)
+    if "force" in signature(copyfile).parameters:
+        return {"force": True}
+    else:
+        return {}
+
+
 def html_collect_pages(app):
     """This event handler is abused to copy local files around."""
-    # From version 8 of Sphinx, we need to pass force=True to the copyfile
-    # function but not to older version of the same function.
-    from inspect import signature
-    use_force = bool(
-        signature(sphinx.util.copyfile).parameters.get('force'))
     files = set()
     for file_list in app.env.nbsphinx_files.values():
         files.update(file_list)
+    overwrite = backwards_compat_overwrite()
     for file in status_iterator(files, 'copying linked files... ',
                                 sphinx.util.console.brown, len(files)):
         target = os.path.join(app.builder.outdir, file)
         sphinx.util.ensuredir(os.path.dirname(target))
         try:
-            kwargs = {"force": True} if use_force else {}
             sphinx.util.copyfile(
                 os.path.join(app.env.srcdir, file),
                 target,
-                **kwargs)
+                **overwrite)
         except OSError as err:
             logger.warning(
                 'Cannot copy local file %r: %s', file, err,
@@ -1717,11 +1729,10 @@ def html_collect_pages(app):
     for notebook in status_iterator(
             notebooks, 'copying notebooks ... ',
             'brown', len(notebooks)):
-        kwargs = {"force": True} if use_force else {}
         sphinx.util.copyfile(
             os.path.join(app.env.nbsphinx_auxdir, notebook),
             os.path.join(app.builder.outdir, notebook),
-            **kwargs)
+            **overwrite)
     return []  # No new HTML pages are created
 
 def env_updated(app, env):
