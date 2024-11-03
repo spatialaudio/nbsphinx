@@ -1710,7 +1710,6 @@ def html_collect_pages(app):
     files = set()
     for file_list in app.env.nbsphinx_files.values():
         files.update(file_list)
-    overwrite = backwards_compat_overwrite()
     for file in status_iterator(files, 'copying linked files... ',
                                 sphinx.util.console.brown, len(files)):
         target = os.path.join(app.builder.outdir, file)
@@ -1719,7 +1718,7 @@ def html_collect_pages(app):
             sphinx.util.copyfile(
                 os.path.join(app.env.srcdir, file),
                 target,
-                **overwrite)
+                **backwards_compat_overwrite())
         except OSError as err:
             logger.warning(
                 'Cannot copy local file %r: %s', file, err,
@@ -1731,7 +1730,7 @@ def html_collect_pages(app):
         sphinx.util.copyfile(
             os.path.join(app.env.nbsphinx_auxdir, notebook),
             os.path.join(app.builder.outdir, notebook),
-            **overwrite)
+            **backwards_compat_overwrite())
     return []  # No new HTML pages are created
 
 def env_updated(app, env):
