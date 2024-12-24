@@ -79,18 +79,24 @@ jobs:
     - name: Run Sphinx (HTML)
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
-        PYTHONWARNINGS: error,default::DeprecationWarning
+        # RemovedInSphinx10Warning: 'sphinx.util.import_object' is deprecated
+        # https://github.com/sphinx-doc/sphinx/issues/13083
+        PYTHONWARNINGS: error,default::DeprecationWarning,default:'sphinx.util.import_object'
       run: |
         $SPHINX doc _build -b html
     - name: Run Sphinx (LaTeX, but without running LaTeX)
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
-        PYTHONWARNINGS: error,default::DeprecationWarning
+        # RemovedInSphinx10Warning: 'sphinx.util.import_object' is deprecated
+        # https://github.com/sphinx-doc/sphinx/issues/13083
+        PYTHONWARNINGS: error,default::DeprecationWarning,default:'sphinx.util.import_object'
       run: |
         $SPHINX doc _build -b latex
     - name: Run Sphinx (epub)
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
-        PYTHONWARNINGS: error,default::DeprecationWarning
+        # RemovedInSphinx10Warning: 'sphinx.util.import_object' is deprecated
+        # https://github.com/sphinx-doc/sphinx/issues/13083
+        PYTHONWARNINGS: error,default::DeprecationWarning,default:'sphinx.util.import_object'
       run: |
         $SPHINX doc _build -b epub
