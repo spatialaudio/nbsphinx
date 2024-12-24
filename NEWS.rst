@@ -1,3 +1,9 @@
+Version 0.9.6 -- 2024-12-24 -- PyPI__ -- diff__
+ * Markdown: allow lists without leading blank line
+
+__ https://pypi.org/project/nbsphinx/0.9.6/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.5...0.9.6
+
 Version 0.9.5 -- 2024-08-13 -- PyPI__ -- diff__
  * Miscellaneous fixes
 
