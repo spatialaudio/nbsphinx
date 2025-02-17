@@ -1477,7 +1477,7 @@ class ForceEquations(sphinx.transforms.SphinxTransform):
             return
 
         maths_data = self.env.get_domain('math').data
-        maths_data.setdefault('has_equations', {})[env.docname] = True
+        maths_data.setdefault('has_equations', {})[self.env.docname] = True
 
 
 class GetSizeFromImages(
