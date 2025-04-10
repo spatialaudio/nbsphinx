@@ -292,7 +292,7 @@ RST_TEMPLATE = """
 {{ (cell.source or '% empty raw cell') | indent }}
 {%- elif raw_mimetype == 'text/markdown' %}
 {{ cell.source | markdown2rst }}
-{%- elif raw_mimetype == 'text/restructuredtext' %}
+{%- elif raw_mimetype in ['text/restructuredtext', 'text/x-rst'] %}
 {{ cell.source }}
 {% endif %}
 {% endblock rawcell %}
