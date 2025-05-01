@@ -19,3 +19,13 @@ from pathlib import Path
 filename = 'due-rst.pct.py'
 
 print(Path(filename).read_text())
+
+# %% [markdown]
+# This page has a secondary use,
+# which is testing whether a single math output cell works
+# (if there is no other math on the same page):
+
+# %%
+from IPython.display import Math
+eq = Math(r'\int\limits_{-\infty}^\infty f(x) \delta(x - x_0) dx = f(x_0)')
+eq
