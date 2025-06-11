@@ -47,14 +47,14 @@ __ subdir/a-notebook-in-a-subdir.ipynb
     __ subdir/a-notebook-in-a-subdir.ipynb
 
 Finally, you can use `Embedded URIs`_, like this
-`link <subdir/a-notebook-in-a-subdir.ipynb>`_.
+`link <subdir/a-notebook-in-a-subdir.ipynb>`__.
 
 .. _Embedded URIs: https://docutils.sourceforge.io/docs/ref/rst/
                    restructuredtext.html#embedded-uris-and-aliases
 
 .. code-block:: rst
 
-    like this `link <subdir/a-notebook-in-a-subdir.ipynb>`_.
+    like this `link <subdir/a-notebook-in-a-subdir.ipynb>`__.
 
 .. note::
 
@@ -80,7 +80,7 @@ Links to Notebooks, Ye Olde Way
 
 In addition to the way shown above, you can also create links to notebooks (and
 other Sphinx source files) with
-`:ref: <https://www.sphinx-doc.org/en/master/usage/referencing.html#role-ref>`_.
+`:ref: <https://www.sphinx-doc.org/en/master/usage/referencing.html#role-ref>`__.
 This has some disadvantages:
 
 * It is arguably a bit more clunky.
@@ -218,7 +218,7 @@ syntax, see the section about
 `citations in Markdown cells <markdown-cells.ipynb#Citations>`__.
 
 You can create a list of references in any reStructuredText file
-(or `reST cell <raw-cells.ipynb#reST>`_ in a notebook) like this:
+(or `reST cell <raw-cells.ipynb#reST>`__ in a notebook) like this:
 
 .. code-block:: rst
 
@@ -296,7 +296,7 @@ The following example gallery was created using:
 
 .. seealso::
 
-    `Link Galleries in Jupyter Notebooks <gallery/gallery-with-links.ipynb>`_
+    `Link Galleries in Jupyter Notebooks <gallery/gallery-with-links.ipynb>`__
 
 
 Thumbnail Galleries

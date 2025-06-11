@@ -148,7 +148,7 @@ Version 0.8.0 -- 2020-10-20 -- PyPI__ -- diff__
    To get rid of those ugly greenish code blocks,
    remove ``pygments_style = 'sphinx'`` from your ``conf.py``.
  * Switch documentation to
-   `insipid <https://insipid-sphinx-theme.readthedocs.io/>`_ theme by default
+   `insipid <https://insipid-sphinx-theme.readthedocs.io/>`__ theme by default
  * Require Python 3.6+
 
 __ https://pypi.org/project/nbsphinx/0.8.0/
@@ -166,7 +166,7 @@ Version 0.7.0 -- 2020-05-08 -- PyPI__ -- diff__
    ``height`` and ``class`` attributes are supported.
  * CSS: prompts protrude into left margin if ``nbsphinx_prompt_width`` is
    too small. If you want to hide the prompts, use
-   `custom CSS <https://nbsphinx.readthedocs.io/en/0.7.0/custom-css.html>`_.
+   `custom CSS <https://nbsphinx.readthedocs.io/en/0.7.0/custom-css.html>`__.
 
 __ https://pypi.org/project/nbsphinx/0.7.0/
 __ https://github.com/spatialaudio/nbsphinx/compare/0.6.1...0.7.0
