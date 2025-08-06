@@ -1490,6 +1490,9 @@ class ForceEquations(docutils.transforms.Transform):
     def apply(self):
         env = self.document.settings.env
         if env.config.nbsphinx_assume_equations:
+            # sphinx >= 8.2
+            self.document['nbsphinx_assume_equations'] = True
+            # sphinx < 8.2
             env.get_domain('math').data['has_equations'][env.docname] = True
 
 
@@ -1698,6 +1701,16 @@ def env_purge_doc(app, env, docname):
     except KeyError:
         pass
     env.nbsphinx_widgets.discard(docname)
+
+
+def set_flag_to_add_mathjax(app, pagename, templatename, context, doctree):
+    """Tell Sphinx to load MathJax for pages created by this extension.
+
+    Unless ``nbsphinx_assume_equations`` config variable was set to false.
+    """
+    if doctree and doctree.get('nbsphinx_assume_equations'):
+        # This context variable is used by Sphinx starting in version 8.2
+        context['has_maths_elements'] = True
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
@@ -2095,6 +2108,10 @@ def setup(app):
     app.connect('builder-inited', builder_inited)
     app.connect('config-inited', config_inited)
     app.connect('html-page-context', html_page_context)
+    # Give our handler higher priority so that it executes before MathJax's. We
+    # need to write the context variable `has_maths_elements` before the MathJax
+    # Sphinx extension reads it.
+    app.connect('html-page-context', set_flag_to_add_mathjax, priority=100)
     app.connect('html-collect-pages', html_collect_pages)
     app.connect('env-purge-doc', env_purge_doc)
     app.connect('env-updated', env_updated)
