@@ -28,14 +28,7 @@ jobs:
         # https://github.com/pypa/pip/issues/11684
         PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
-        $PIP install .
-    - name: Install docs dependencies
-      env:
-        # DeprecationWarning: Unimplemented abstract methods {'locate_file'}
-        # https://github.com/pypa/pip/issues/11684
-        PYTHONWARNINGS: error,default::DeprecationWarning
-      run: |
-        $PIP install -r doc/requirements.txt
+        $PIP install --group doc .
     - name: Build HTML
       env:
         # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)

@@ -1,3 +1,58 @@
 [build-system]
-requires = ["setuptools >= 40.8.0"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "nbsphinx"
+license = "MIT"
+dynamic = ["version"]
+description = "Jupyter Notebook Tools for Sphinx"
+readme = "README.rst"
+keywords = ["Sphinx", "Jupyter", "notebook"]
+authors = [{ name = "Matthias Geier", email = "Matthias.Geier@gmail.com" }]
+classifiers = [
+    "Framework :: Sphinx",
+    "Framework :: Sphinx :: Extension",
+    "Framework :: Jupyter",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Documentation :: Sphinx",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "docutils>=0.18.1",
+    "jinja2",
+    "nbconvert>=5.3,!=5.4",
+    "nbformat",
+    "sphinx>=1.8,!=8.2.0,!=8.2.1",
+    "traitlets>=5",
+]
+
+[project.urls]
+Documentation = "https://nbsphinx.readthedocs.io/"
+Repository = "https://github.com/spatialaudio/nbsphinx/"
+Issues = "https://github.com/spatialaudio/nbsphinx/issues/"
+
+[dependency-groups]
+dev = [{ include-group = "test" }, { include-group = "doc" }]
+test = []
+doc = [
+    "ipykernel",
+    "numpy",
+    "matplotlib",
+    "ipympl",
+    "pandas",
+    "xarray",
+    "sphinxcontrib-bibtex>=2.1",
+    "sphinxcontrib-svg2pdfconverter",
+    "ipywidgets",
+    "jupytext",
+    "sphinx-last-updated-by-git",
+    "sphinx-codeautolink",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "nbsphinx.__version__" }
