@@ -597,7 +597,7 @@ class NotebookParser(rst.Parser):
         formats = {
             '.ipynb': lambda s: nbformat.reads(s, as_version=_ipynbversion)}
         formats.update(env.config.nbsphinx_custom_formats)
-        srcfile = str(env.doc2path(env.docname, base=None))
+        srcfile = str(env.doc2path(env.docname, base=False))
         for format, converter in formats.items():
             if srcfile.endswith(format):
                 break
@@ -655,14 +655,14 @@ class NotebookParser(rst.Parser):
         except nbconvert.preprocessors.CellExecutionError as e:
             lines = str(e).split('\n')
             lines[0] = 'CellExecutionError in {}:'.format(
-                env.doc2path(env.docname, base=None))
+                env.doc2path(env.docname, base=False))
             lines.append("You can ignore this error by setting the following "
                          "in conf.py:\n\n    nbsphinx_allow_errors = True\n")
             raise NotebookError('\n'.join(lines))
         except Exception as e:
             raise NotebookError(
                 type(e).__name__ + ' in ' +
-                str(env.doc2path(env.docname, base=None)) + ':\n' + str(e))
+                str(env.doc2path(env.docname, base=False)) + ':\n' + str(e))
 
         rststring = """
 .. role:: nbsphinx-math(raw)
@@ -1348,7 +1348,7 @@ class CreateSectionLabels(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
-        file_ext = str(env.doc2path(env.docname, base=None))[len(env.docname):]
+        file_ext = str(env.doc2path(env.docname, base=False))[len(env.docname):]
         i_still_have_to_create_the_document_label = True
         for section in self.document.findall(docutils.nodes.section):
             assert section.children
@@ -1379,7 +1379,7 @@ class CreateDomainObjectLabels(docutils.transforms.Transform):
 
     def apply(self):
         env = self.document.settings.env
-        file_ext = str(env.doc2path(env.docname, base=None))[len(env.docname):]
+        file_ext = str(env.doc2path(env.docname, base=False))[len(env.docname):]
         for sig in self.document.findall(sphinx.addnodes.desc_signature):
             try:
                 title = sig['ids'][0]
