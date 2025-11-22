@@ -1595,19 +1595,24 @@ def config_inited(app, config):
         # this only works if mathjax_config or mathjax2_config is specified.
         if config.mathjax3_config is None:
             config.mathjax3_config = {}
-        mathjax3_config = config.mathjax3_config
+        mathjax_config = config.mathjax3_config
+        if not mathjax_config and hasattr(config, 'mathjax4_config'):
+            # mathjax4_config was added in Sphinx 8.?
+            if config.mathjax4_config is None:
+                config.mathjax4_config = {}
+            mathjax_config = config.mathjax4_config
         tex = {
             'inlineMath': mathjax_inline_math,
             'processEscapes': True,
         }
-        tex.update(mathjax3_config.get('tex', {}))
-        mathjax3_config['tex'] = tex
+        tex.update(mathjax_config.get('tex', {}))
+        mathjax_config['tex'] = tex
         options = {
             'ignoreHtmlClass': mathjax_ignore_class,
             'processHtmlClass': mathjax_process_class,
         }
-        options.update(mathjax3_config.get('options', {}))
-        mathjax3_config['options'] = options
+        options.update(mathjax_config.get('options', {}))
+        mathjax_config['options'] = options
     else:
         if hasattr(config, 'mathjax2_config'):
             # Sphinx >= 4.0
