@@ -30,9 +30,7 @@ jobs:
           - env:
               SPHINX_PACKAGE: "sphinx==6.2.1 sphinxcontrib-bibtex==2.5.0"
           - env:
-              SPHINX_PACKAGE: "sphinx==7.0.1"
-          - env:
-              SPHINX_PACKAGE: "sphinx==7.1.2"
+              SPHINX_PACKAGE: "sphinx==7.4.7"
 
           # a few Python versions using latest Sphinx release
           - env:
