@@ -1597,7 +1597,7 @@ def config_inited(app, config):
             config.mathjax3_config = {}
         mathjax_config = config.mathjax3_config
         if not mathjax_config and hasattr(config, 'mathjax4_config'):
-            # mathjax4_config was added in Sphinx 8.?
+            # mathjax4_config was added in Sphinx 9
             if config.mathjax4_config is None:
                 config.mathjax4_config = {}
             mathjax_config = config.mathjax4_config
