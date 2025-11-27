@@ -41,7 +41,6 @@ import sphinx.environment.adapters.toctree
 import sphinx.errors
 import sphinx.transforms.post_transforms.images
 import sphinx.util
-import sphinx.util.console
 import sphinx.util.fileutil
 import sphinx.util.images
 import sphinx.util.logging
@@ -1749,7 +1748,7 @@ def html_collect_pages(app):
     for file_list in app.env.nbsphinx_files.values():
         files.update(file_list)
     for file in status_iterator(files, 'copying linked files... ',
-                                sphinx.util.console.brown, len(files)):
+                                'brown', len(files)):
         target = os.path.join(app.builder.outdir, file)
         sphinx.util.ensuredir(os.path.dirname(target))
         try:
