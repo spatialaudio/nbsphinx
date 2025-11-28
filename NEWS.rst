@@ -1,3 +1,11 @@
+Version 0.9.8 -- 2025-11-28 -- PyPI__ -- diff__
+ * Re-enable Sphinx 8.2+
+ * Support ``text/x-rst`` MIME type in raw cells
+ * Support for ``mathjax4_config``
+
+__ https://pypi.org/project/nbsphinx/0.9.8/
+__ https://github.com/spatialaudio/nbsphinx/compare/0.9.7...0.9.8
+
 Version 0.9.7 -- 2025-03-03 -- PyPI__ -- diff__
  * Disable Sphinx 8.2+ (for now)
 
