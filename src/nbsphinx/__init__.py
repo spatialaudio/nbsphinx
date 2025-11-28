@@ -1632,7 +1632,7 @@ def config_inited(app, config):
 def load_requirejs(app):
     config = app.config
     if config.nbsphinx_requirejs_path is None:
-        config.nbsphinx_requirejs_path = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js'
+        config.nbsphinx_requirejs_path = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.7/require.min.js'
     if config.nbsphinx_requirejs_options is None:
         config.nbsphinx_requirejs_options = {
             'integrity': 'sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=',
