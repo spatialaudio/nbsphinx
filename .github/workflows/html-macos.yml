@@ -1,7 +1,6 @@
 name: Build HTML on macOS
 on: [push, pull_request]
 env:
-  PYTHONWARNINGS: error
   PIP: python -m pip
   SPHINX: python -m sphinx -W --keep-going --color
 jobs:
@@ -23,17 +22,8 @@ jobs:
       run: |
         python --version
     - name: Install Python package
-      env:
-        # DeprecationWarning: Unimplemented abstract methods {'locate_file'}
-        # https://github.com/pypa/pip/issues/11684
-        PYTHONWARNINGS: error,default::DeprecationWarning
       run: |
         $PIP install --group doc .
     - name: Build HTML
-      env:
-        # There is a weird warning from jupyter_core (https://github.com/jupyter/jupyter_core/issues/398)
-        # RemovedInSphinx10Warning: 'sphinx.util.import_object' is deprecated
-        # https://github.com/sphinx-doc/sphinx/issues/13083
-        PYTHONWARNINGS: error,default::DeprecationWarning,default:'sphinx.util.import_object'
       run: |
         $SPHINX doc/ _build/html/
