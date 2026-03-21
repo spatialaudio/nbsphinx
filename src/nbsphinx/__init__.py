@@ -792,7 +792,7 @@ class DummyTocTree(docutils.nodes.Element):
     """A dummy node to replace and disable sphinx.addnodes.toctree."""
 
 
-# See http://docutils.sourceforge.net/docs/howto/rst-directives.html
+# See http://www.docutils.org/docs/howto/rst-directives.html
 
 class NbInput(rst.Directive):
     """A notebook input cell with prompt and code area."""
