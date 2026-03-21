@@ -117,6 +117,8 @@ linkcheck_ignore = [
     'https://github.com/spatialaudio/nbsphinx/compare/',
     # 418 Client Error: Unknown for url: https://ieeexplore.ieee.org/document/5582063/
     'https://doi.org/10.1109/MCSE.2010.119',
+    # Read timed out
+    'https://doi.org/10.3233/978-1-61499-649-1-87',
     # Intermittent network errors:
     # Failed to establish a new connection: [Errno 101] Network is unreachable
     'https://repology.org/',
