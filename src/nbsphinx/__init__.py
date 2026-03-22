@@ -1149,8 +1149,12 @@ def _extract_gallery_or_toctree(cell):
             .format(options))
 
     text = markdown2rst(cell.source)
-    settings = docutils.frontend.OptionParser(
-        components=(rst.Parser,)).get_default_values()
+    try:
+        # Since docutils 0.19:
+        settings = docutils.frontend.get_default_settings()
+    except AttributeError:
+        settings = docutils.frontend.OptionParser(
+            components=(rst.Parser,)).get_default_values()
     node = docutils.utils.new_document('gallery_or_toctree', settings)
     parser = rst.Parser()
     parser.parse(text, node)
