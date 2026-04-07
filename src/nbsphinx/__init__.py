@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from urllib.parse import unquote
 import uuid
 
@@ -413,7 +414,15 @@ class Exporter(nbconvert.RSTExporter):
                 kernel_name=self._kernel_name,
                 extra_arguments=self._execute_arguments,
                 allow_errors=allow_errors, timeout=timeout)
+            notebook_path = resources.get('nbsphinx_docname', '<unknown>')
+            logger.info('executing notebook %s ...', notebook_path)
+            start_time = time.monotonic()
             nb, resources = pp.preprocess(nb, resources)
+            elapsed = time.monotonic() - start_time
+            logger.info(
+                'notebook %s executed in %.1f seconds',
+                notebook_path, elapsed,
+            )
 
         if 'nbsphinx_save_notebook' in resources:
             # Save *executed* notebook *before* the Exporter can change it:
