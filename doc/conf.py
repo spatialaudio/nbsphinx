@@ -122,6 +122,8 @@ linkcheck_ignore = [
     # Intermittent network errors:
     # Failed to establish a new connection: [Errno 101] Network is unreachable
     'https://repology.org/',
+    # 403 Client Error: Forbidden
+    'https://jupytext.org/',
 ]
 
 nitpicky = True
