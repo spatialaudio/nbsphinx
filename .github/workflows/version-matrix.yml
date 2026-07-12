@@ -42,7 +42,7 @@ jobs:
     env: ${{ matrix.env || fromJSON('{}') }}
     steps:
     - name: Clone repo
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: Install apt packages
