@@ -124,6 +124,7 @@ RST_TEMPLATE = """
 
 
 {% block input -%}
+{%- if cell.metadata.nbsphinx != 'hidden-input' %}
 .. nbinput:: {% if cell.metadata.magics_language -%}
 {{ cell.metadata.magics_language }}
 {%- elif nb.metadata.language_info -%}
@@ -140,6 +141,7 @@ RST_TEMPLATE = """
 {%- endif %}
 
 {{ cell.source.strip('\n') | indent }}
+{%- endif %}
 {% endblock input %}
 
 
