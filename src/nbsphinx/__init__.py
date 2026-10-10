@@ -79,6 +79,7 @@ DISPLAY_DATA_PRIORITY_HTML = (
     'text/latex',
     'image/png',
     'image/jpeg',
+    'image/gif',
     'text/plain',
 )
 # See nbconvert/exporters/latex.py:
@@ -96,6 +97,7 @@ THUMBNAIL_MIME_TYPES = {
     'image/svg+xml': '.svg',
     'image/png': '.png',
     'image/jpeg': '.jpg',
+    'image/gif': '.gif',
 }
 
 # The default rst template name is changing in nbconvert 6, so we substitute
@@ -180,7 +182,7 @@ RST_TEMPLATE = """
 {{ output.data[datatype] | indent | indent }}
 {%- endif %}
 
-{%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf'] %}
+{%- elif datatype in ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif', 'application/pdf'] %}
 
     .. image:: {{ output.metadata.filenames[datatype] | posix_path }}
 {%- if datatype in output.metadata %}
