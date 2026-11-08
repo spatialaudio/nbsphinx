@@ -2100,19 +2100,23 @@ def setup(app):
     app.add_node(CodeAreaNode,
                  html=(do_nothing, depart_codearea_html),
                  latex=(visit_codearea_latex, depart_codearea_latex),
-                 text=(do_nothing, do_nothing))
+                 text=(do_nothing, do_nothing),
+                 markdown=(do_nothing, do_nothing))
     app.add_node(FancyOutputNode,
                  html=(do_nothing, do_nothing),
                  latex=(visit_fancyoutput_latex, depart_fancyoutput_latex),
-                 text=(do_nothing, do_nothing))
+                 text=(do_nothing, do_nothing),
+                 markdown=(do_nothing, do_nothing))
     app.add_node(AdmonitionNode,
                  html=(visit_admonition_html, depart_admonition_html),
                  latex=(visit_admonition_latex, depart_admonition_latex),
-                 text=(visit_admonition_text, depart_admonition_text))
+                 text=(visit_admonition_text, depart_admonition_text),
+                 markdown=(do_nothing, do_nothing))
     app.add_node(GalleryNode,
                  html=(do_nothing, depart_gallery_html),
                  latex=(do_nothing, do_nothing),
-                 text=(do_nothing, do_nothing))
+                 text=(do_nothing, do_nothing),
+                 markdown=(do_nothing, do_nothing))
     app.connect('builder-inited', builder_inited)
     app.connect('config-inited', config_inited)
     app.connect('html-page-context', html_page_context)
