@@ -128,6 +128,11 @@ div.nboutput.container div.output_area {
         width: 100%;
     }
 }
+/* scroll long text outputs vertically */
+div.nboutput.container div.output_area:has(pre) {
+    max-height: 600px;
+}
+
 
 /* input area */
 div.nbinput.container div.input_area {
